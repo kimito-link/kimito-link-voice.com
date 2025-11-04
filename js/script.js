@@ -159,7 +159,8 @@ async function checkFollowStatusOnLoad() {
 
 // ===== プラットフォーム表示 =====
 function showPlatform() {
-    document.getElementById('mainPlatform').style.display = 'block';
+    document.getElementById('publicPage').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
     
     // ユーザー情報を表示
     if (currentUser) {
@@ -206,8 +207,8 @@ function logout() {
         currentUser = null;
         followedAccounts = { creator: false, idol: false };
         
-        document.getElementById('mainPlatform').style.display = 'none';
-        showLoginModal();
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('publicPage').style.display = 'block';
     }
 }
 
