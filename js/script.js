@@ -1,4 +1,7 @@
 // ===== グローバル変数 =====
+// 開発モード（本番環境では false に設定）
+const DEVELOPMENT_MODE = true;
+
 let currentUser = null;
 let followedAccounts = {
     creator: false,
@@ -29,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // ローカルストレージからユーザー情報を取得
     const savedUser = localStorage.getItem('kimitolink_user');
     
-    if (savedUser) {
+    // 開発モードでない場合のみ自動ログイン
+    if (savedUser && !DEVELOPMENT_MODE) {
         currentUser = JSON.parse(savedUser);
         // フォロー状態を確認
         checkFollowStatusOnLoad();
