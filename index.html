@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KimiLink Voice - 君と声でつながる</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- 宇宙背景エフェクト -->
+    <div id="star-field"></div>
+    <div class="galaxy-fog"></div>
+    <div class="aurora"></div>
+
+    <!-- ログイン前のページ -->
+    <div id="publicPage" class="public-page active">
+        <!-- ヘッダー -->
+        <header class="public-header">
+            <div class="header-container">
+                <div class="logo-area">
+                    <img src="images/logo/RGB/透過/logo_funlink_RGB_color.png" alt="KimiLink Voice" class="header-logo">
+                </div>
+                
+                <nav class="header-nav">
+                    <a href="#home">ホーム</a>
+                    <a href="#narrators">声優・ナレーター</a>
+                    <a href="#voices">応援ボイス</a>
+                    <a href="#about">使い方</a>
+                </nav>
+
+                <button class="btn-login" onclick="showLoginModal()">
+                    <i class="fab fa-twitter"></i> ログイン
+                </button>
+            </div>
+        </header>
+
+        <!-- ヒーローセクション -->
+        <section class="hero-section" id="home">
+            <div class="hero-content">
+                <div class="hero-character">
+                    <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img">
+                </div>
+                <h1 class="hero-title">
+                    君と声でつながる<br>
+                    <span class="highlight">新しいクリエイター応援のカタチ</span>
+                </h1>
+                <p class="hero-subtitle">
+                    プロ・アマチュア問わず、声優・ナレーターと依頼者を<br>
+                    適正価格でマッチング。応援ボイスで推し活もサポート。
+                </p>
+                <div class="hero-buttons">
+                    <button class="btn-primary-large" onclick="showLoginModal()">
+                        <i class="fas fa-microphone"></i> 声優として登録
+                    </button>
+                    <button class="btn-secondary-large" onclick="scrollToSection('voices')">
+                        <i class="fas fa-heart"></i> ボイスを依頼する
+                    </button>
+                </div>
+                <div class="hero-icons">
+                    <i class="fas fa-microphone icon-float"></i>
+                    <i class="fas fa-star icon-float"></i>
+                    <i class="fas fa-music icon-float"></i>
+                    <i class="fas fa-heart icon-float"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- 人気の声優・ナレーター -->
+        <section class="narrators-section" id="narrators">
+            <div class="container">
+                <div class="section-header">
+                    <img src="images/yukkuri/yukkuri-link-hanme-kuchiake.png" alt="" class="section-icon">
+                    <h2>人気の声優・ナレーター</h2>
+                </div>
+
+                <div class="narrator-filters">
+                    <button class="filter-btn active" data-filter="all">すべて</button>
+                    <button class="filter-btn" data-filter="entry">エントリー</button>
+                    <button class="filter-btn" data-filter="standard">スタンダード</button>
+                    <button class="filter-btn" data-filter="professional">プロフェッショナル</button>
+                </div>
+
+                <div class="narrator-grid">
+                    <!-- エントリー -->
+                    <div class="narrator-card" data-level="entry">
+                        <div class="narrator-badge badge-entry">エントリー</div>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar">
+                        <h3 class="narrator-name">佐藤 みお</h3>
+                        <div class="narrator-tags">
+                            <span class="tag">少女ボイス</span>
+                            <span class="tag">萌え系</span>
+                        </div>
+                        <div class="narrator-price">¥1/文字〜</div>
+                        <div class="narrator-meta">最低 ¥500</div>
+                        <div class="narrator-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>(23)</span>
+                        </div>
+                        <audio controls class="narrator-sample">
+                            <source src="#" type="audio/mpeg">
+                        </audio>
+                    </div>
+
+                    <!-- スタンダード -->
+                    <div class="narrator-card" data-level="standard">
+                        <div class="narrator-badge badge-standard">スタンダード</div>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar">
+                        <h3 class="narrator-name">山田 たける</h3>
+                        <div class="narrator-tags">
+                            <span class="tag">青年ボイス</span>
+                            <span class="tag">ナレーション</span>
+                        </div>
+                        <div class="narrator-price">¥3/文字〜</div>
+                        <div class="narrator-meta">最低 ¥1,000</div>
+                        <div class="narrator-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>(45)</span>
+                        </div>
+                        <audio controls class="narrator-sample">
+                            <source src="#" type="audio/mpeg">
+                        </audio>
+                    </div>
+
+                    <!-- プロフェッショナル -->
+                    <div class="narrator-card" data-level="professional">
+                        <div class="narrator-badge badge-professional">プロ</div>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar">
+                        <h3 class="narrator-name">鈴木 あかね</h3>
+                        <div class="narrator-tags">
+                            <span class="tag">CM</span>
+                            <span class="tag">企業VP</span>
+                        </div>
+                        <div class="narrator-price">¥6/文字〜</div>
+                        <div class="narrator-meta">最低 ¥3,000</div>
+                        <div class="narrator-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>(89)</span>
+                        </div>
+                        <audio controls class="narrator-sample">
+                            <source src="#" type="audio/mpeg">
+                        </audio>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 応援ボイス -->
+        <section class="voices-section" id="voices">
+            <div class="container">
+                <div class="section-header">
+                    <img src="images/yukkuri/yukkuri-link-mabataki-kuchiake.png" alt="" class="section-icon">
+                    <h2>
+                        <span class="badge-new">NEW!</span>
+                        応援ボイス
+                    </h2>
+                    <p class="section-subtitle">あなただけの名前で、特別な応援メッセージを</p>
+                </div>
+
+                <div class="voice-grid">
+                    <div class="voice-card">
+                        <div class="voice-icon">☀️</div>
+                        <h3>朝の応援</h3>
+                        <div class="voice-price">¥500〜</div>
+                    </div>
+
+                    <div class="voice-card">
+                        <div class="voice-icon">📚</div>
+                        <h3>勉強応援</h3>
+                        <div class="voice-price">¥500〜</div>
+                    </div>
+
+                    <div class="voice-card">
+                        <div class="voice-icon">💼</div>
+                        <h3>お仕事応援</h3>
+                        <div class="voice-price">¥500〜</div>
+                    </div>
+
+                    <div class="voice-card">
+                        <div class="voice-icon">🍌</div>
+                        <h3>おやすみ</h3>
+                        <div class="voice-price">¥500〜</div>
+                    </div>
+
+                    <div class="voice-card">
+                        <div class="voice-icon">🎂</div>
+                        <h3>誕生日</h3>
+                        <div class="voice-price">¥1,000〜</div>
+                    </div>
+
+                    <div class="voice-card voice-card-special">
+                        <div class="voice-icon">✨</div>
+                        <h3>カスタム</h3>
+                        <div class="voice-price">¥1,500〜</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- かんたん見積もり -->
+        <section class="estimate-section">
+            <div class="container">
+                <div class="section-header">
+                    <img src="images/yukkuri/yukkuri-link-tuujoui-kuchiake.png" alt="" class="section-icon">
+                    <h2>かんたん見積もり</h2>
+                </div>
+
+                <div class="estimate-form">
+                    <div class="form-group">
+                        <label>文字数を入力</label>
+                        <input type="number" id="charCount" placeholder="文字数を入力してください" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>声優ランク</label>
+                        <select id="narratorRank" class="form-select">
+                            <option value="">選択してください</option>
+                            <option value="1">エントリー (¥1/文字)</option>
+                            <option value="3">スタンダード (¥3/文字)</option>
+                            <option value="6">プロフェッショナル (¥6/文字)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>選択肢</label>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" id="expressOpt"> 特急対応 (+20%)</label>
+                            <label><input type="checkbox" id="revisionOpt"> 選人修正 (+20%)</label>
+                        </div>
+                    </div>
+
+                    <button class="btn-estimate" onclick="calculateEstimate()">
+                        お見積りの試算
+                    </button>
+
+                    <div class="estimate-result" id="estimateResult">
+                        <div class="result-price">¥500</div>
+                        <p class="result-note">文字数や内容は概算</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- フッター -->
+        <footer class="public-footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="images/logo/RGB/透過/logo_funlink_RGB_color.png" alt="KimiLink Voice">
+                    <p>君と繋がる、声で届ける</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#about">サービスについて</a>
+                    <a href="#terms">利用規約</a>
+                    <a href="#privacy">プライバシーポリシー</a>
+                    <a href="mailto:info@kimito-link.jp">お問い合わせ</a>
+                </div>
+                <div class="footer-social">
+                    <a href="https://twitter.com/streamerfunch" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="https://twitter.com/idolfunch" target="_blank"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 KimiLink Voice. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ログインモーダル -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeLoginModal()">×</button>
+            
+            <div class="logo-section">
+                <img src="images/logo/RGB/透過/logo_funlink_RGB_color.png" alt="KimiLink Voice" class="logo">
+                <h1>KimiLink Voice</h1>
+                <p class="tagline">君と繋がる、声で届ける</p>
+            </div>
+
+            <div class="login-steps">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Twitterアカウントでログイン</h3>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>君斗リンクの2つのアカウントをフォロー</h3>
+                    </div>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>プラットフォームへアクセス!</h3>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-twitter" onclick="loginWithTwitter()">
+                <i class="fab fa-twitter"></i>
+                Twitterでログイン
+            </button>
+        </div>
+    </div>
+
+    <!-- フォロー確認モーダル -->
+    <div id="followModal" class="modal">
+        <div class="modal-content">
+            <h2>必須アカウントをフォロー</h2>
+            <p class="subtitle">以下の2つのアカウントをフォローしてください</p>
+            
+            <div class="follow-accounts">
+                <div class="account-card">
+                    <img src="images/icon/kewXCUOt_400x400.jpg" alt="クリエイター応援" class="account-avatar">
+                    <div class="account-info">
+                        <h3>君斗りんく@クリエイター応援</h3>
+                        <p class="account-handle">@streamerfunch</p>
+                    </div>
+                    <div class="follow-status" id="follow-status-1">
+                        <span class="status-pending">未フォロー</span>
+                    </div>
+                </div>
+
+                <div class="account-card">
+                    <img src="images/icon/kewXCUOt_400x400.jpg" alt="アイドル応援" class="account-avatar">
+                    <div class="account-info">
+                        <h3>君斗りんく@アイドル応援</h3>
+                        <p class="account-handle">@idolfunch</p>
+                    </div>
+                    <div class="follow-status" id="follow-status-2">
+                        <span class="status-pending">未フォロー</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="checkFollowStatus()">フォロー状態を確認</button>
+        </div>
+    </div>
+
+    <!-- ログイン後のダッシュボード -->
+    <div id="dashboard" class="dashboard">
+        <!-- ヘッダー -->
+        <header class="dashboard-header">
+            <div class="header-container">
+                <div class="logo-area">
+                    <img src="images/logo/RGB/透過/logo_funlink_RGB_maru_blue.png" alt="KimiLink Voice" class="header-logo-small">
+                    <span class="platform-name">KimiLink Voice</span>
+                </div>
+                
+                <nav class="dashboard-nav">
+                    <a href="#" class="nav-link active" onclick="showDashboardSection('main')">ダッシュボード</a>
+                    <a href="#" class="nav-link" onclick="showDashboardSection('reviews')">レビュー</a>
+                    <a href="#" class="nav-link" onclick="showDashboardSection('stats')">実績</a>
+                </nav>
+
+                <div class="user-area">
+                    <img src="" alt="User" class="user-avatar" id="userAvatar">
+                    <span class="user-name" id="userName">デモユーザー</span>
+                    <button class="btn-logout" onclick="logout()">ログアウト</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- ダッシュボードコンテンツ -->
+        <main class="dashboard-content">
+            <div class="dashboard-grid">
+                <!-- プロフィールカード -->
+                <div class="card profile-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user"></i> プロフィール</h2>
+                    </div>
+                    <div class="profile-content">
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="Profile" class="profile-avatar" id="profileAvatar">
+                        <h3 id="profileName">デモユーザー</h3>
+                        <p class="profile-handle" id="profileHandle">@demo_user</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-value">150</span>
+                                <span class="stat-label">フォロワー</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value">200</span>
+                                <span class="stat-label">フォロー中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 実績カード -->
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-chart-line"></i> 実績</h2>
+                    </div>
+                    <div class="stats-rows">
+                        <div class="stat-row">
+                            <div class="stat-icon"><i class="fas fa-microphone"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="voiceCount">43</span>
+                                <span class="stat-text">音声配信数</span>
+                            </div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="reviewCount">24</span>
+                                <span class="stat-text">レビュー数</span>
+                            </div>
+                        </div>
+                        <div class="stat-row">
+                            <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-number" id="reachCount">192</span>
+                                <span class="stat-text">リーチ数</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- コラボカード -->
+                <div class="card collab-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-film"></i> オプション機能</h2>
+                    </div>
+                    <div class="collab-content">
+                        <div class="collab-creator">
+                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="コタのAI紀行" class="collab-avatar">
+                            <div class="collab-info">
+                                <h3>コタのAI紀行さんコラボ</h3>
+                                <p>@c0tanpoTeshi1a</p>
+                            </div>
+                        </div>
+                        <div class="collab-description">
+                            <p>あなたの音声を動画化して拡散!</p>
+                            <ul>
+                                <li>✓ プロフェッショナルな動画編集</li>
+                                <li>✓ AI技術を活用した高品質な動画</li>
+                                <li>✓ SNSでの拡散サポート</li>
+                            </ul>
+                        </div>
+                        <div class="collab-price">
+                            <span class="price">¥30,000</span>
+                            <span class="price-note">/コラボ</span>
+                        </div>
+                        <button class="btn-collab" onclick="requestCollab()">
+                            <i class="fas fa-video"></i> コラボを依頼する
+                        </button>
+                    </div>
+                </div>
+
+                <!-- フォロー状態カード -->
+                <div class="card follow-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> フォロー状態</h2>
+                    </div>
+                    <div class="follow-check-content">
+                        <div class="follow-check-item">
+                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="クリエイター応援">
+                            <div class="follow-check-info">
+                                <h4>クリエイター応援</h4>
+                                <p>@streamerfunch</p>
+                            </div>
+                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
+                        </div>
+                        <div class="follow-check-item">
+                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="アイドル応援">
+                            <div class="follow-check-info">
+                                <h4>アイドル応援</h4>
+                                <p>@idolfunch</p>
+                            </div>
+                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/galaxy-effects.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

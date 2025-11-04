@@ -1,0 +1,68 @@
+MIT License
+
+Copyright (c) 2024 KimiLink Voice
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Third-Party Licenses
+
+### Fonts
+- Noto Sans JP: SIL Open Font License 1.1
+  https://fonts.google.com/specimen/Noto+Sans+JP/license
+
+### Icons and Images
+- Icons from the君斗リンク brand guidelines
+- User avatars from Twitter (used with permission)
+
+### JavaScript Libraries
+Any third-party JavaScript libraries used in this project retain their
+original licenses. Please refer to their respective documentation.
+
+---
+
+## Trademark Notice
+
+"KimiLink Voice" and associated logos are trademarks of KimiLink.
+All rights reserved.
+
+Twitter, the Twitter logo, and Tweet are trademarks of Twitter, Inc.
+or its affiliates.
+
+---
+
+## Attribution
+
+When using this software, please provide appropriate attribution:
+
+"Powered by KimiLink Voice"
+
+or
+
+"Built with KimiLink Voice (https://github.com/yourusername/kimitolink-voice)"
+
+---
+
+## Contact
+
+For licensing inquiries or questions, please contact:
+- Twitter: @streamerfunch
+- Twitter: @idolfunch
+- GitHub: https://github.com/yourusername/kimitolink-voice

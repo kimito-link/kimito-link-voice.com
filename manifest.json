@@ -1,0 +1,28 @@
+{
+  "name": "KimiLink Voice",
+  "short_name": "KimiLink",
+  "description": "君と繋がる、声で届ける - 音声配信プラットフォーム",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00427B",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/logo/RGB/logo_funlink_RGB_maru_blue.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "images/logo/RGB/logo_funlink_RGB_maru_blue.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "categories": [
+    "social",
+    "entertainment",
+    "music"
+  ],
+  "lang": "ja"
+}

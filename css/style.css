@@ -1,0 +1,678 @@
+/* KimiLink Voice - Style Sheet */
+/* キミトリンクブランドカラー */
+:root {
+    --kimito-blue: #00427B;
+    --kimito-orange: #DD6500;
+    --kimito-black: #000000;
+    --kimito-white: #FFFFFF;
+    --kimito-gray: #666666;
+    --kimito-light-gray: #F5F5F5;
+    --kimito-blue-light: #E6EDF4;
+    --kimito-orange-light: #FFE8D6;
+}
+
+/* リセット */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ベース */
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--kimito-black);
+    line-height: 1.6;
+    background: var(--kimito-white);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* ヘッダー */
+.header {
+    background: var(--kimito-white);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
+}
+
+.logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--kimito-blue);
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--kimito-gray);
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--kimito-blue);
+}
+
+.twitter-login-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1DA1F2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.twitter-login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(29, 161, 242, 0.3);
+}
+
+.twitter-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ヒーローセクション */
+.hero {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--kimito-blue-light) 0%, var(--kimito-orange-light) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 20px;
+    color: var(--kimito-black);
+}
+
+.highlight {
+    background: linear-gradient(135deg, var(--kimito-blue) 0%, var(--kimito-orange) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 18px;
+    color: var(--kimito-gray);
+    margin-bottom: 40px;
+    line-height: 1.8;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 15px 35px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: var(--kimito-blue);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #003366;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 66, 123, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--kimito-blue);
+    border: 2px solid var(--kimito-blue);
+}
+
+.btn-secondary:hover {
+    background: var(--kimito-blue);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* フローティングアイコン */
+.hero-visual {
+    position: absolute;
+    right: 100px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.floating-icons {
+    position: relative;
+    width: 300px;
+    height: 300px;
+}
+
+.float-icon {
+    position: absolute;
+    font-size: 48px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.float-icon.mic {
+    top: 0;
+    left: 50%;
+    animation-delay: 0s;
+}
+
+.float-icon.note {
+    top: 50%;
+    right: 0;
+    animation-delay: 0.5s;
+}
+
+.float-icon.heart {
+    bottom: 0;
+    left: 50%;
+    animation-delay: 1s;
+}
+
+.float-icon.star {
+    top: 50%;
+    left: 0;
+    animation-delay: 1.5s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* 特徴セクション */
+.features {
+    padding: 80px 0;
+    background: white;
+}
+
+.section-title {
+    font-size: 36px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 50px;
+    color: var(--kimito-black);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    border: 1px solid var(--kimito-light-gray);
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 66, 123, 0.1);
+    border-color: var(--kimito-blue);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: var(--kimito-blue);
+}
+
+.feature-card p {
+    color: var(--kimito-gray);
+    line-height: 1.6;
+}
+
+/* 声優一覧 */
+.voices {
+    padding: 80px 0;
+    background: var(--kimito-light-gray);
+}
+
+.voice-filter {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 40px;
+}
+
+.filter-btn {
+    padding: 10px 25px;
+    background: white;
+    border: 1px solid var(--kimito-blue);
+    border-radius: 20px;
+    color: var(--kimito-blue);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+    background: var(--kimito-blue);
+    color: white;
+}
+
+.voice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.voice-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+}
+
+.voice-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 66, 123, 0.15);
+}
+
+.voice-avatar {
+    position: relative;
+    padding: 20px;
+    text-align: center;
+    background: var(--kimito-blue-light);
+}
+
+.voice-avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.voice-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.voice-badge.entry {
+    background: #28a745;
+}
+
+.voice-badge.standard {
+    background: var(--kimito-orange);
+}
+
+.voice-badge.pro {
+    background: var(--kimito-blue);
+}
+
+.voice-info {
+    padding: 20px;
+}
+
+.voice-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--kimito-black);
+}
+
+.voice-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: var(--kimito-blue-light);
+    color: var(--kimito-blue);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.voice-price {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--kimito-orange);
+}
+
+.minimum {
+    font-size: 14px;
+    color: var(--kimito-gray);
+}
+
+.voice-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.stars {
+    color: #ffd700;
+}
+
+.count {
+    color: var(--kimito-gray);
+    font-size: 14px;
+}
+
+.voice-sample {
+    width: 100%;
+    height: 40px;
+}
+
+/* 応援ボイス */
+.cheer-voice {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--kimito-orange-light) 0%, var(--kimito-blue-light) 100%);
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--kimito-gray);
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.badge-new {
+    background: var(--kimito-orange);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.cheer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+}
+
+.cheer-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.cheer-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(221, 101, 0, 0.2);
+}
+
+.cheer-card.special {
+    background: linear-gradient(135deg, var(--kimito-blue) 0%, var(--kimito-orange) 100%);
+    color: white;
+}
+
+.cheer-emoji {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.cheer-card h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: var(--kimito-black);
+}
+
+.cheer-card.special h3 {
+    color: white;
+}
+
+.cheer-price {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--kimito-orange);
+}
+
+.cheer-card.special .cheer-price {
+    color: white;
+}
+
+/* 見積もりセクション */
+.estimate {
+    padding: 80px 0;
+    background: white;
+}
+
+.estimate-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--kimito-light-gray);
+    padding: 40px;
+    border-radius: 20px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--kimito-black);
+}
+
+textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--kimito-blue);
+}
+
+textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.char-count {
+    text-align: right;
+    color: var(--kimito-gray);
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.option:hover {
+    background: var(--kimito-blue-light);
+}
+
+.option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.estimate-result {
+    background: var(--kimito-blue);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.result-label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    opacity: 0.9;
+}
+
+.result-price {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+/* フッター */
+.footer {
+    background: var(--kimito-black);
+    color: white;
+    padding: 40px 0;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer-logo {
+    height: 30px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.footer-links {
+    display: flex;
+    gap: 30px;
+}
+
+.footer-links a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--kimito-orange);
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 32px;
+    }
+    
+    .hero-visual {
+        display: none;
+    }
+    
+    .nav {
+        display: none;
+    }
+    
+    .features-grid,
+    .voice-grid,
+    .cheer-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
