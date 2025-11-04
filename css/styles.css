@@ -635,6 +635,170 @@ body {
     font-size: 0.9rem;
 }
 
+/* ===== コラボメンバーセクション ===== */
+.collaborators-section {
+    padding: 80px 20px;
+    background: linear-gradient(135deg, rgba(0, 66, 123, 0.05), rgba(221, 101, 0, 0.05));
+}
+
+.collaborators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.collaborator-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.collaborator-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 66, 123, 0.2);
+    border-color: var(--primary-blue);
+}
+
+.collaborator-header {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: start;
+}
+
+.collaborator-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-orange);
+}
+
+.collaborator-info h3 {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.collaborator-handle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.collaborator-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.collaborator-tags .tag {
+    background: linear-gradient(135deg, var(--primary-blue), rgba(0, 66, 123, 0.8));
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.collaborator-description {
+    margin: 20px 0;
+    color: var(--text-dark);
+}
+
+.collaborator-description > p {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--primary-blue);
+}
+
+.collaborator-features {
+    list-style: none;
+    padding: 0;
+}
+
+.collaborator-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: var(--text-dark);
+}
+
+.collaborator-features i {
+    color: var(--success-green);
+    font-size: 1.1rem;
+}
+
+.collaborator-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.collaborator-price {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-orange);
+}
+
+.price-note {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.btn-collaborator {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary-orange), #ff7700);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-collaborator:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(221, 101, 0, 0.4);
+    background: linear-gradient(135deg, #ff7700, var(--primary-orange));
+}
+
+.btn-collaborator i {
+    font-size: 1.1rem;
+}
+
+.badge-special {
+    background: linear-gradient(135deg, var(--primary-orange), #ff7700);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-right: 10px;
+    letter-spacing: 1px;
+}
+
 /* ===== パブリックフッター ===== */
 .public-footer {
     background: var(--card-bg);
