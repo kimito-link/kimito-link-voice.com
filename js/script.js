@@ -33,10 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentUser = JSON.parse(savedUser);
         // フォロー状態を確認
         checkFollowStatusOnLoad();
-    } else {
-        // ログインモーダルを表示
-        showLoginModal();
     }
+    // ログインボタンをクリックしたときのみモーダルを表示
     
     // ナビゲーションのイベントリスナー
     setupNavigation();
