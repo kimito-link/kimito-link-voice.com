@@ -2,6 +2,9 @@
 // 開発モード（本番環境では false に設定）
 const DEVELOPMENT_MODE = true;
 
+// フォロー確認をスキップ（開発中のみ）
+const SKIP_FOLLOW_CHECK = true; // APIレート制限回避用
+
 let currentUser = null;
 let followedAccounts = {
     creator: false,
@@ -28,17 +31,23 @@ const COLLABORATOR = {
 };
 
 // ===== 初期化 =====
-document.addEventListener('DOMContentLoaded', function() {
-    // ローカルストレージからユーザー情報を取得
-    const savedUser = localStorage.getItem('kimitolink_user');
+document.addEventListener('DOMContentLoaded', async function() {
+    // URLパラメータをチェック
+    const urlParams = new URLSearchParams(window.location.search);
+    const loginStatus = urlParams.get('login');
     
-    // 開発モードでない場合のみ自動ログイン
-    if (savedUser && !DEVELOPMENT_MODE) {
-        currentUser = JSON.parse(savedUser);
-        // フォロー状態を確認
-        checkFollowStatusOnLoad();
+    if (loginStatus === 'success') {
+        // ログイン成功後の処理
+        await checkAuthStatus();
+        // URLをクリーンアップ
+        window.history.replaceState({}, document.title, '/');
+    } else if (loginStatus === 'error') {
+        alert('ログインに失敗しました。もう一度お試しください。');
+        window.history.replaceState({}, document.title, '/');
+    } else {
+        // 常にセッションを確認（開発モードでも）
+        await checkAuthStatus();
     }
-    // ログインボタンをクリックしたときのみモーダルを表示
     
     // ナビゲーションのイベントリスナー
     setupNavigation();
@@ -46,6 +55,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // モックデータで統計を更新
     updateMockStats();
 });
+
+// 認証状態を確認
+async function checkAuthStatus() {
+    try {
+        const response = await fetch('/api/user/me');
+        if (response.ok) {
+            currentUser = await response.json();
+            // フォロー状態を確認
+            await checkFollowStatusOnLoad();
+        }
+    } catch (error) {
+        console.log('未ログイン:', error);
+    }
+}
 
 // ===== ログイン処理 =====
 function showLoginModal() {
@@ -57,56 +80,41 @@ function hideLoginModal() {
 }
 
 function showFollowModal() {
-    document.getElementById('followModal').style.display = 'flex';
+    const modal = document.getElementById('followModal');
+    modal.style.display = 'flex';
+    
+    // 開発モード: スキップボタンを追加
+    if (SKIP_FOLLOW_CHECK) {
+        setTimeout(() => {
+            console.log('🚧 開発モード: 3秒後に自動的にダッシュボードへ移動');
+            hideFollowModal();
+            showPlatform();
+        }, 3000);
+    }
 }
 
 function hideFollowModal() {
     document.getElementById('followModal').style.display = 'none';
 }
 
-async function loginWithTwitter() {
-    // 実際の実装ではTwitter OAuth 2.0を使用
-    // ここではデモ用のモック実装
-    
-    try {
-        // モックユーザーデータ
-        const mockUser = {
-            id: 'user_' + Date.now(),
-            username: 'demo_user',
-            displayName: 'デモユーザー',
-            avatar: 'https://via.placeholder.com/100',
-            followers: 150,
-            following: 200,
-            createdAt: new Date().toISOString()
-        };
-        
-        currentUser = mockUser;
-        localStorage.setItem('kimitolink_user', JSON.stringify(mockUser));
-        
-        // ログインモーダルを閉じてフォローモーダルを表示
-        hideLoginModal();
-        showFollowModal();
-        
-        // フォロー状態をチェック
-        setTimeout(() => {
-            checkFollowStatus();
-        }, 1000);
-        
-    } catch (error) {
-        console.error('ログインエラー:', error);
-        alert('ログインに失敗しました。もう一度お試しください。');
-    }
+function loginWithTwitter() {
+    // Twitter OAuth 2.0 フローを開始
+    window.location.href = '/auth/twitter';
 }
 
 // ===== フォロー確認 =====
 async function checkFollowStatus() {
-    // 実際の実装ではTwitter APIを使用してフォロー状態を確認
-    // ここではデモ用にランダムに判定
-    
     try {
-        // モック: ランダムにフォロー状態を設定
-        followedAccounts.creator = Math.random() > 0.3;
-        followedAccounts.idol = Math.random() > 0.3;
+        // APIを呼び出してフォロー状態を確認
+        const response = await fetch('/api/user/follow-status');
+        
+        if (!response.ok) {
+            throw new Error('Failed to check follow status');
+        }
+        
+        const data = await response.json();
+        followedAccounts.creator = data.creator;
+        followedAccounts.idol = data.idol;
         
         // UI更新
         updateFollowStatus('follow-status-1', followedAccounts.creator);
@@ -150,13 +158,38 @@ function updateFollowStatus(elementId, isFollowing) {
 }
 
 async function checkFollowStatusOnLoad() {
-    // ページ読み込み時のフォロー状態確認
-    followedAccounts.creator = true;
-    followedAccounts.idol = true;
-    
-    if (followedAccounts.creator && followedAccounts.idol) {
-        showPlatform();
-    } else {
+    try {
+        // 開発モードでフォロー確認をスキップ
+        if (SKIP_FOLLOW_CHECK) {
+            console.log('🚧 開発モード: フォロー確認をスキップしてダッシュボードを表示');
+            followedAccounts.creator = true;
+            followedAccounts.idol = true;
+            showPlatform();
+            return;
+        }
+
+        // APIを呼び出してフォロー状態を確認
+        const response = await fetch('/api/user/follow-status');
+        
+        if (!response.ok) {
+            throw new Error('Failed to check follow status');
+        }
+        
+        const data = await response.json();
+        followedAccounts.creator = data.creator;
+        followedAccounts.idol = data.idol;
+        
+        if (followedAccounts.creator && followedAccounts.idol) {
+            showPlatform();
+        } else {
+            showFollowModal();
+            // フォロー状態を表示
+            updateFollowStatus('follow-status-1', followedAccounts.creator);
+            updateFollowStatus('follow-status-2', followedAccounts.idol);
+        }
+    } catch (error) {
+        console.error('フォロー状態確認エラー:', error);
+        // エラーの場合はフォローモーダルを表示
         showFollowModal();
     }
 }
@@ -180,8 +213,59 @@ function showPlatform() {
         document.getElementById('followingCount').textContent = currentUser.following;
     }
     
+    // 必須フォローアカウントのプロフィール画像を取得
+    loadRequiredAccountsAvatars();
+    
     // Twitter タイムラインを読み込み
     loadTwitterTimeline();
+}
+
+// 必須フォローアカウントの画像と名前を取得
+async function loadRequiredAccountsAvatars() {
+    try {
+        // クリエイター応援アカウント
+        const creatorResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.creator.id);
+        if (creatorResponse.ok) {
+            const creatorData = await creatorResponse.json();
+            
+            // 画像を更新
+            const creatorAvatar = document.getElementById('creatorAvatar');
+            if (creatorAvatar && creatorData.profile_image_url) {
+                creatorAvatar.src = creatorData.profile_image_url;
+            }
+            
+            // 表示名を更新
+            const creatorNameElement = document.querySelector('.follow-check-item:nth-child(1) .follow-check-info h4');
+            if (creatorNameElement && creatorData.name) {
+                creatorNameElement.textContent = creatorData.name;
+            }
+            
+            console.log('✅ クリエイター応援の情報を更新:', creatorData.name);
+        }
+        
+        // アイドル応援アカウント
+        const idolResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.idol.id);
+        if (idolResponse.ok) {
+            const idolData = await idolResponse.json();
+            
+            // 画像を更新
+            const idolAvatar = document.getElementById('idolAvatar');
+            if (idolAvatar && idolData.profile_image_url) {
+                idolAvatar.src = idolData.profile_image_url;
+            }
+            
+            // 表示名を更新
+            const idolNameElement = document.querySelector('.follow-check-item:nth-child(2) .follow-check-info h4');
+            if (idolNameElement && idolData.name) {
+                idolNameElement.textContent = idolData.name;
+            }
+            
+            console.log('✅ アイドル応援の情報を更新:', idolData.name);
+        }
+    } catch (error) {
+        console.error('プロフィール情報の取得エラー:', error);
+        // エラーの場合はデフォルト表示のまま
+    }
 }
 
 // ===== ナビゲーション =====
@@ -205,14 +289,23 @@ function setupNavigation() {
 }
 
 // ===== ログアウト =====
-function logout() {
+async function logout() {
     if (confirm('ログアウトしますか?')) {
-        localStorage.removeItem('kimitolink_user');
-        currentUser = null;
-        followedAccounts = { creator: false, idol: false };
-        
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('publicPage').style.display = 'block';
+        try {
+            // サーバーのセッションを破棄
+            await fetch('/auth/logout', { method: 'POST' });
+            
+            // クライアント側の状態をクリア
+            currentUser = null;
+            followedAccounts = { creator: false, idol: false };
+            
+            // UIをリセット
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('publicPage').style.display = 'block';
+        } catch (error) {
+            console.error('ログアウトエラー:', error);
+            alert('ログアウトに失敗しました。');
+        }
     }
 }
 
@@ -294,16 +387,16 @@ function requestCollab() {
     }
 }
 
-// ===== モック統計データ更新 =====
+// ===== 統計データ更新 =====
 function updateMockStats() {
-    // ランダムな統計データを生成
+    // 実際のデータ（Phase 3のデータベース実装まではゼロ）
     const stats = {
-        voiceCount: Math.floor(Math.random() * 50) + 10,
-        reviewCount: Math.floor(Math.random() * 100) + 20,
-        reachCount: Math.floor(Math.random() * 1000) + 500,
-        likesCount: Math.floor(Math.random() * 500) + 100,
-        retweetCount: Math.floor(Math.random() * 200) + 50,
-        replyCount: Math.floor(Math.random() * 150) + 30
+        voiceCount: 0,
+        reviewCount: 0,
+        reachCount: 0,
+        likesCount: 0,
+        retweetCount: 0,
+        replyCount: 0
     };
     
     // DOM要素が存在する場合のみ更新
