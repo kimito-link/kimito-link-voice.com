@@ -1,28 +1,66 @@
 {
-  "name": "KimiLink Voice",
+  "name": "KimiLink Voice - 君と声でつながる",
   "short_name": "KimiLink",
-  "description": "君と繋がる、声で届ける - 音声配信プラットフォーム",
-  "start_url": "/",
+  "description": "君と繋がる、声で届ける - 声優・ナレーターマッチングプラットフォーム",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#00427B",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "images/logo/RGB/logo_funlink_RGB_maru_blue.jpg",
+      "src": "images/logo/RGB/透過/logo_funlink_RGB_maru_blue.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "images/logo/RGB/logo_funlink_RGB_maru_blue.jpg",
+      "src": "images/logo/RGB/透過/logo_funlink_RGB_maru_blue.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/logo/RGB/透過/logo_funlink_RGB_color.png",
+      "sizes": "192x192",
+      "type": "image/png"
     }
   ],
   "categories": [
     "social",
     "entertainment",
-    "music"
+    "music",
+    "productivity"
   ],
-  "lang": "ja"
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "声優を探す",
+      "short_name": "声優検索",
+      "description": "声優・ナレーターを検索",
+      "url": "/#narrators",
+      "icons": [
+        {
+          "src": "images/logo/RGB/透過/logo_funlink_RGB_maru_blue.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "応援ボイス",
+      "short_name": "ボイス",
+      "description": "応援ボイスを依頼",
+      "url": "/#voices",
+      "icons": [
+        {
+          "src": "images/logo/RGB/透過/logo_funlink_RGB_maru_orange.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "lang": "ja",
+  "dir": "ltr",
+  "prefer_related_applications": false
 }

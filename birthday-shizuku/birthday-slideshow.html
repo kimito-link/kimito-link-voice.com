@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 蒼凪しずく 生誕祭</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, 'Hiragino Sans', sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* オープニング */
+        .opening {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .opening h1 {
+            font-size: 8rem;
+            animation: bounce 1s infinite;
+        }
+
+        .opening h2 {
+            font-size: 4rem;
+            color: white;
+            margin-top: 2rem;
+            animation: slideUp 1s ease-out;
+        }
+
+        /* テキストシーン */
+        .text-scene {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-direction: column;
+        }
+
+        .text-scene h1 {
+            font-size: 5rem;
+            color: white;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .text-scene p {
+            font-size: 2.5rem;
+            color: white;
+            line-height: 1.8;
+            max-width: 1000px;
+            animation: slideUp 1s ease-out 0.3s both;
+        }
+
+        /* ツイート画像シーン */
+        .tweet-scene {
+            background: #15202b;
+            flex-direction: column;
+        }
+
+        .tweet-scene iframe {
+            width: 550px;
+            height: 800px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 50px rgba(255, 107, 157, 0.5);
+            animation: slideUp 1s ease-out;
+        }
+
+        .tweet-scene h2 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        /* TikTokシーン */
+        .tiktok-scene {
+            background: #000;
+        }
+
+        .tiktok-scene blockquote {
+            max-width: 605px;
+            min-width: 325px;
+        }
+
+        /* フィナーレ */
+        .finale {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            flex-direction: column;
+        }
+
+        .finale .emoji {
+            font-size: 10rem;
+            animation: bounce 1s infinite;
+        }
+
+        .finale h1 {
+            font-size: 6rem;
+            background: linear-gradient(45deg, #ff6b9d, #ffd93d, #6bcf7f, #4d9fff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s ease infinite;
+            margin: 2rem 0;
+        }
+
+        .finale h2 {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .finale .sparkle {
+            font-size: 5rem;
+            margin: 2rem 0;
+        }
+
+        .finale p {
+            font-size: 3rem;
+            color: white;
+        }
+
+        /* プログレスバー */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b9d, #ffd93d, #6bcf7f, #4d9fff);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* コントロール */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .controls button:hover {
+            transform: scale(1.05);
+        }
+
+        .scene-counter {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- シーン1: オープニング -->
+    <div class="slide opening active" data-duration="4000">
+        <div>
+            <h1>🎉</h1>
+            <h2>これから始まります...</h2>
+        </div>
+    </div>
+
+    <!-- シーン2: Twitter検索説明 -->
+    <div class="slide text-scene" data-duration="5000">
+        <h1>🔍 Twitter検索</h1>
+        <p>「蒼凪しずく 生誕祭 楽しみ」<br>ファンのみんなが楽しみにしています！</p>
+    </div>
+
+    <!-- シーン3: メイド服ツイート -->
+    <div class="slide tweet-scene" data-duration="8000">
+        <h2>📸 可愛いメイド服姿</h2>
+        <iframe src="https://platform.twitter.com/embed/Tweet.html?id=1988950811075125652&theme=dark" scrolling="no"></iframe>
+    </div>
+
+    <!-- シーン4: JR大塚駅広告 -->
+    <div class="slide tweet-scene" data-duration="8000">
+        <h2>🚉 JR大塚駅 生誕祭広告</h2>
+        <iframe src="https://platform.twitter.com/embed/Tweet.html?id=1988510278448017445&theme=dark" scrolling="no"></iframe>
+    </div>
+
+    <!-- シーン5: TikTok説明 -->
+    <div class="slide text-scene" data-duration="6000">
+        <h1>🎵 TikTok動画</h1>
+        <p>素敵なパフォーマンス！<br>次のシーンで動画が再生されます</p>
+    </div>
+
+    <!-- シーン6: TikTok埋め込み -->
+    <div class="slide tiktok-scene" data-duration="15000">
+        <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@idolfunch/video/7509897290023177489" data-video-id="7509897290023177489" style="max-width: 605px;min-width: 325px;">
+            <section></section>
+        </blockquote>
+    </div>
+
+    <!-- シーン7: idolfunchツイート -->
+    <div class="slide tweet-scene" data-duration="10000">
+        <h2>🎤 パフォーマンス動画</h2>
+        <iframe src="https://platform.twitter.com/embed/Tweet.html?id=1942732395515633764&theme=dark" scrolling="no"></iframe>
+    </div>
+
+    <!-- シーン8: フィナーレ -->
+    <div class="slide finale" data-duration="8000">
+        <div class="emoji">🎉</div>
+        <h1>蒼凪しずく</h1>
+        <h2>生誕祭 楽しみ！</h2>
+        <div class="sparkle">✨</div>
+        <p>おめでとう！</p>
+    </div>
+
+    <!-- コントロール -->
+    <div class="controls">
+        <div class="scene-counter" id="sceneCounter">シーン 1 / 8</div>
+        <button onclick="prevSlide()">⏮️ 前</button>
+        <button onclick="toggleAutoPlay()" id="playButton">⏸️ 停止</button>
+        <button onclick="nextSlide()">次 ⏭️</button>
+    </div>
+
+    <script async src="https://www.tiktok.com/embed.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progressBar = document.getElementById('progressBar');
+        const sceneCounter = document.getElementById('sceneCounter');
+        const playButton = document.getElementById('playButton');
+        let autoPlayTimer = null;
+        let isPlaying = true;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                if (i === index) {
+                    slide.classList.add('active');
+                }
+            });
+
+            currentSlide = index;
+            updateProgress();
+            updateCounter();
+
+            if (isPlaying) {
+                clearTimeout(autoPlayTimer);
+                const duration = parseInt(slides[index].getAttribute('data-duration'));
+                autoPlayTimer = setTimeout(() => {
+                    if (currentSlide < slides.length - 1) {
+                        nextSlide();
+                    } else {
+                        isPlaying = false;
+                        playButton.textContent = '▶️ 再生';
+                    }
+                }, duration);
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        function toggleAutoPlay() {
+            isPlaying = !isPlaying;
+            playButton.textContent = isPlaying ? '⏸️ 停止' : '▶️ 再生';
+            
+            if (isPlaying) {
+                showSlide(currentSlide);
+            } else {
+                clearTimeout(autoPlayTimer);
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            progressBar.style.width = progress + '%';
+        }
+
+        function updateCounter() {
+            sceneCounter.textContent = `シーン ${currentSlide + 1} / ${slides.length}`;
+        }
+
+        // キーボード操作
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+            if (e.key === ' ') {
+                e.preventDefault();
+                toggleAutoPlay();
+            }
+        });
+
+        // 初期化
+        updateProgress();
+        updateCounter();
+        
+        // 自動再生開始（3秒後）
+        setTimeout(() => {
+            showSlide(0);
+        }, 1000);
+
+        // 最初のシーンを表示
+        console.log('🎬 蒼凪しずく 生誕祭スライドショー開始！');
+        console.log('📝 操作方法:');
+        console.log('   - スペースキー: 再生/停止');
+        console.log('   - ←→キー: 前/次のシーン');
+        console.log('   - 右下のボタンでも操作可能');
+    </script>
+</body>
+</html>

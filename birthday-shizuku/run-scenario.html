@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 蒼凪しずく 生誕祭 自動化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
+            padding: 2rem;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .emoji {
+            font-size: 4rem;
+            margin: 1rem 0;
+        }
+
+        .instructions {
+            text-align: left;
+            background: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+            line-height: 1.8;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            margin-left: 1.5rem;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-run {
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+        }
+
+        .btn-run:hover {
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.6);
+        }
+
+        .console {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .console.active {
+            display: block;
+        }
+
+        .console p {
+            margin: 0.3rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emoji">🎉</div>
+        <h1>蒼凪しずく 生誕祭 自動化</h1>
+        <div class="emoji">✨</div>
+
+        <div class="instructions">
+            <h3>📝 使い方</h3>
+            <ol>
+                <li><strong>Win + G</strong> で画面録画を開始</li>
+                <li><strong>F12</strong> を押してDevToolsを開く</li>
+                <li><strong>Console</strong> タブに切り替え</li>
+                <li>下の「シナリオ表示」ボタンでコードを確認</li>
+                <li>「自動実行」ボタンで開始</li>
+            </ol>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn" onclick="showScenario()">📋 シナリオ表示</button>
+            <button class="btn btn-run" onclick="runScenario()">▶️ 自動実行</button>
+        </div>
+
+        <div class="console" id="console"></div>
+    </div>
+
+    <script src="birthday-scenario.js"></script>
+    <script>
+        const consoleEl = document.getElementById('console');
+
+        function showScenario() {
+            consoleEl.classList.add('active');
+            consoleEl.innerHTML = '<p style="color: #00ffff;">🎬 蒼凪しずく生誕祭シナリオ</p>';
+            consoleEl.innerHTML += '<p style="color: #ffffff;">━━━━━━━━━━━━━━━━━━━━━━</p>';
+            
+            scenario.steps.forEach(step => {
+                consoleEl.innerHTML += `<p style="color: #ffff00;">📌 Step ${step.step}: ${step.description}</p>`;
+                consoleEl.innerHTML += `<p style="color: #aaaaaa;">   Action: ${step.action}</p>`;
+                if (step.url) {
+                    consoleEl.innerHTML += `<p style="color: #aaaaaa;">   URL: ${step.url}</p>`;
+                }
+                consoleEl.innerHTML += '<br>';
+            });
+            
+            consoleEl.innerHTML += '<p style="color: #00ff00;">✅ 全18ステップ準備完了！</p>';
+        }
+
+        async function runScenario() {
+            const confirmed = confirm('🎬 自動化を開始しますか？\n\n画面録画が開始されていることを確認してください！');
+            if (!confirmed) return;
+
+            consoleEl.classList.add('active');
+            consoleEl.innerHTML = '<p style="color: #00ffff;">🎬 実行開始...</p>';
+
+            // 3秒カウントダウン
+            for (let i = 3; i > 0; i--) {
+                consoleEl.innerHTML += `<p style="color: #ffff00;">${i}...</p>`;
+                await sleep(1000);
+            }
+
+            // シナリオ実行
+            for (const step of scenario.steps) {
+                consoleEl.innerHTML += `<p style="color: #00ff00;">📌 Step ${step.step}: ${step.description}</p>`;
+                
+                try {
+                    await executeStep(step);
+                    consoleEl.innerHTML += `<p style="color: #aaaaaa;">   ✅ 完了</p>`;
+                } catch (error) {
+                    consoleEl.innerHTML += `<p style="color: #ff0000;">   ❌ エラー: ${error.message}</p>`;
+                }
+                
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+
+            consoleEl.innerHTML += '<p style="color: #00ff00;">━━━━━━━━━━━━━━━━━━━━━━</p>';
+            consoleEl.innerHTML += '<p style="color: #00ffff;">✅ すべて完了！録画を停止してください！</p>';
+        }
+
+        async function executeStep(step) {
+            switch (step.action) {
+                case 'navigate':
+                    window.location.href = step.url;
+                    await sleep(step.wait || 2000);
+                    break;
+
+                case 'click':
+                    const clickEl = document.querySelector(step.selector);
+                    if (clickEl) clickEl.click();
+                    await sleep(step.wait || 1000);
+                    break;
+
+                case 'typeSlowly':
+                    const inputEl = document.querySelector(step.selector);
+                    if (inputEl) {
+                        inputEl.focus();
+                        for (const char of step.text) {
+                            inputEl.value += char;
+                            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+                            await sleep(step.speed || 200);
+                        }
+                    }
+                    break;
+
+                case 'press':
+                    const event = new KeyboardEvent('keydown', { 
+                        key: step.key, 
+                        code: step.key,
+                        keyCode: step.key === 'Enter' ? 13 : 0,
+                        bubbles: true 
+                    });
+                    document.activeElement.dispatchEvent(event);
+                    await sleep(step.wait || 1000);
+                    break;
+
+                case 'scroll':
+                    window.scrollTo({ 
+                        top: step.direction === 'down' ? step.amount : -step.amount, 
+                        behavior: 'smooth' 
+                    });
+                    await sleep(step.duration || 2000);
+                    break;
+
+                case 'wait':
+                    await sleep(step.duration || 1000);
+                    break;
+
+                case 'typeInNewTab':
+                    window.location.href = step.url;
+                    await sleep(500);
+                    document.body.innerHTML = step.htmlContent;
+                    await sleep(step.wait || 5000);
+                    break;
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>

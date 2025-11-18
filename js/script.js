@@ -3,7 +3,7 @@
 const DEVELOPMENT_MODE = true;
 
 // フォロー確認をスキップ（開発中のみ）
-const SKIP_FOLLOW_CHECK = true; // APIレート制限回避用
+const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 let currentUser = null;
 let followedAccounts = {
@@ -62,6 +62,16 @@ async function checkAuthStatus() {
         const response = await fetch('/api/user/me');
         if (response.ok) {
             currentUser = await response.json();
+            
+            // 開発モード: フォロー確認をスキップしてダッシュボードを表示
+            if (SKIP_FOLLOW_CHECK) {
+                console.log('🚧 開発モード: フォロー確認をスキップしてダッシュボードを表示');
+                followedAccounts.creator = true;
+                followedAccounts.idol = true;
+                showPlatform();
+                return;
+            }
+            
             // フォロー状態を確認
             await checkFollowStatusOnLoad();
         }
@@ -214,7 +224,12 @@ function showPlatform() {
     }
     
     // 必須フォローアカウントのプロフィール画像を取得
-    loadRequiredAccountsAvatars();
+    // 開発モードでフォロー確認をスキップする場合はAPIリクエストも省略
+    if (!SKIP_FOLLOW_CHECK) {
+        loadRequiredAccountsAvatars();
+    } else {
+        console.log('🚧 開発モード: プロフィール画像取得をスキップ');
+    }
     
     // Twitter タイムラインを読み込み
     loadTwitterTimeline();
@@ -228,19 +243,24 @@ async function loadRequiredAccountsAvatars() {
         if (creatorResponse.ok) {
             const creatorData = await creatorResponse.json();
             
+            // APIレスポンスの構造を確認（dataプロパティがある場合）
+            const userData = creatorData.data || creatorData;
+            
             // 画像を更新
             const creatorAvatar = document.getElementById('creatorAvatar');
-            if (creatorAvatar && creatorData.profile_image_url) {
-                creatorAvatar.src = creatorData.profile_image_url;
+            if (creatorAvatar && userData.profile_image_url) {
+                creatorAvatar.src = userData.profile_image_url;
             }
             
             // 表示名を更新
             const creatorNameElement = document.querySelector('.follow-check-item:nth-child(1) .follow-check-info h4');
-            if (creatorNameElement && creatorData.name) {
-                creatorNameElement.textContent = creatorData.name;
+            if (creatorNameElement && userData.name) {
+                creatorNameElement.textContent = userData.name;
             }
             
-            console.log('✅ クリエイター応援の情報を更新:', creatorData.name);
+            console.log('✅ クリエイター応援の情報を更新:', userData.name);
+        } else {
+            console.warn('⚠️ クリエイター応援プロフィール取得失敗（APIレート制限の可能性）');
         }
         
         // アイドル応援アカウント
@@ -248,19 +268,24 @@ async function loadRequiredAccountsAvatars() {
         if (idolResponse.ok) {
             const idolData = await idolResponse.json();
             
+            // APIレスポンスの構造を確認（dataプロパティがある場合）
+            const userData = idolData.data || idolData;
+            
             // 画像を更新
             const idolAvatar = document.getElementById('idolAvatar');
-            if (idolAvatar && idolData.profile_image_url) {
-                idolAvatar.src = idolData.profile_image_url;
+            if (idolAvatar && userData.profile_image_url) {
+                idolAvatar.src = userData.profile_image_url;
             }
             
             // 表示名を更新
             const idolNameElement = document.querySelector('.follow-check-item:nth-child(2) .follow-check-info h4');
-            if (idolNameElement && idolData.name) {
-                idolNameElement.textContent = idolData.name;
+            if (idolNameElement && userData.name) {
+                idolNameElement.textContent = userData.name;
             }
             
-            console.log('✅ アイドル応援の情報を更新:', idolData.name);
+            console.log('✅ アイドル応援の情報を更新:', userData.name);
+        } else {
+            console.warn('⚠️ アイドル応援プロフィール取得失敗（APIレート制限の可能性）');
         }
     } catch (error) {
         console.error('プロフィール情報の取得エラー:', error);
@@ -529,10 +554,23 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/service-worker.js')
             .then(registration => {
-                console.log('Service Worker registered:', registration);
+                console.log('✅ Service Worker registered:', registration.scope);
+                
+                // 更新チェック
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    console.log('🔄 Service Worker update found');
+                    
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('✨ New content is available; please refresh.');
+                            // 必要に応じて更新通知を表示
+                        }
+                    });
+                });
             })
             .catch(error => {
-                console.log('Service Worker registration failed:', error);
+                console.error('❌ Service Worker registration failed:', error);
             });
     });
 }

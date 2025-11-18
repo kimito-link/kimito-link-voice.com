@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 蒼凪しずく 生誕祭 デモ 🎉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* 検索バーシミュレーション */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 1.5rem;
+            font-size: 1.5rem;
+            border: 3px solid #fff;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* タイトル */
+        .main-content {
+            text-align: center;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .title {
+            font-size: 5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b9d, #ffd93d, #6bcf7f, #4d9fff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin: 2rem 0;
+        }
+
+        .subtitle {
+            font-size: 3rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin: 1rem 0;
+        }
+
+        .emoji-large {
+            font-size: 6rem;
+            animation: bounce 1s infinite;
+        }
+
+        /* ギャラリー */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            animation: fadeInUp 0.8s ease-out both;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.2s; }
+        .card:nth-child(2) { animation-delay: 0.4s; }
+        .card:nth-child(3) { animation-delay: 0.6s; }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.05);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .like-button {
+            background: linear-gradient(45deg, #ff6b9d, #ff8fab);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        .like-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.6);
+        }
+
+        .like-button.liked {
+            background: linear-gradient(45deg, #ff1744, #f50057);
+        }
+
+        /* アニメーション */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* パーティクル */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 2rem;
+            animation: floatParticle 8s infinite ease-in-out;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- パーティクル背景 -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 検索バー -->
+    <div class="search-container">
+        <input type="text" 
+               class="search-box" 
+               id="searchBox"
+               placeholder="ここに入力してみてね..."
+               readonly>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <div class="emoji-large">🎉</div>
+        <h1 class="title">蒼凪しずく</h1>
+        <h2 class="subtitle">生誕祭 楽しみ！</h2>
+        <div class="emoji-large">✨</div>
+    </div>
+
+    <!-- ギャラリー -->
+    <div class="gallery">
+        <div class="card">
+            <div class="card-content">
+                <h3 class="card-title">📸 メイド服姿</h3>
+                <p class="card-text">
+                    可愛いメイド服でファンを魅了！<br>
+                    素敵な笑顔にみんなメロメロ💕
+                </p>
+                <button class="like-button" onclick="likeThis(this)">❤️ いいね</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <h3 class="card-title">🚉 JR大塚駅 広告</h3>
+                <p class="card-text">
+                    JR大塚駅に生誕祭広告が登場！<br>
+                    ファンの愛が形になりました🎂
+                </p>
+                <button class="like-button" onclick="likeThis(this)">❤️ いいね</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-content">
+                <h3 class="card-title">🎤 パフォーマンス</h3>
+                <p class="card-text">
+                    圧巻のステージパフォーマンス！<br>
+                    歌とダンスで観客を魅了✨
+                </p>
+                <button class="like-button" onclick="likeThis(this)">❤️ いいね</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // タイピングアニメーション
+        const searchBox = document.getElementById('searchBox');
+        const text = "蒼凪しずく 生誕祭 楽しみ！🎉";
+        let index = 0;
+
+        function typeText() {
+            if (index < text.length) {
+                searchBox.value += text.charAt(index);
+                index++;
+                setTimeout(typeText, 200);
+            }
+        }
+
+        // ページ読み込み後に開始
+        window.addEventListener('load', () => {
+            setTimeout(typeText, 1000);
+        });
+
+        // いいねボタン
+        function likeThis(button) {
+            button.classList.add('liked');
+            button.textContent = '💖 いいね済み';
+            
+            // エフェクト
+            for (let i = 0; i < 10; i++) {
+                createHeart(button);
+            }
+        }
+
+        function createHeart(button) {
+            const heart = document.createElement('div');
+            heart.textContent = '❤️';
+            heart.style.position = 'fixed';
+            heart.style.fontSize = '2rem';
+            heart.style.pointerEvents = 'none';
+            heart.style.zIndex = '1000';
+            
+            const rect = button.getBoundingClientRect();
+            heart.style.left = rect.left + Math.random() * 100 + 'px';
+            heart.style.top = rect.top + 'px';
+            
+            document.body.appendChild(heart);
+            
+            const animation = heart.animate([
+                { transform: 'translateY(0) scale(1)', opacity: 1 },
+                { transform: 'translateY(-100px) scale(1.5)', opacity: 0 }
+            ], {
+                duration: 2000,
+                easing: 'ease-out'
+            });
+            
+            animation.onfinish = () => heart.remove();
+        }
+
+        // パーティクル生成
+        const particles = document.getElementById('particles');
+        const emojis = ['🎉', '✨', '💕', '🎂', '🎈', '⭐', '💖', '🌟'];
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            particles.appendChild(particle);
+            
+            setTimeout(() => particle.remove(), 13000);
+        }
+
+        // 定期的にパーティクル生成
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>
