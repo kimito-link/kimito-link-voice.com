@@ -13,6 +13,7 @@ dotenv.config();
 
 // Supabaseデータベース
 const { upsertProfile, getProfileByTwitterId, updateFollowStatus } = require('./database/profiles');
+const supabase = require('./database/supabase-client');
 
 // Expressアプリ初期化
 const app = express();
@@ -21,6 +22,10 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 
 // フォロー状態のキャッシュ（5分間有効）
 const followStatusCache = new Map();
+
+// アカウント情報のサーバー側キャッシュ（7日間有効）
+const accountProfileCache = new Map();
+const ACCOUNT_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7日間
 
 // セッション設定（メモリストア使用 - 開発用）
 app.use(session({
@@ -115,6 +120,10 @@ app.get('/auth/twitter', (req, res) => {
         });
 
         const authUrl = `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
+        if (isDevelopment) {
+            console.log('🔗 認証URL生成:', authUrl);
+            console.log('📋 コールバックURL:', process.env.TWITTER_CALLBACK_URL);
+        }
         res.redirect(authUrl);
 
     } catch (error) {
@@ -125,7 +134,14 @@ app.get('/auth/twitter', (req, res) => {
 
 // OAuth コールバック
 app.get('/auth/twitter/callback', async (req, res) => {
-    if (isDevelopment) console.log('🔄 OAuth コールバック開始');
+    if (isDevelopment) {
+        console.log('🔄 OAuth コールバック開始');
+        console.log('📥 受信したクエリパラメータ:', req.query);
+        console.log('🔐 セッション状態:', {
+            hasCodeVerifier: !!req.session.codeVerifier,
+            hasState: !!req.session.state
+        });
+    }
     try {
         const { code, state, error } = req.query;
         if (isDevelopment) console.log('📝 クエリパラメータ:', { code: code ? '取得済み' : 'なし', state: state ? '取得済み' : 'なし', error });
@@ -265,25 +281,95 @@ app.post('/auth/logout', (req, res) => {
 app.get('/api/user/profile/:username', async (req, res) => {
     try {
         const { username } = req.params;
-        const accessToken = req.session.accessToken;
+        const bearerToken = process.env.TWITTER_BEARER_TOKEN;
 
-        if (!accessToken) {
-            return res.status(401).json({ error: '認証が必要です' });
+        if (!bearerToken) {
+            console.error('❌ Bearer Token が設定されていません');
+            return res.status(500).json({ error: 'Twitter Bearer Token が設定されていません' });
         }
 
-        if (isDevelopment) console.log('👤 プロフィール取得:', username);
+        // サーバー側メモリキャッシュをチェック（7日間有効・最速）
+        const cacheKey = `profile_${username}`;
+        const cached = accountProfileCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < ACCOUNT_CACHE_DURATION) {
+            if (isDevelopment) console.log(`💾 メモリキャッシュからプロフィール取得: ${username} (残り: ${Math.floor((ACCOUNT_CACHE_DURATION - (Date.now() - cached.timestamp)) / 1000 / 60 / 60)}時間)`);
+            return res.json(cached.data);
+        }
+
+        // Supabaseからチェック（永続的・サーバー再起動後も有効）
+        try {
+            const { data: dbProfile, error: dbError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('twitter_username', username)
+                .single();
+            
+            if (dbProfile && !dbError) {
+                // Supabaseから取得できた場合
+                const profileData = {
+                    id: dbProfile.twitter_id,
+                    username: dbProfile.twitter_username,
+                    name: dbProfile.display_name,
+                    profile_image_url: dbProfile.avatar_url
+                };
+                
+                // メモリキャッシュにも保存
+                accountProfileCache.set(cacheKey, {
+                    timestamp: Date.now(),
+                    data: profileData
+                });
+                
+                if (isDevelopment) console.log(`💾 Supabaseからプロフィール取得: ${username}`);
+                return res.json(profileData);
+            }
+        } catch (dbError) {
+            // データベースエラーの場合はログ出力して続行
+            if (isDevelopment) console.warn('⚠️ Supabase取得エラー:', dbError);
+        }
+
+        if (isDevelopment) console.log('📡 Twitter APIからプロフィール取得:', username);
 
         const response = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
             headers: {
-                'Authorization': `Bearer ${accessToken}`
+                'Authorization': `Bearer ${bearerToken}`
             },
             params: {
-                'user.fields': 'profile_image_url,name,description'
+                'user.fields': 'profile_image_url,name,description,public_metrics'
             }
         });
 
-        if (isDevelopment) console.log('✅ プロフィール取得成功:', username);
-        res.json(response.data);
+        if (isDevelopment) {
+            console.log('✅ プロフィール取得成功:', username);
+            console.log('📊 Twitter API レスポンス:', JSON.stringify(response.data, null, 2));
+        }
+        
+        // Twitter API v2のレスポンス構造: { data: { ... } }
+        // フロントエンドが直接使えるように data.data を返す
+        const profileData = response.data && response.data.data ? response.data.data : response.data;
+        
+        // Supabaseに保存（永続化）
+        try {
+            await upsertProfile({
+                twitter_id: profileData.id,
+                twitter_username: profileData.username,
+                display_name: profileData.name,
+                avatar_url: profileData.profile_image_url,
+                user_type: 'narrator' // フォロー必須アカウントは声優として扱う
+            });
+            if (isDevelopment) console.log(`💾 Supabaseにプロフィールを保存: ${username}`);
+        } catch (dbError) {
+            // データベース保存に失敗してもAPI結果は返す
+            console.error('⚠️ Supabase保存エラー:', dbError);
+        }
+        
+        // サーバー側メモリキャッシュにも保存（7日間）
+        accountProfileCache.set(cacheKey, {
+            timestamp: Date.now(),
+            data: profileData
+        });
+        if (isDevelopment) console.log(`💾 プロフィールをキャッシュに保存: ${username} (7日間有効)`);
+        
+        res.json(profileData);
 
     } catch (error) {
         if (isDevelopment) {
@@ -423,47 +509,7 @@ app.get('/api/user/follow-status', async (req, res) => {
     }
 });
 
-// 指定ユーザーのプロフィール情報取得
-app.get('/api/user/profile/:username', async (req, res) => {
-    try {
-        const { username } = req.params;
-        if (isDevelopment) console.log('👤 プロフィール取得:', username);
-
-        // アクセストークンを取得（認証済みユーザーのトークンを使用）
-        if (!req.session.accessToken) {
-            return res.status(401).json({ error: '認証が必要です' });
-        }
-
-        const accessToken = req.session.accessToken;
-
-        // ユーザー情報を取得
-        const userResponse = await axios.get('https://api.twitter.com/2/users/by/username/' + username, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`
-            },
-            params: {
-                'user.fields': 'profile_image_url'
-            }
-        });
-
-        const userData = userResponse.data.data;
-        if (isDevelopment) console.log('✅ プロフィール取得成功:', userData.username);
-
-        res.json({
-            id: userData.id,
-            username: userData.username,
-            name: userData.name,
-            profile_image_url: userData.profile_image_url
-        });
-
-    } catch (error) {
-        if (isDevelopment) console.error('❌ プロフィール取得エラー:', error.response?.data || error.message);
-        res.status(500).json({ 
-            error: 'プロフィール情報の取得に失敗しました',
-            details: error.response?.data?.detail || error.message
-        });
-    }
-});
+// 重複したエンドポイントを削除（上記で既に定義済み）
 
 // ヘルスチェック
 app.get('/api/health', (req, res) => {

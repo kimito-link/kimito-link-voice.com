@@ -1,9 +1,9 @@
 // Service Worker for KimiLink Voice
 // PWA (Progressive Web App) support
 
-const CACHE_NAME = 'kimitolink-voice-v2-optimized';
-const STATIC_CACHE = 'static-v2';
-const DYNAMIC_CACHE = 'dynamic-v2';
+const CACHE_NAME = 'kimitolink-voice-v3-fixed';
+const STATIC_CACHE = 'static-v3';
+const DYNAMIC_CACHE = 'dynamic-v3';
 
 // 重要な静的リソース（前キャッシュ）
 const STATIC_ASSETS = [

@@ -140,6 +140,7 @@
         <div class="btn-container">
             <button class="btn" onclick="showScenario()">📋 シナリオ表示</button>
             <button class="btn btn-run" onclick="runScenario()">▶️ 自動実行</button>
+            <button class="btn" onclick="runImprovedVersion()" style="background: linear-gradient(45deg, #28a745, #20c997);">🔧 改善版実行</button>
         </div>
 
         <div class="console" id="console"></div>
@@ -256,6 +257,42 @@
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 改善版実行関数
+        async function runImprovedVersion() {
+            const confirmed = confirm('🔧 改善版自動化を開始しますか？\n\n✅ Twitterログイン状態の自動確認\n✅ エラー処理の強化\n✅ より安全な実行\n\n画面録画が開始されていることを確認してください！');
+            if (!confirmed) return;
+
+            consoleEl.classList.add('active');
+            consoleEl.innerHTML = '<p style="color: #00ffff;">🔧 改善版自動化開始...</p>';
+            consoleEl.innerHTML += '<p style="color: #ffffff;">━━━━━━━━━━━━━━━━━━━━━━</p>';
+            
+            // 改善版の特徴を表示
+            consoleEl.innerHTML += '<p style="color: #00ff00;">✨ 改善版の特徴:</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   🔐 Twitterログイン状態の自動確認</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   🛡️ 強化されたエラー処理</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   🔄 失敗時の自動リトライ</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   ⏰ ログイン待機機能</p>';
+            consoleEl.innerHTML += '<br>';
+            
+            consoleEl.innerHTML += '<p style="color: #ffff00;">📋 実行方法:</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   1. コマンドプロンプトを開く</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   2. birthday-shizukuフォルダに移動</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   3. 以下のコマンドを実行:</p>';
+            consoleEl.innerHTML += '<p style="color: #00ff00;">   node birthday-automation-improved.js</p>';
+            consoleEl.innerHTML += '<br>';
+            
+            consoleEl.innerHTML += '<p style="color: #ffff00;">または:</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   step2-auto-run-improved.bat をダブルクリック</p>';
+            consoleEl.innerHTML += '<br>';
+            
+            consoleEl.innerHTML += '<p style="color: #ff6b9d;">💡 改善版では以下の問題が解決されています:</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   ❌ ログイン画面での停止 → ✅ 自動検出＆待機</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   ❌ エラー時の停止 → ✅ 安全なスキップ</p>';
+            consoleEl.innerHTML += '<p style="color: #aaaaaa;">   ❌ 不明なエラー → ✅ 詳細なトラブルシューティング</p>';
+            
+            consoleEl.scrollTop = consoleEl.scrollHeight;
         }
     </script>
 </body>
