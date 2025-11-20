@@ -313,6 +313,15 @@ app.get('/api/user/profile/:username', async (req, res) => {
                     profile_image_url: dbProfile.avatar_url
                 };
                 
+                // デバッグ: avatar_urlが正しく取得できているか確認
+                console.log(`📊 Supabaseから取得したデータ (${username}):`, {
+                    id: profileData.id,
+                    username: profileData.username,
+                    name: profileData.name,
+                    profile_image_url: profileData.profile_image_url,
+                    avatar_url_exists: !!dbProfile.avatar_url
+                });
+                
                 // メモリキャッシュにも保存
                 accountProfileCache.set(cacheKey, {
                     timestamp: Date.now(),

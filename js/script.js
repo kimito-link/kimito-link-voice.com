@@ -1,12 +1,12 @@
 // ===== グローバル変数 =====
 // 開発モード（本番環境では false に設定）
-const DEVELOPMENT_MODE = false; // キャッシュを活用してAPI負荷を削減
+const DEVELOPMENT_MODE = true; // 一時的にtrue: キャッシュをクリアしてAPI再取得
 
 // フォロー確認をスキップ（開発中のみ）
 const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 // 認証をスキップ（開発中のみ）
-const SKIP_AUTHENTICATION = true; // サムネイル問題の調査のため一時的にtrue
+const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse
 
 let currentUser = null;
 let followedAccounts = {
@@ -303,6 +303,11 @@ async function updateAccountDisplays() {
         
     } catch (error) {
         console.error('❌ アカウント情報取得エラー:', error);
+        // エラーが発生してもフォールバックを表示
+        console.warn('⚠️ エラー発生のため、フォールバック表示を使用します');
+        alert(`アカウント情報の取得でエラーが発生しました。\n\nエラー: ${error.message}\n\nコンソールログ(F12)を確認してください。`);
+        useFallbackDisplay('creator', 'streamerfunch');
+        useFallbackDisplay('idol', 'idolfunch');
     }
 }
 
@@ -416,18 +421,26 @@ function getCachedAccountData(username, allowExpired = false) {
         if (!cached) return null;
         
         const data = JSON.parse(cached);
-        const now = Date.now();
         
-        // キャッシュが期限切れかチェック
-        if (now - data.timestamp > CACHE_DURATION) {
-            if (!allowExpired) {
-                localStorage.removeItem(cacheKey);
-                console.log(`🗑️ ${username}のキャッシュが期限切れのため削除`);
-                return null;
-            } else {
-                console.log(`⚠️ ${username}の期限切れキャッシュを使用`);
-                return data.accountData;
-            }
+        // データ構造の検証
+        if (!data.accountData || typeof data.accountData !== 'object') {
+            console.warn(`⚠️ キャッシュデータの構造が不正: ${username}`);
+            localStorage.removeItem(cacheKey); // 壊れたキャッシュを削除
+            return null;
+        }
+        
+        // キャッシュの有効期限をチェック
+        if (!allowExpired && Date.now() - data.timestamp > CACHE_DURATION) {
+            console.log(`⏰ キャッシュ期限切れ: ${username}`);
+            return null;
+        }
+        
+        // accountDataが正しいプロパティを持っているか確認
+        const accountData = data.accountData;
+        if (!accountData.id && !accountData.username && !accountData.name) {
+            console.warn(`⚠️ キャッシュデータが不完全: ${username}`, accountData);
+            localStorage.removeItem(cacheKey); // 不完全なキャッシュを削除
+            return null;
         }
         
         console.log(`💾 ${username}のキャッシュデータを使用`);
@@ -456,12 +469,17 @@ function setCachedAccountData(username, accountData) {
 
 // 個別アカウント表示を更新
 function updateAccountDisplay(type, accountData) {
-    console.log(`🎨 ${type}アカウント表示を更新中...`, accountData);
+    console.log(`🎨 ${type}アカウント表示を更新中...`);
+    console.log(`📦 受信したaccountData:`, accountData);
+    console.log(`📦 accountDataのキー:`, Object.keys(accountData || {}));
+    
     const avatarId = type === 'creator' ? 'creatorAvatar' : 'idolAvatar';
     const avatarElement = document.getElementById(avatarId);
-    console.log(`🔍 アバター要素 (${avatarId}):`, avatarElement);
-    console.log(`🔍 プロフィール画像URL:`, accountData.profile_image_url);
-    console.log(`🔍 アカウントデータ全体:`, JSON.stringify(accountData, null, 2));
+    console.log(`🔍 アバターID: ${avatarId}`);
+    console.log(`🔍 アバター要素:`, avatarElement);
+    console.log(`🔍 profile_image_url:`, accountData?.profile_image_url);
+    console.log(`🔍 name:`, accountData?.name);
+    console.log(`🔍 username:`, accountData?.username);
     
     if (avatarElement && accountData.profile_image_url) {
         // Twitter APIから取得した画像URLを使用（高解像度版）
