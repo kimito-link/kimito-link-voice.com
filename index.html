@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=31.0">
+    <link rel="stylesheet" href="css/styles.css?v=38.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
     <link rel="manifest" href="manifest.json">
     
@@ -591,6 +591,14 @@
                 </div>
             </div>
 
+            <!-- アカウント履歴 -->
+            <div class="account-history-section" id="accountHistorySection" style="display: none;">
+                <h3><i class="fas fa-history"></i> 最近ログインしたアカウント</h3>
+                <div class="account-history-list" id="accountHistoryList">
+                    <!-- JavaScriptで動的に生成 -->
+                </div>
+            </div>
+
             <div class="switch-steps">
                 <h3>アカウント切り替え手順</h3>
                 <div class="step-item">
@@ -617,11 +625,188 @@
             </div>
 
             <div class="switch-actions">
-                <a href="https://x.com/logout" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                <a href="https://x.com/logout" class="btn-secondary">
                     <i class="fab fa-x-twitter"></i> X.comでログアウト
                 </a>
                 <button class="btn-primary" onclick="logoutAndSwitch()">
                     <i class="fas fa-sign-out-alt"></i> ログアウトして切り替え
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 複数アカウント同時利用ガイドモーダル -->
+    <div id="multiAccountGuideModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <button class="modal-close" onclick="hideMultiAccountGuide()">×</button>
+            
+            <h2><i class="fas fa-users"></i> 複数アカウントを同時に利用する</h2>
+            <p class="subtitle">ブラウザの機能を使って、複数のアカウントを同時に使用できます</p>
+            
+            <div class="guide-tabs">
+                <button class="guide-tab active" onclick="showGuideTab('chrome')">
+                    <i class="fab fa-chrome"></i> Chrome
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('firefox')">
+                    <i class="fab fa-firefox"></i> Firefox
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('edge')">
+                    <i class="fab fa-edge"></i> Edge
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('safari')">
+                    <i class="fab fa-safari"></i> Safari
+                </button>
+            </div>
+
+            <!-- Chrome -->
+            <div class="guide-content" id="guideChrome">
+                <h3>Chrome プロフィール機能</h3>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>Chromeブラウザでプロフィールを追加</strong>
+                            <p>Chromeブラウザ右上のプロフィールアイコン（丸いアイコン）をクリック → 「追加」または「別のユーザーを追加」を選択</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>新しいChromeウィンドウが開きます</strong>
+                            <p>完全に独立したブラウザ環境として動作します</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>それぞれのプロフィールでログイン</strong>
+                            <p>各ウィンドウで異なるアカウントにログインできます</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li><strong>重要：</strong> KimiLink Voiceのプロフィールメニューではなく、<strong>Chromeブラウザ自体のプロフィール機能</strong>です（アドレスバーの右側、ブラウザの右上隅にあります）</li>
+                        <li>プロフィールごとに名前とアイコンをカスタマイズできます</li>
+                        <li>ブックマーク、履歴、パスワードも完全に分離されます</li>
+                        <li>複数のウィンドウを同時に開いて作業できます</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Firefox -->
+            <div class="guide-content" id="guideFirefox" style="display: none;">
+                <h3>Firefox コンテナタブ機能</h3>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>Firefoxの拡張機能をインストール</strong>
+                            <p>Firefoxブラウザで「Multi-Account Containers」をFirefoxアドオンストアから無料でインストール</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>新しいコンテナタブを作成</strong>
+                            <p>タブの「+」ボタンを長押し → コンテナを選択</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>各コンテナで異なるアカウントにログイン</strong>
+                            <p>コンテナごとに独立したCookieを持ちます</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li>コンテナごとに色分けして管理できます</li>
+                        <li>同じウィンドウ内で複数アカウントを使い分け可能</li>
+                        <li>「仕事用」「プライベート用」など目的別に分けられます</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Edge -->
+            <div class="guide-content" id="guideEdge" style="display: none;">
+                <h3>Edge プロフィール機能</h3>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>Edgeブラウザでプロフィールを追加</strong>
+                            <p>Edgeブラウザ右上のプロフィールアイコン → 「プロフィールの追加」を選択</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>新しいEdgeウィンドウが開きます</strong>
+                            <p>Chromeと同様に独立した環境で動作します</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>Microsoft アカウントと連携可能</strong>
+                            <p>設定を複数デバイス間で同期できます</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li><strong>重要：</strong> KimiLink Voiceのプロフィールメニューではなく、<strong>Edgeブラウザ自体のプロフィール機能</strong>です（アドレスバーの右側、ブラウザの右上隅にあります）</li>
+                        <li>職場アカウントと個人アカウントを分けて管理</li>
+                        <li>EdgeとChromeは同じChromiumベース</li>
+                        <li>Windows 11との統合が優れています</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Safari -->
+            <div class="guide-content" id="guideSafari" style="display: none;">
+                <h3>Safari プライベートウィンドウ</h3>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>Safariブラウザでプライベートウィンドウを開く</strong>
+                            <p>Safariブラウザのメニュー「ファイル」 → 「新規プライベートウィンドウ」（⌘+Shift+N）</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>通常ウィンドウとプライベートウィンドウを両方使用</strong>
+                            <p>それぞれで異なるアカウントにログインできます</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>注意：プライベートウィンドウを閉じるとログアウト</strong>
+                            <p>セッションは保持されません</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li>MacユーザーにはChrome/Firefoxの方が便利</li>
+                        <li>プライベートウィンドウは一時的な使用に適しています</li>
+                        <li>iOS/iPadOSでも同様の方法が使えます</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="guide-footer">
+                <button class="btn-primary" onclick="hideMultiAccountGuide()">
+                    <i class="fas fa-check"></i> 理解しました
                 </button>
             </div>
         </div>
@@ -647,15 +832,54 @@
                 </nav>
 
                 <div class="user-area">
-                    <img src="" alt="User" class="user-avatar" id="userAvatar">
-                    <button class="btn-switch-account" onclick="showSwitchAccountModal()">
-                        <i class="fas fa-sync-alt"></i>
-                        <span class="btn-text">アカウント切り替え</span>
-                    </button>
-                    <button class="btn-logout" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span class="btn-text">ログアウト</span>
-                    </button>
+                    <!-- ユーザーメニュートリガー -->
+                    <div class="user-menu-trigger" onclick="toggleUserMenu()">
+                        <img src="" alt="User" class="user-avatar" id="userAvatar">
+                        <div class="user-info">
+                            <span class="user-name" id="headerUserName">ユーザー</span>
+                            <span class="user-handle" id="headerUserHandle">@username</span>
+                        </div>
+                        <i class="fas fa-chevron-down user-menu-arrow"></i>
+                    </div>
+
+                    <!-- ユーザードロップダウンメニュー -->
+                    <div class="user-dropdown-menu" id="userDropdownMenu">
+                        <div class="dropdown-header">
+                            <img src="" alt="User" class="dropdown-avatar" id="dropdownAvatar">
+                            <div class="dropdown-user-info">
+                                <span class="dropdown-name" id="dropdownName">ユーザー</span>
+                                <span class="dropdown-username" id="dropdownUsername">@username</span>
+                            </div>
+                        </div>
+
+                        <!-- 最近のアカウント -->
+                        <div class="dropdown-section" id="dropdownHistorySection" style="display: none;">
+                            <div class="dropdown-section-title">
+                                <i class="fas fa-history"></i> 最近のアカウント
+                            </div>
+                            <div id="dropdownHistoryList">
+                                <!-- JavaScriptで動的に生成 -->
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <!-- アクション -->
+                        <div class="dropdown-actions">
+                            <button class="dropdown-item" onclick="showSwitchAccountModal()">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>アカウントを切り替え</span>
+                            </button>
+                            <button class="dropdown-item" onclick="showMultiAccountGuide()">
+                                <i class="fas fa-users"></i>
+                                <span>複数アカウント同時利用</span>
+                            </button>
+                            <button class="dropdown-item danger" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>ログアウト</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -748,23 +972,50 @@
                     </div>
                 </div>
 
-                <!-- プロフィールカード -->
-                <div class="card profile-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-user"></i> プロフィール</h2>
-                    </div>
-                    <div class="profile-content">
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="Profile" class="profile-avatar" id="profileAvatar" loading="lazy">
-                        <h3 id="profileName">デモユーザー</h3>
-                        <p class="profile-handle" id="profileHandle">@demo_user</p>
-                        <div class="profile-stats">
-                            <div class="stat-item">
-                                <span class="stat-value" id="followerCount">0</span>
-                                <span class="stat-label">フォロワー</span>
+                <!-- プロフィールカード（Twitterライク） -->
+                <div class="card profile-card-twitter">
+                    <!-- ヘッダー画像 -->
+                    <div class="profile-header-image" id="profileHeaderImage"></div>
+                    
+                    <!-- プロフィール情報 -->
+                    <div class="profile-info-container">
+                        <!-- アバターとボタン -->
+                        <div class="profile-top">
+                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="Profile" class="profile-avatar-large" id="profileAvatar" loading="lazy">
+                        </div>
+                        
+                        <!-- 名前とユーザー名 -->
+                        <div class="profile-names">
+                            <h2 id="profileName">デモユーザー</h2>
+                            <p class="profile-username" id="profileHandle">@demo_user</p>
+                        </div>
+                        
+                        <!-- プロフィール説明 -->
+                        <div class="profile-description" id="profileBio">
+                            プロフィール説明がここに表示されます
+                        </div>
+                        
+                        <!-- メタ情報 -->
+                        <div class="profile-meta">
+                            <div class="profile-meta-item">
+                                <i class="fas fa-link"></i>
+                                <a href="#" id="profileWebsite" target="_blank">kimito-link-voice.com</a>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-value" id="followingCount">0</span>
-                                <span class="stat-label">フォロー中</span>
+                            <div class="profile-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="profileJoinDate">2025年5月から利用しています</span>
+                            </div>
+                        </div>
+                        
+                        <!-- フォロー統計 -->
+                        <div class="profile-follow-stats">
+                            <div class="follow-stat-item">
+                                <span class="follow-count" id="followingCount">35</span>
+                                <span class="follow-label">フォロー中</span>
+                            </div>
+                            <div class="follow-stat-item">
+                                <span class="follow-count" id="followerCount">6</span>
+                                <span class="follow-label">フォロワー</span>
                             </div>
                         </div>
                     </div>
@@ -842,8 +1093,19 @@
         </footer>
     </div>
 
+    <!-- トースト通知コンテナ -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ローディングオーバーレイ -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">読み込み中...</p>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=13"></script>
+    <script src="js/script.js?v=21.0"></script>
 </body>
 </html>

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>認証がキャンセルされました - KimiLink Voice</title>
+    
+    <!-- Cache Control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -21,7 +27,8 @@
             justify-content: center;
             font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            padding: 40px 0;
         }
 
         /* 宇宙背景エフェクト */
@@ -42,13 +49,35 @@
             backdrop-filter: blur(20px);
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            padding: 60px 50px;
+            padding: 70px 60px;
             max-width: 650px;
             width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             text-align: center;
             position: relative;
             z-index: 1;
             animation: slideIn 0.5s ease-out;
+            /* スクロールバーのスタイル */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(74, 144, 226, 0.5) transparent;
+        }
+
+        .cancelled-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .cancelled-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cancelled-container::-webkit-scrollbar-thumb {
+            background: rgba(74, 144, 226, 0.5);
+            border-radius: 4px;
+        }
+
+        .cancelled-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(74, 144, 226, 0.7);
         }
 
         @keyframes slideIn {
@@ -63,7 +92,7 @@
         }
 
         .logo-container {
-            margin-bottom: 30px;
+            margin-bottom: 45px;
         }
 
         .logo-container img {
@@ -76,7 +105,7 @@
             display: flex;
             justify-content: space-around;
             align-items: flex-start;
-            margin: 30px auto;
+            margin: 45px auto 50px;
             max-width: 500px;
             gap: 20px;
         }
@@ -178,7 +207,7 @@
         .cancelled-icon {
             width: 100px;
             height: 100px;
-            margin: 0 auto 28px;
+            margin: 0 auto 40px;
             background: linear-gradient(135deg, #FFE8D6 0%, #FFD6BA 100%);
             border-radius: 50%;
             display: flex;
@@ -205,13 +234,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 18px;
+            margin-bottom: 25px;
         }
 
         .cancelled-subtitle {
             font-size: 18px;
             color: #4A5568;
-            margin-bottom: 32px;
+            margin-bottom: 45px;
             line-height: 1.6;
         }
 
@@ -226,7 +255,7 @@
             background: linear-gradient(135deg, #E6EDF4 0%, #FFE8D6 100%);
             border-left: 4px solid #4A90E2;
             padding: 24px 28px;
-            margin-bottom: 36px;
+            margin-bottom: 45px;
             text-align: left;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -249,8 +278,8 @@
         .cancelled-actions {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-bottom: 32px;
+            gap: 18px;
+            margin-bottom: 40px;
         }
 
         .btn-primary {
@@ -298,9 +327,98 @@
             transform: translateY(-2px);
         }
 
+        .btn-switch-account-action {
+            background: white;
+            color: #FF8C42;
+            border: 2px solid #FF8C42;
+            padding: 16px 36px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-switch-account-action:hover {
+            background: #FFF3E0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+        }
+
+        /* アカウント切り替え案内 */
+        .account-switch-notice {
+            margin: 40px 0;
+            padding: 28px;
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFF3CC 100%);
+            border: 2px solid #FFE082;
+            border-radius: 16px;
+            text-align: left;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                padding-top: 0;
+                padding-bottom: 0;
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+                padding-top: 28px;
+                padding-bottom: 28px;
+                margin-top: 40px;
+                margin-bottom: 40px;
+            }
+        }
+
+        .account-switch-notice p:first-child {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #F57C00;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .account-switch-notice i.fa-info-circle {
+            font-size: 20px;
+        }
+
+        .btn-logout-x {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: white;
+            color: #1DA1F2;
+            border: 2px solid #1DA1F2;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+
+        .btn-logout-x:hover {
+            background: #E8F5FD;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 161, 242, 0.2);
+        }
+
         .cancelled-links {
-            margin-top: 28px;
-            padding-top: 28px;
+            margin-top: 40px;
+            padding-top: 35px;
             border-top: 2px solid #E2E8F0;
             display: flex;
             flex-wrap: wrap;
@@ -331,13 +449,26 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 30px 0;
+            }
+
             .cancelled-container {
-                padding: 40px 28px;
+                padding: 50px 35px;
                 max-width: 95%;
+                max-height: 92vh;
+            }
+
+            .logo-container {
+                margin-bottom: 35px;
             }
 
             .logo-container img {
                 width: 180px;
+            }
+
+            .yukkuri-decoration {
+                margin: 35px auto 40px;
             }
 
             .yukkuri-decoration img {
@@ -359,14 +490,31 @@
                 width: 80px;
                 height: 80px;
                 font-size: 48px;
+                margin-bottom: 32px;
             }
 
             .cancelled-title {
                 font-size: 26px;
+                margin-bottom: 20px;
             }
 
             .cancelled-subtitle {
                 font-size: 16px;
+                margin-bottom: 35px;
+            }
+
+            .cancelled-info {
+                margin-bottom: 35px;
+            }
+
+            .cancelled-actions {
+                gap: 16px;
+                margin-bottom: 32px;
+            }
+
+            .account-switch-notice {
+                margin: 32px 0;
+                padding: 22px;
             }
 
             .btn-primary, .btn-secondary {
@@ -376,8 +524,17 @@
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: 20px 0;
+            }
+
             .cancelled-container {
-                padding: 32px 20px;
+                padding: 40px 25px;
+                max-height: 94vh;
+            }
+
+            .logo-container {
+                margin-bottom: 28px;
             }
 
             .logo-container img {
@@ -386,6 +543,7 @@
 
             .yukkuri-decoration {
                 gap: 15px;
+                margin: 28px auto 35px;
             }
 
             .yukkuri-decoration img {
@@ -407,18 +565,32 @@
                 width: 70px;
                 height: 70px;
                 font-size: 42px;
+                margin-bottom: 25px;
             }
 
             .cancelled-title {
                 font-size: 22px;
+                margin-bottom: 16px;
             }
 
             .cancelled-subtitle {
                 font-size: 15px;
+                margin-bottom: 28px;
             }
 
             .cancelled-info {
                 padding: 18px 20px;
+                margin-bottom: 28px;
+            }
+
+            .cancelled-actions {
+                gap: 14px;
+                margin-bottom: 25px;
+            }
+
+            .account-switch-notice {
+                margin: 25px 0;
+                padding: 18px;
             }
 
             .btn-primary, .btn-secondary {
@@ -485,7 +657,28 @@
             
             <a href="/auth/twitter" class="btn-secondary">
                 <i class="fas fa-redo"></i>
-                もう一度ログインする
+                同じアカウントでログインする
+            </a>
+            
+            <button class="btn-switch-account-action" onclick="showSwitchAccountGuide()">
+                <i class="fas fa-user-friends"></i>
+                違うアカウントでログインする
+            </button>
+        </div>
+
+        <!-- 別のアカウントでログインする場合の案内 -->
+        <div class="account-switch-notice" id="switchAccountGuide" style="display: none;">
+            <p>
+                <i class="fas fa-info-circle"></i>
+                <strong>別のアカウントでログインしたい場合</strong>
+            </p>
+            <p style="font-size: 14px; color: #666; margin: 10px 0;">
+                現在X.comにログイン中の場合、自動的にそのアカウントで認証されます。<br>
+                別のアカウントでログインするには、先にX.comからログアウトしてください。
+            </p>
+            <a href="https://x.com/logout" class="btn-logout-x">
+                <i class="fab fa-x-twitter"></i>
+                X.comからログアウトする
             </a>
         </div>
 
@@ -564,6 +757,16 @@
             iconElement.textContent = '🔒';
         } else if (error === 'oauth_error') {
             iconElement.textContent = '❌';
+        }
+
+        // アカウント切り替え案内を表示
+        function showSwitchAccountGuide() {
+            const guideElement = document.getElementById('switchAccountGuide');
+            if (guideElement) {
+                guideElement.style.display = 'block';
+                // スムーズにスクロール
+                guideElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         }
     </script>
 </body>

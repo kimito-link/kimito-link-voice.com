@@ -37,13 +37,15 @@ app.use(session({
     //     retries: 0
     // }),
     secret: process.env.SESSION_SECRET,
-    resave: true, // セッションを常に保存
-    saveUninitialized: true, // 初期化されていないセッションも保存
+    resave: false, // 変更がない場合は保存しない（推奨）
+    saveUninitialized: true, // OAuth用に初期化されていないセッションも保存
+    name: 'kimilink.sid', // セッションIDのCookie名を明示的に設定
     cookie: {
         secure: false, // 開発環境ではfalse（HTTPでも動作）
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 24時間
-        sameSite: 'lax' // CSRF対策
+        sameSite: 'lax', // CSRF対策、OAuth認証に必要
+        path: '/' // 全パスでCookieを有効化
     }
 }));
 
@@ -110,7 +112,20 @@ app.get('/', (req, res) => {
 
 // 認証キャンセルページ
 app.get('/auth-cancelled.html', (req, res) => {
+    // キャッシュを無効化
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
     res.sendFile(path.join(__dirname, 'auth-cancelled.html'));
+});
+
+// ログアウト成功ページ
+app.get('/logout-success.html', (req, res) => {
+    // キャッシュを無効化
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(__dirname, 'logout-success.html'));
 });
 
 // ===== ユーティリティ関数 =====
@@ -177,7 +192,10 @@ app.get('/auth/twitter', (req, res) => {
                 console.error('❌ セッション保存エラー:', err);
                 return res.status(500).json({ error: 'セッション保存に失敗しました' });
             }
-            if (isDevelopment) console.log('✅ セッション保存完了、リダイレクトします');
+            if (isDevelopment) {
+                console.log('✅ セッション保存完了、リダイレクトします');
+                console.log('🆔 セッションID:', req.sessionID);
+            }
             res.redirect(authUrl);
         });
 
@@ -191,6 +209,7 @@ app.get('/auth/twitter', (req, res) => {
 app.get('/auth/twitter/callback', async (req, res) => {
     if (isDevelopment) {
         console.log('🔄 OAuth コールバック開始');
+        console.log('🆔 セッションID:', req.sessionID);
         console.log('📥 受信したクエリパラメータ:', req.query);
         console.log('🔐 セッション状態:', {
             hasCodeVerifier: !!req.session.codeVerifier,
@@ -266,7 +285,7 @@ app.get('/auth/twitter/callback', async (req, res) => {
                 'Authorization': `Bearer ${access_token}`
             },
             params: {
-                'user.fields': 'profile_image_url,public_metrics,created_at'
+                'user.fields': 'profile_image_url,description,public_metrics,created_at'
             }
         });
 
@@ -304,6 +323,7 @@ app.get('/auth/twitter/callback', async (req, res) => {
             username: userData.username,
             displayName: userData.name,
             avatar: userData.profile_image_url,
+            description: userData.description || '',
             followers: userData.public_metrics?.followers_count || 0,
             following: userData.public_metrics?.following_count || 0,
             createdAt: userData.created_at,

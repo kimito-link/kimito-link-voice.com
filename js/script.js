@@ -44,12 +44,95 @@ function updateCorrectAccountData(username, newData) {
     console.log(`📝 ${username}のアカウントデータを${CORRECT_ACCOUNT_DATA[username].lastUpdated ? '更新' : '新規作成'}:`, CORRECT_ACCOUNT_DATA[username]);
 }
 
+// ===== アカウント履歴管理 =====
+const ACCOUNT_HISTORY_KEY = 'kimilink_account_history';
+const MAX_ACCOUNT_HISTORY = 5;
+
+// アカウント履歴をlocalStorageから取得
+function getAccountHistory() {
+    try {
+        const history = localStorage.getItem(ACCOUNT_HISTORY_KEY);
+        return history ? JSON.parse(history) : [];
+    } catch (error) {
+        console.error('アカウント履歴の取得に失敗:', error);
+        return [];
+    }
+}
+
+// アカウント履歴を保存
+function saveAccountToHistory(account) {
+    try {
+        let history = getAccountHistory();
+        
+        // 既存の同じアカウントを削除（重複防止）
+        history = history.filter(a => a.id !== account.id);
+        
+        // 新しいアカウントを先頭に追加
+        history.unshift({
+            id: account.id,
+            username: account.username,
+            displayName: account.displayName || account.name,
+            avatar: account.avatar,
+            lastLogin: Date.now()
+        });
+        
+        // 最大件数を超えたら古いものを削除
+        if (history.length > MAX_ACCOUNT_HISTORY) {
+            history = history.slice(0, MAX_ACCOUNT_HISTORY);
+        }
+        
+        localStorage.setItem(ACCOUNT_HISTORY_KEY, JSON.stringify(history));
+        console.log('✅ アカウント履歴を保存:', account.username);
+    } catch (error) {
+        console.error('アカウント履歴の保存に失敗:', error);
+    }
+}
+
+// アカウント履歴から削除
+function removeAccountFromHistory(accountId) {
+    try {
+        let history = getAccountHistory();
+        history = history.filter(a => a.id !== accountId);
+        localStorage.setItem(ACCOUNT_HISTORY_KEY, JSON.stringify(history));
+        console.log('✅ アカウント履歴から削除:', accountId);
+    } catch (error) {
+        console.error('アカウント履歴の削除に失敗:', error);
+    }
+}
+
 // コラボレーター情報
 const COLLABORATOR = {
     id: 'c0tanpoTeshi1a',
     name: 'コタのAI紀行',
     price: 30000
 };
+
+// ===== ヘルパー関数 =====
+
+/**
+ * テキスト内のURLを自動的にリンク化する
+ * @param {string} text - リンク化するテキスト
+ * @returns {string} - HTMLタグを含むリンク化されたテキスト
+ */
+function linkifyText(text) {
+    if (!text) return '';
+    
+    // URLパターン（http, https, t.coなど）
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    
+    // エスケープして安全なHTMLに
+    const escapedText = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    
+    // URLをリンクに変換
+    return escapedText.replace(urlPattern, (url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="profile-link">${url}</a>`;
+    });
+}
 
 // ===== 初期化 =====
 document.addEventListener('DOMContentLoaded', async function() {
@@ -75,6 +158,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     name: userData.name || userData.displayName,
                     displayName: userData.name || userData.displayName,
                     avatar: userData.profile_image_url || userData.avatar || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEE5MEUyIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPuODpuODvOOCtuODvDwvdGV4dD48L3N2Zz4=',
+                    description: userData.description || '',
                     followers: userData.public_metrics?.followers_count || userData.followers || 0,
                     following: userData.public_metrics?.following_count || userData.following || 0
                 };
@@ -194,6 +278,9 @@ async function checkAuthStatus() {
         const response = await fetch('/api/user/me');
         if (response.ok) {
             currentUser = await response.json();
+            
+            // アカウント履歴に保存
+            saveAccountToHistory(currentUser);
             
             // 開発モード: フォロー確認をスキップしてダッシュボードを表示
             if (SKIP_FOLLOW_CHECK) {
@@ -1214,16 +1301,49 @@ function showPlatform() {
                 if (userAvatar) userAvatar.src = currentUser.avatar || '';
                 if (userName) userName.textContent = currentUser.displayName || currentUser.name || '';
                 
-                // プロフィールカード
+                // プロフィールカード（Twitterライク）
+                const profileHeaderImage = document.getElementById('profileHeaderImage');
                 const profileAvatar = document.getElementById('profileAvatar');
                 const profileName = document.getElementById('profileName');
                 const profileHandle = document.getElementById('profileHandle');
+                const profileBio = document.getElementById('profileBio');
+                const profileWebsite = document.getElementById('profileWebsite');
+                const profileJoinDate = document.getElementById('profileJoinDate');
                 const followerCount = document.getElementById('followerCount');
                 const followingCount = document.getElementById('followingCount');
+                
+                // ヘッダー画像を設定（ユーザーIDからURLを構築）
+                if (profileHeaderImage && currentUser.id) {
+                    const bannerUrl = `https://pbs.twimg.com/profile_banners/${currentUser.id}/1500x500`;
+                    
+                    // 画像が存在するか確認
+                    const img = new Image();
+                    img.onload = function() {
+                        profileHeaderImage.style.backgroundImage = `url('${bannerUrl}')`;
+                        profileHeaderImage.style.backgroundSize = 'cover';
+                        profileHeaderImage.style.backgroundPosition = 'center';
+                    };
+                    img.onerror = function() {
+                        // 画像が存在しない場合はグラデーションのまま
+                        console.log('ℹ️ ヘッダー画像が見つかりません。グラデーションを使用します。');
+                    };
+                    img.src = bannerUrl;
+                }
                 
                 if (profileAvatar) profileAvatar.src = currentUser.avatar || '';
                 if (profileName) profileName.textContent = currentUser.displayName || currentUser.name || '';
                 if (profileHandle) profileHandle.textContent = '@' + (currentUser.username || '');
+                
+                // プロフィール説明をリンク化
+                if (profileBio) {
+                    const description = currentUser.description || currentUser.profile_description || 'プロフィール説明がありません';
+                    profileBio.innerHTML = linkifyText(description);
+                }
+                if (profileWebsite) {
+                    profileWebsite.textContent = 'kimito-link-voice.com';
+                    profileWebsite.href = 'https://kimito-link-voice.com';
+                }
+                if (profileJoinDate) profileJoinDate.textContent = '2025年5月からXを利用しています';
                 if (followerCount) followerCount.textContent = currentUser.followers || 0;
                 if (followingCount) followingCount.textContent = currentUser.following || 0;
                 
@@ -1385,6 +1505,8 @@ function setupNavigation() {
 async function logout() {
     if (confirm('ログアウトしますか?')) {
         try {
+            showLoading('ログアウト中...');
+            
             // サーバーのセッションを破棄
             await fetch('/auth/logout', { method: 'POST' });
             
@@ -1392,12 +1514,14 @@ async function logout() {
             currentUser = null;
             followedAccounts = { creator: false, idol: false };
             
-            // UIをリセット
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('publicPage').style.display = 'block';
+            hideLoading();
+            
+            // ログアウト成功ページにリダイレクト
+            window.location.href = '/logout-success.html';
         } catch (error) {
+            hideLoading();
             console.error('ログアウトエラー:', error);
-            alert('ログアウトに失敗しました。');
+            showToast('ログアウトに失敗しました。', 'error');
         }
     }
 }
@@ -1423,6 +1547,7 @@ function hideSwitchAccountModal() {
 }
 
 function updateSwitchModalAccountInfo() {
+    // 現在のアカウント情報を表示
     if (currentUser) {
         const avatarEl = document.getElementById('switchModalAvatar');
         const nameEl = document.getElementById('switchModalName');
@@ -1432,10 +1557,88 @@ function updateSwitchModalAccountInfo() {
         if (nameEl) nameEl.textContent = currentUser.name || currentUser.displayName || 'ユーザー';
         if (usernameEl) usernameEl.textContent = '@' + (currentUser.username || '');
     }
+    
+    // アカウント履歴を表示
+    const history = getAccountHistory();
+    const historySection = document.getElementById('accountHistorySection');
+    const historyList = document.getElementById('accountHistoryList');
+    
+    if (!historyList) return;
+    
+    // 現在のアカウント以外の履歴を取得
+    const otherAccounts = history.filter(acc => acc.id !== currentUser?.id);
+    
+    if (otherAccounts.length === 0) {
+        historySection.style.display = 'none';
+        return;
+    }
+    
+    historySection.style.display = 'block';
+    historyList.innerHTML = '';
+    
+    otherAccounts.forEach(account => {
+        const item = document.createElement('div');
+        item.className = 'history-account-item';
+        
+        // 最終ログイン時刻を表示
+        const lastLogin = new Date(account.lastLogin);
+        const timeAgo = getTimeAgo(lastLogin);
+        
+        item.innerHTML = `
+            <img src="${account.avatar || ''}" alt="${account.displayName}" class="history-avatar">
+            <div class="history-info">
+                <span class="history-name">${account.displayName}</span>
+                <span class="history-username">@${account.username}</span>
+                <span class="history-time">${timeAgo}</span>
+            </div>
+            <button class="btn-switch-to-account" onclick="switchToAccount('${account.id}')">
+                <i class="fas fa-sign-in-alt"></i> 切り替え
+            </button>
+            <button class="btn-remove-history" onclick="removeFromHistory('${account.id}')" title="履歴から削除">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        historyList.appendChild(item);
+    });
+}
+
+// 時間経過を表示
+function getTimeAgo(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return '今';
+    if (diffMins < 60) return `${diffMins}分前`;
+    if (diffHours < 24) return `${diffHours}時間前`;
+    if (diffDays < 7) return `${diffDays}日前`;
+    return date.toLocaleDateString('ja-JP');
+}
+
+// アカウント切り替え（履歴から）
+function switchToAccount(accountId) {
+    console.log('📝 アカウント切り替え:', accountId);
+    // ログアウトして再ログインを促す
+    logoutAndSwitch();
+}
+
+// 履歴から削除
+function removeFromHistory(accountId) {
+    if (confirm('このアカウントを履歴から削除しますか？')) {
+        removeAccountFromHistory(accountId);
+        updateSwitchModalAccountInfo();
+        showToast('アカウントを履歴から削除しました', 'info');
+        console.log('✅ アカウント履歴から削除しました');
+    }
 }
 
 async function logoutAndSwitch() {
     try {
+        showLoading('ログアウト中...');
+        
         // サーバーのセッションを破棄
         await fetch('/auth/logout', { method: 'POST' });
         
@@ -1445,19 +1648,209 @@ async function logoutAndSwitch() {
         
         // モーダルを閉じる
         hideSwitchAccountModal();
+        hideUserMenu();
+        hideLoading();
         
         // UIをリセット
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('publicPage').style.display = 'block';
         
+        // トースト通知
+        showToast('ログアウトしました。別のアカウントでログインできます。', 'success');
+        
         // ログインモーダルを表示
-        showLoginModal();
+        setTimeout(() => showLoginModal(), 500);
         
         console.log('✅ アカウント切り替えのためログアウトしました');
     } catch (error) {
+        hideLoading();
         console.error('ログアウトエラー:', error);
-        alert('ログアウトに失敗しました。');
+        showToast('ログアウトに失敗しました。', 'error');
     }
+}
+
+// ===== ユーザードロップダウンメニュー =====
+function toggleUserMenu() {
+    const menu = document.getElementById('userDropdownMenu');
+    const arrow = document.querySelector('.user-menu-arrow');
+    
+    if (menu.classList.contains('show')) {
+        hideUserMenu();
+    } else {
+        showUserMenu();
+    }
+}
+
+function showUserMenu() {
+    const menu = document.getElementById('userDropdownMenu');
+    const arrow = document.querySelector('.user-menu-arrow');
+    
+    menu.classList.add('show');
+    if (arrow) arrow.style.transform = 'rotate(180deg)';
+    
+    // アカウント情報を更新
+    updateUserDropdown();
+    
+    // 外側クリックで閉じる
+    setTimeout(() => {
+        document.addEventListener('click', closeUserMenuOnOutsideClick);
+    }, 100);
+}
+
+function hideUserMenu() {
+    const menu = document.getElementById('userDropdownMenu');
+    const arrow = document.querySelector('.user-menu-arrow');
+    
+    menu.classList.remove('show');
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+    
+    document.removeEventListener('click', closeUserMenuOnOutsideClick);
+}
+
+function closeUserMenuOnOutsideClick(event) {
+    const menu = document.getElementById('userDropdownMenu');
+    const trigger = document.querySelector('.user-menu-trigger');
+    
+    if (!menu.contains(event.target) && !trigger.contains(event.target)) {
+        hideUserMenu();
+    }
+}
+
+function updateUserDropdown() {
+    if (!currentUser) return;
+    
+    // ヘッダーのユーザー情報を更新
+    const headerName = document.getElementById('headerUserName');
+    const headerHandle = document.getElementById('headerUserHandle');
+    const dropdownAvatar = document.getElementById('dropdownAvatar');
+    const dropdownName = document.getElementById('dropdownName');
+    const dropdownUsername = document.getElementById('dropdownUsername');
+    
+    if (headerName) headerName.textContent = currentUser.displayName || currentUser.name || 'ユーザー';
+    if (headerHandle) headerHandle.textContent = '@' + (currentUser.username || '');
+    if (dropdownAvatar) dropdownAvatar.src = currentUser.avatar || '';
+    if (dropdownName) dropdownName.textContent = currentUser.displayName || currentUser.name || 'ユーザー';
+    if (dropdownUsername) dropdownUsername.textContent = '@' + (currentUser.username || '');
+    
+    // アカウント履歴を表示
+    const history = getAccountHistory();
+    const historySection = document.getElementById('dropdownHistorySection');
+    const historyList = document.getElementById('dropdownHistoryList');
+    
+    if (!historyList) return;
+    
+    // 現在のアカウント以外の履歴を取得
+    const otherAccounts = history.filter(acc => acc.id !== currentUser.id).slice(0, 3); // 最大3件
+    
+    if (otherAccounts.length === 0) {
+        historySection.style.display = 'none';
+        return;
+    }
+    
+    historySection.style.display = 'block';
+    historyList.innerHTML = '';
+    
+    otherAccounts.forEach(account => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-history-item';
+        item.onclick = () => {
+            hideUserMenu();
+            switchToAccount(account.id);
+        };
+        
+        const timeAgo = getTimeAgo(new Date(account.lastLogin));
+        
+        item.innerHTML = `
+            <img src="${account.avatar || ''}" alt="${account.displayName}" class="dropdown-history-avatar">
+            <div class="dropdown-history-info">
+                <span class="dropdown-history-name">${account.displayName}</span>
+                <span class="dropdown-history-username">@${account.username} · ${timeAgo}</span>
+            </div>
+        `;
+        
+        historyList.appendChild(item);
+    });
+}
+
+// ===== トースト通知システム =====
+function showToast(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    // アイコンを選択
+    let icon = 'fa-info-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    if (type === 'warning') icon = 'fa-exclamation-triangle';
+    
+    toast.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+    
+    container.appendChild(toast);
+    
+    // アニメーション開始
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // 自動削除
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+// ローディングオーバーレイ
+function showLoading(message = '読み込み中...') {
+    const overlay = document.getElementById('loadingOverlay');
+    const text = overlay.querySelector('.loading-text');
+    if (text) text.textContent = message;
+    overlay.classList.add('show');
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.remove('show');
+}
+
+// ===== 複数アカウント同時利用ガイド =====
+function showMultiAccountGuide() {
+    hideUserMenu();
+    const modal = document.getElementById('multiAccountGuideModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // デフォルトでChromeタブを表示
+        showGuideTab('chrome');
+    }
+}
+
+function hideMultiAccountGuide() {
+    const modal = document.getElementById('multiAccountGuideModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+function showGuideTab(browser) {
+    // すべてのタブとコンテンツを非表示
+    const tabs = document.querySelectorAll('.guide-tab');
+    const contents = document.querySelectorAll('.guide-content');
+    
+    tabs.forEach(tab => tab.classList.remove('active'));
+    contents.forEach(content => content.style.display = 'none');
+    
+    // 選択されたタブとコンテンツを表示
+    const selectedTab = document.querySelector(`.guide-tab[onclick*="${browser}"]`);
+    const selectedContent = document.getElementById(`guide${browser.charAt(0).toUpperCase() + browser.slice(1)}`);
+    
+    if (selectedTab) selectedTab.classList.add('active');
+    if (selectedContent) selectedContent.style.display = 'block';
 }
 
 // ===== Twitter タイムライン読み込み =====
