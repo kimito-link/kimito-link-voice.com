@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認証がキャンセルされました - KimiLink Voice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #01579b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 宇宙背景エフェクト */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 138, 101, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .cancelled-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            padding: 60px 50px;
+            max-width: 650px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo-container img {
+            width: 220px;
+            height: auto;
+        }
+
+        /* ゆっくりキャラクター装飾 */
+        .yukkuri-decoration {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin: 30px auto;
+            max-width: 500px;
+            gap: 20px;
+        }
+
+        .yukkuri-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .yukkuri-decoration img {
+            max-width: 80px;
+            max-height: 80px;
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            animation: yukkuriBounce 2s ease-in-out infinite;
+        }
+
+        .yukkuri-left img {
+            animation-delay: 0s;
+        }
+
+        .yukkuri-center img {
+            max-width: 100px;
+            max-height: 100px;
+            width: 100px;
+            height: 100px;
+            animation-delay: 0.3s;
+        }
+
+        .yukkuri-right img {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes yukkuriBounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 吹き出し */
+        .speech-bubble {
+            background: white;
+            border: 3px solid #4A90E2;
+            border-radius: 16px;
+            padding: 10px 16px;
+            position: relative;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a237e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+            animation: bubblePop 0.5s ease-out;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-bottom: 12px solid #4A90E2;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        @keyframes bubblePop {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .cancelled-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 28px;
+            background: linear-gradient(135deg, #FFE8D6 0%, #FFD6BA 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            box-shadow: 0 8px 24px rgba(255, 138, 101, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .cancelled-title {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 18px;
+        }
+
+        .cancelled-subtitle {
+            font-size: 18px;
+            color: #4A5568;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .cancelled-message {
+            font-size: 16px;
+            color: #718096;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .cancelled-info {
+            background: linear-gradient(135deg, #E6EDF4 0%, #FFE8D6 100%);
+            border-left: 4px solid #4A90E2;
+            padding: 24px 28px;
+            margin-bottom: 36px;
+            text-align: left;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .cancelled-info p {
+            margin: 0;
+            color: #2D3748;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .cancelled-info strong {
+            color: #1a237e;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .cancelled-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4A90E2;
+            border: 2px solid #4A90E2;
+            padding: 16px 36px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #E6EDF4;
+            transform: translateY(-2px);
+        }
+
+        .cancelled-links {
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 2px solid #E2E8F0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cancelled-links a {
+            color: #4A90E2;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .cancelled-links a:hover {
+            color: #357ABD;
+            transform: translateX(3px);
+        }
+
+        .cancelled-links .divider {
+            color: #CBD5E0;
+            font-weight: 300;
+        }
+
+        @media (max-width: 768px) {
+            .cancelled-container {
+                padding: 40px 28px;
+                max-width: 95%;
+            }
+
+            .logo-container img {
+                width: 180px;
+            }
+
+            .yukkuri-decoration img {
+                width: 65px;
+                height: 65px;
+            }
+
+            .yukkuri-center img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .speech-bubble {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+
+            .cancelled-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 48px;
+            }
+
+            .cancelled-title {
+                font-size: 26px;
+            }
+
+            .cancelled-subtitle {
+                font-size: 16px;
+            }
+
+            .btn-primary, .btn-secondary {
+                font-size: 16px;
+                padding: 16px 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cancelled-container {
+                padding: 32px 20px;
+            }
+
+            .logo-container img {
+                width: 160px;
+            }
+
+            .yukkuri-decoration {
+                gap: 15px;
+            }
+
+            .yukkuri-decoration img {
+                width: 55px;
+                height: 55px;
+            }
+
+            .yukkuri-center img {
+                width: 70px;
+                height: 70px;
+            }
+
+            .speech-bubble {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .cancelled-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 42px;
+            }
+
+            .cancelled-title {
+                font-size: 22px;
+            }
+
+            .cancelled-subtitle {
+                font-size: 15px;
+            }
+
+            .cancelled-info {
+                padding: 18px 20px;
+            }
+
+            .btn-primary, .btn-secondary {
+                font-size: 15px;
+                padding: 14px 24px;
+            }
+
+            .cancelled-links {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .cancelled-links .divider {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cancelled-container">
+        <div class="logo-container">
+            <img src="images/logo/RGB/透過/logo_funlink_RGB_color.png" alt="KimiLink Voice" onerror="this.style.display='none'">
+        </div>
+
+        <!-- ゆっくりキャラクター装飾 -->
+        <div class="yukkuri-decoration">
+            <div class="yukkuri-item yukkuri-left">
+                <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-smile-mouth-open.png" alt="こんた">
+                <div class="speech-bubble">ログアウトしたよ！</div>
+            </div>
+            <div class="yukkuri-item yukkuri-center">
+                <img src="images/yukkuri-charactore-english/link/link-normal.png" alt="リンク">
+                <div class="speech-bubble">またね〜✨</div>
+            </div>
+            <div class="yukkuri-item yukkuri-right">
+                <img src="images/yukkuri-charactore-english/tanunee/tanuki-yukkuri-smile-mouth-open.png" alt="たぬねぇ">
+                <div class="speech-bubble">またきてね💕</div>
+            </div>
+        </div>
+
+        <div class="cancelled-icon">
+            ⚠️
+        </div>
+        
+        <h1 class="cancelled-title">ログインがキャンセルされました</h1>
+        
+        <p class="cancelled-subtitle">
+            X（Twitter）との連携認証がキャンセルされました
+        </p>
+
+        <div class="cancelled-info">
+            <p>
+                <strong>💡 KimiLink Voice について</strong>
+                このアプリは、声で応援できる次世代のクリエイター応援プラットフォームです。<br>
+                アカウントへのアクセス許可は、X（Twitter）の設定からいつでも取り消すことができます。
+            </p>
+        </div>
+
+        <div class="cancelled-actions">
+            <a href="/" class="btn-primary">
+                <i class="fas fa-home"></i>
+                ホームページに戻る
+            </a>
+            
+            <a href="/auth/twitter" class="btn-secondary">
+                <i class="fas fa-redo"></i>
+                もう一度ログインする
+            </a>
+        </div>
+
+        <div class="cancelled-links">
+            <a href="https://x.com/" target="_blank">
+                <i class="fab fa-x-twitter"></i>
+                X（Twitter）に移動
+            </a>
+            <span class="divider">•</span>
+            <a href="/">
+                <i class="fas fa-question-circle"></i>
+                ヘルプ
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // URLパラメータからエラー理由を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        const errorMessage = urlParams.get('message');
+
+        // エラー内容に応じてメッセージをカスタマイズ
+        const subtitleElement = document.querySelector('.cancelled-subtitle');
+        const titleElement = document.querySelector('.cancelled-title');
+        const infoElement = document.querySelector('.cancelled-info p');
+
+        if (error === 'access_denied') {
+            console.log('👤 ユーザーが認証をキャンセルしました');
+            // デフォルトのメッセージを使用
+        } else if (error === 'session_lost') {
+            titleElement.textContent = 'セッションが失われました';
+            subtitleElement.textContent = '認証セッション情報が見つかりませんでした';
+            infoElement.innerHTML = `
+                <strong>💡 セッションが失われる主な原因</strong>
+                このエラーは以下の理由で発生する可能性があります：<br>
+                • 認証ページを長時間開いたままにしていた<br>
+                • ブラウザのCookieが無効になっている<br>
+                • プライベートブラウジング（シークレット）モードを使用している<br>
+                • 複数のタブで同時にログインを試みた
+            `;
+        } else if (error === 'invalid_state') {
+            titleElement.textContent = 'セキュリティ検証エラー';
+            subtitleElement.textContent = 'セキュリティチェックに失敗しました';
+            infoElement.innerHTML = `
+                <strong>🔒 あなたのアカウントを保護しています</strong>
+                KimiLink Voice は、不正なアクセスを防ぐために厳格なセキュリティチェックを実施しています。<br>
+                このエラーは、認証リクエストが改ざんされた可能性がある場合に表示されます。<br><br>
+                もう一度最初からログインをお試しください。
+            `;
+        } else if (error === 'oauth_error') {
+            titleElement.textContent = '認証エラーが発生しました';
+            subtitleElement.textContent = 'X（Twitter）との連携中に問題が発生しました';
+            if (errorMessage) {
+                infoElement.innerHTML = `
+                    <strong>⚠️ エラー詳細</strong>
+                    ${decodeURIComponent(errorMessage)}<br><br>
+                    このエラーが繰り返し発生する場合は、しばらく時間をおいてから再度お試しください。
+                `;
+            } else {
+                infoElement.innerHTML = `
+                    <strong>⚠️ 認証エラー</strong>
+                    X（Twitter）の認証サービスとの通信中にエラーが発生しました。<br>
+                    しばらく時間をおいてから、もう一度お試しください。
+                `;
+            }
+        }
+
+        // アイコンもエラー内容に応じて変更
+        const iconElement = document.querySelector('.cancelled-icon');
+        if (error === 'access_denied') {
+            iconElement.textContent = '⚠️';
+        } else if (error === 'session_lost') {
+            iconElement.textContent = '🔄';
+        } else if (error === 'invalid_state') {
+            iconElement.textContent = '🔒';
+        } else if (error === 'oauth_error') {
+            iconElement.textContent = '❌';
+        }
+    </script>
+</body>
+</html>

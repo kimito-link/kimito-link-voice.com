@@ -7,6 +7,8 @@ const path = require('path');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const crypto = require('crypto');
+const multer = require('multer');
+const fs = require('fs');
 
 // 環境変数読み込み
 dotenv.config();
@@ -35,19 +37,56 @@ app.use(session({
     //     retries: 0
     // }),
     secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // セッションを常に保存
+    saveUninitialized: true, // 初期化されていないセッションも保存
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: false, // 開発環境ではfalse（HTTPでも動作）
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24時間
+        maxAge: 24 * 60 * 60 * 1000, // 24時間
+        sameSite: 'lax' // CSRF対策
     }
 }));
+
+// アップロードディレクトリの作成
+const uploadDir = path.join(__dirname, 'uploads', 'audio');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer設定（ファイルアップロード）
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueName + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+    fileFilter: (req, file, cb) => {
+        const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/x-m4a', 'audio/m4a'];
+        const allowedExtensions = ['.mp3', '.wav', '.ogg', '.m4a'];
+        const ext = path.extname(file.originalname).toLowerCase();
+        
+        if (allowedTypes.includes(file.mimetype) || allowedExtensions.includes(ext)) {
+            cb(null, true);
+        } else {
+            cb(new Error('対応していないファイル形式です。MP3, WAV, OGG, M4A形式のファイルをアップロードしてください。'));
+        }
+    }
+});
 
 // ミドルウェア設定
 app.use(compression()); // Gzip圧縮を有効化
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 静的ファイルのキャッシュ設定
 app.use(express.static(path.join(__dirname), {
@@ -67,6 +106,11 @@ app.use(express.static(path.join(__dirname), {
 // ルート設定
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 認証キャンセルページ
+app.get('/auth-cancelled.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'auth-cancelled.html'));
 });
 
 // ===== ユーティリティ関数 =====
@@ -116,15 +160,26 @@ app.get('/auth/twitter', (req, res) => {
             scope: 'tweet.read users.read follows.read offline.access',
             state: state,
             code_challenge: codeChallenge,
-            code_challenge_method: 'S256'
+            code_challenge_method: 'S256',
+            force_login: 'true' // 毎回ログイン画面を表示し、アカウント選択を可能にする
         });
 
         const authUrl = `https://twitter.com/i/oauth2/authorize?${params.toString()}`;
         if (isDevelopment) {
             console.log('🔗 認証URL生成:', authUrl);
             console.log('📋 コールバックURL:', process.env.TWITTER_CALLBACK_URL);
+            console.log('💾 セッションに保存:', { codeVerifier: codeVerifier.substring(0, 20) + '...', state: state.substring(0, 20) + '...' });
         }
-        res.redirect(authUrl);
+        
+        // セッションを確実に保存してからリダイレクト
+        req.session.save((err) => {
+            if (err) {
+                console.error('❌ セッション保存エラー:', err);
+                return res.status(500).json({ error: 'セッション保存に失敗しました' });
+            }
+            if (isDevelopment) console.log('✅ セッション保存完了、リダイレクトします');
+            res.redirect(authUrl);
+        });
 
     } catch (error) {
         if (isDevelopment) console.error('OAuth開始エラー:', error);
@@ -139,24 +194,47 @@ app.get('/auth/twitter/callback', async (req, res) => {
         console.log('📥 受信したクエリパラメータ:', req.query);
         console.log('🔐 セッション状態:', {
             hasCodeVerifier: !!req.session.codeVerifier,
-            hasState: !!req.session.state
+            hasState: !!req.session.state,
+            codeVerifier: req.session.codeVerifier ? req.session.codeVerifier.substring(0, 20) + '...' : 'なし',
+            state: req.session.state ? req.session.state.substring(0, 20) + '...' : 'なし'
         });
     }
     try {
         const { code, state, error } = req.query;
         if (isDevelopment) console.log('📝 クエリパラメータ:', { code: code ? '取得済み' : 'なし', state: state ? '取得済み' : 'なし', error });
-
-        // エラーがある場合
+        
+        // ⚠️ 重要：エラーチェックを最優先（セッション検証より前）
+        // ユーザーがキャンセルした場合、エラーパラメータが返ってくる
         if (error) {
-            if (isDevelopment) console.error('❌ Twitter認証エラー:', error);
-            return res.redirect('/?login=error&reason=' + error);
+            if (isDevelopment) console.log('❌ Twitter認証エラー:', error);
+            
+            // access_denied = ユーザーが「キャンセル」を選択
+            if (error === 'access_denied') {
+                if (isDevelopment) console.log('👤 ユーザーが認証をキャンセルしました');
+                return res.redirect('/auth-cancelled.html?error=access_denied');
+            }
+            
+            // その他のエラー
+            return res.redirect('/auth-cancelled.html?error=' + error);
+        }
+        
+        // エラーがない場合のみセッションを検証
+        if (!req.session.codeVerifier) {
+            console.error('❌ セッションにcodeVerifierが存在しません');
+            console.error('💡 原因: セッションが保持されていない可能性があります');
+            return res.redirect('/auth-cancelled.html?error=session_lost');
+        }
+        
+        if (!req.session.state) {
+            console.error('❌ セッションにstateが存在しません');
+            return res.redirect('/auth-cancelled.html?error=session_lost');
         }
 
         // ステート検証
         if (isDevelopment) console.log('🔍 State検証:', { received: state, expected: req.session.state });
         if (!state || state !== req.session.state) {
             if (isDevelopment) console.error('❌ State検証失敗');
-            throw new Error('Invalid state parameter');
+            return res.redirect('/auth-cancelled.html?error=invalid_state');
         }
         if (isDevelopment) console.log('✅ State検証成功');
 
@@ -261,7 +339,7 @@ app.get('/auth/twitter/callback', async (req, res) => {
             console.error('  ステータス:', error.response?.status);
             console.error('  スタック:', error.stack);
         }
-        res.redirect('/?login=error');
+        res.redirect('/auth-cancelled.html?error=oauth_error&message=' + encodeURIComponent(error.message));
     }
 });
 
@@ -519,6 +597,143 @@ app.get('/api/user/follow-status', async (req, res) => {
 });
 
 // 重複したエンドポイントを削除（上記で既に定義済み）
+
+// ===== 音声ファイルアップロード =====
+app.post('/api/audio/upload', upload.single('audio'), async (req, res) => {
+    try {
+        // ログイン確認
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'ログインが必要です' });
+        }
+        
+        const { title, description, category, is_public } = req.body;
+        const file = req.file;
+        
+        if (!file) {
+            return res.status(400).json({ error: 'ファイルが選択されていません' });
+        }
+        
+        console.log('📤 音声ファイルアップロード:', {
+            user: req.session.user.username,
+            title,
+            category,
+            fileSize: file.size,
+            fileName: file.originalname
+        });
+        
+        // データベースに保存
+        const { data, error } = await supabase
+            .from('audio_files')
+            .insert([{
+                user_id: req.session.user.id,
+                twitter_username: req.session.user.username,
+                title: title,
+                description: description || '',
+                category: category,
+                file_url: `/uploads/audio/${file.filename}`,
+                file_name: file.originalname,
+                file_size: file.size,
+                is_public: is_public === 'true',
+                created_at: new Date().toISOString()
+            }])
+            .select();
+        
+        if (error) {
+            console.error('❌ データベース保存エラー:', error);
+            throw error;
+        }
+        
+        console.log('✅ アップロード完了:', data);
+        
+        res.json({ 
+            success: true, 
+            message: 'アップロード完了',
+            data: data[0]
+        });
+        
+    } catch (error) {
+        console.error('❌ アップロードエラー:', error);
+        res.status(500).json({ 
+            error: 'アップロードに失敗しました',
+            details: error.message
+        });
+    }
+});
+
+// 音声ファイルリスト取得
+app.get('/api/audio/list', async (req, res) => {
+    try {
+        // ログイン確認
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'ログインが必要です' });
+        }
+        
+        const { data, error } = await supabase
+            .from('audio_files')
+            .select('*')
+            .eq('user_id', req.session.user.id)
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        res.json({ success: true, data });
+        
+    } catch (error) {
+        console.error('❌ リスト取得エラー:', error);
+        res.status(500).json({ 
+            error: 'リスト取得に失敗しました',
+            details: error.message
+        });
+    }
+});
+
+// 音声ファイル削除
+app.delete('/api/audio/:id', async (req, res) => {
+    try {
+        // ログイン確認
+        if (!req.session.user) {
+            return res.status(401).json({ error: 'ログインが必要です' });
+        }
+        
+        const { id } = req.params;
+        
+        // ファイル情報を取得
+        const { data: fileData, error: fetchError } = await supabase
+            .from('audio_files')
+            .select('*')
+            .eq('id', id)
+            .eq('user_id', req.session.user.id)
+            .single();
+        
+        if (fetchError || !fileData) {
+            return res.status(404).json({ error: 'ファイルが見つかりません' });
+        }
+        
+        // データベースから削除
+        const { error: deleteError } = await supabase
+            .from('audio_files')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', req.session.user.id);
+        
+        if (deleteError) throw deleteError;
+        
+        // 実際のファイルを削除
+        const filePath = path.join(__dirname, fileData.file_url);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+        
+        res.json({ success: true, message: '削除しました' });
+        
+    } catch (error) {
+        console.error('❌ 削除エラー:', error);
+        res.status(500).json({ 
+            error: '削除に失敗しました',
+            details: error.message
+        });
+    }
+});
 
 // ヘルスチェック
 app.get('/api/health', (req, res) => {

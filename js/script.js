@@ -111,8 +111,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         window.history.replaceState({}, document.title, '/');
         
         console.log('🎯 showPlatform()を呼び出します');
-        // ダッシュボードを直接表示
-        showPlatform();
+        
+        // ダッシュボードを直接表示（エラーでも止まらないように）
+        try {
+            showPlatform();
+            console.log('✅ showPlatform()完了');
+        } catch (error) {
+            console.error('❌ showPlatform()エラー:', error);
+            // エラーでも続行
+        }
         
         // アカウント情報を非同期で取得（バックグラウンドで実行）
         console.log('🚀 アカウント情報を非同期で取得開始');
@@ -122,7 +129,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         return;
     } else if (loginStatus === 'error') {
-        alert('ログインに失敗しました。もう一度お試しください。');
+        // エラーの理由を確認
+        const errorReason = urlParams.get('reason');
+        
+        if (errorReason === 'access_denied') {
+            // ユーザーが認証をキャンセルした場合
+            console.log('ℹ️ ユーザーが認証をキャンセルしました');
+            // エラーメッセージは表示せず、静かにログイン画面に戻る
+        } else if (errorReason === 'session_lost') {
+            // セッションが失われた場合
+            alert('セッションが失われました。もう一度ログインしてください。');
+        } else {
+            // その他のエラー
+            alert('ログインに失敗しました。もう一度お試しください。');
+        }
+        
+        // URLをクリーンアップ
         window.history.replaceState({}, document.title, '/');
     } else {
         // 認証スキップモードの場合
@@ -161,6 +183,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // モックデータで統計を更新
     updateMockStats();
+    
+    // モーダルのイベントリスナー設定
+    setupModalListeners();
 });
 
 // 認証状態を確認
@@ -196,12 +221,203 @@ async function checkAuthStatus() {
 }
 
 // ===== ログイン処理 =====
-function showLoginModal() {
-    document.getElementById('loginModal').style.display = 'flex';
+function showLoginModal(event) {
+    // イベントの伝播を停止
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log('🎭 ログインモーダルを表示します');
+    
+    // モーダルを表示
+    const modal = document.getElementById('loginModal');
+    if (!modal) {
+        console.error('❌ loginModal要素が見つかりません');
+        return;
+    }
+    
+    modal.style.display = 'flex';
+    console.log('✅ モーダル表示完了');
+    
+    // 必須アカウント情報を動的に更新
+    updateLoginModalAccounts();
+    
+    // bodyのスクロールを無効化
+    document.body.style.overflow = 'hidden';
+    
+    // スクロール検出とヒント表示の設定（スマホのみ）
+    setupModalScrollHint();
+}
+
+// モーダルのスクロールヒント設定
+function setupModalScrollHint() {
+    const modalContent = document.querySelector('#loginModal .modal-content');
+    const scrollHint = document.getElementById('scrollHint');
+    
+    if (!modalContent || !scrollHint) return;
+    
+    // スクロールが必要かどうかを確認
+    const hasScroll = modalContent.scrollHeight > modalContent.clientHeight;
+    
+    if (hasScroll) {
+        scrollHint.style.display = 'flex';
+        
+        // スクロールイベントリスナー（重複登録を防ぐ）
+        const handleScroll = function() {
+            const scrollTop = modalContent.scrollTop;
+            const scrollHeight = modalContent.scrollHeight;
+            const clientHeight = modalContent.clientHeight;
+            
+            // スクロールしたらヒントを非表示
+            if (scrollTop > 20) {
+                modalContent.classList.add('scrolled');
+            }
+            
+            // 最下部に達したらクラスを追加
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+                modalContent.classList.add('scrolled-to-bottom');
+            } else {
+                modalContent.classList.remove('scrolled-to-bottom');
+            }
+        };
+        
+        // 既存のリスナーを削除してから追加
+        modalContent.removeEventListener('scroll', handleScroll);
+        modalContent.addEventListener('scroll', handleScroll);
+        
+        // 4秒後に自動的にヒントをフェードアウト
+        setTimeout(() => {
+            if (scrollHint) {
+                scrollHint.style.opacity = '0';
+                setTimeout(() => {
+                    scrollHint.style.display = 'none';
+                }, 300);
+            }
+        }, 4000);
+    } else {
+        scrollHint.style.display = 'none';
+    }
+}
+
+// ログインモーダルのアカウント情報を更新（管理画面での変更に対応）
+async function updateLoginModalAccounts() {
+    // クリエイターアカウント
+    const creatorNameEl = document.getElementById('loginModalCreatorName');
+    const creatorUsernameEl = document.getElementById('loginModalCreatorUsername');
+    const creatorAvatarEl = document.getElementById('loginModalCreatorAvatar');
+    if (creatorNameEl) creatorNameEl.textContent = REQUIRED_ACCOUNTS.creator.name;
+    if (creatorUsernameEl) creatorUsernameEl.textContent = REQUIRED_ACCOUNTS.creator.username;
+    
+    // アイドルアカウント
+    const idolNameEl = document.getElementById('loginModalIdolName');
+    const idolUsernameEl = document.getElementById('loginModalIdolUsername');
+    const idolAvatarEl = document.getElementById('loginModalIdolAvatar');
+    if (idolNameEl) idolNameEl.textContent = REQUIRED_ACCOUNTS.idol.name;
+    if (idolUsernameEl) idolUsernameEl.textContent = REQUIRED_ACCOUNTS.idol.username;
+    
+    console.log('📋 ログインモーダルのアカウント情報を更新:', REQUIRED_ACCOUNTS);
+    
+    // APIからプロフィール画像を取得
+    try {
+        // クリエイターアカウントの画像取得
+        const creatorResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.creator.id);
+        if (creatorResponse.ok) {
+            const creatorData = await creatorResponse.json();
+            const creatorUserData = creatorData.data || creatorData;
+            if (creatorAvatarEl && creatorUserData.profile_image_url) {
+                const imageUrl = creatorUserData.profile_image_url.replace('_normal', '_400x400');
+                creatorAvatarEl.src = imageUrl;
+                // エラーハンドリング
+                creatorAvatarEl.onerror = function() {
+                    this.onerror = null;
+                    this.src = creatorUserData.profile_image_url;
+                };
+            }
+        }
+        
+        // アイドルアカウントの画像取得
+        const idolResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.idol.id);
+        if (idolResponse.ok) {
+            const idolData = await idolResponse.json();
+            const idolUserData = idolData.data || idolData;
+            if (idolAvatarEl && idolUserData.profile_image_url) {
+                const imageUrl = idolUserData.profile_image_url.replace('_normal', '_400x400');
+                idolAvatarEl.src = imageUrl;
+                // エラーハンドリング
+                idolAvatarEl.onerror = function() {
+                    this.onerror = null;
+                    this.src = idolUserData.profile_image_url;
+                };
+            }
+        }
+        
+        console.log('✅ ログインモーダルのプロフィール画像を更新完了');
+    } catch (error) {
+        console.warn('⚠️ ログインモーダルのプロフィール画像取得エラー:', error);
+    }
 }
 
 function hideLoginModal() {
-    document.getElementById('loginModal').style.display = 'none';
+    const modal = document.getElementById('loginModal');
+    modal.style.display = 'none';
+    
+    // bodyのスクロールを有効化
+    document.body.style.overflow = '';
+    
+    // モーダルのスクロール位置とクラスをリセット
+    const modalContent = document.querySelector('#loginModal .modal-content');
+    const scrollHint = document.getElementById('scrollHint');
+    
+    if (modalContent) {
+        modalContent.scrollTop = 0;
+        modalContent.classList.remove('scrolled', 'scrolled-to-bottom');
+    }
+    
+    if (scrollHint) {
+        scrollHint.style.display = 'none';
+        scrollHint.style.opacity = '1';
+    }
+}
+
+// モーダルのイベントリスナー設定
+function setupModalListeners() {
+    const loginModal = document.getElementById('loginModal');
+    const switchAccountModal = document.getElementById('switchAccountModal');
+    
+    // ログインモーダル: 外側クリックで閉じる
+    if (loginModal) {
+        loginModal.addEventListener('click', function(event) {
+            if (event.target === loginModal) {
+                hideLoginModal();
+            }
+        });
+    }
+    
+    // アカウント切り替えモーダル: 外側クリックで閉じる
+    if (switchAccountModal) {
+        switchAccountModal.addEventListener('click', function(event) {
+            if (event.target === switchAccountModal) {
+                hideSwitchAccountModal();
+            }
+        });
+    }
+    
+    // Escキーでモーダルを閉じる
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            // ログインモーダルが開いている場合
+            if (loginModal && loginModal.style.display === 'flex') {
+                hideLoginModal();
+            }
+            // アカウント切り替えモーダルが開いている場合
+            if (switchAccountModal && switchAccountModal.style.display === 'flex') {
+                hideSwitchAccountModal();
+            }
+        }
+    });
+    
+    console.log('✅ モーダルのイベントリスナーを設定しました');
 }
 
 function showFollowModal() {
@@ -222,10 +438,388 @@ function hideFollowModal() {
     document.getElementById('followModal').style.display = 'none';
 }
 
-function loginWithTwitter() {
+function loginWithTwitter(event) {
+    // イベントの伝播を停止
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log('🔑 Twitter OAuth フローを開始します');
+    console.log('📍 リダイレクト先: /auth/twitter');
+    
     // Twitter OAuth 2.0 フローを開始
     window.location.href = '/auth/twitter';
 }
+
+// ===== 音声アップロード機能 =====
+let selectedFile = null;
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // ファイルサイズチェック (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+        alert('ファイルサイズが大きすぎます。50MB以下のファイルを選択してください。');
+        return;
+    }
+    
+    // ファイル形式チェック
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/m4a'];
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|m4a)$/i)) {
+        alert('対応していないファイル形式です。MP3, WAV, OGG, M4A形式のファイルを選択してください。');
+        return;
+    }
+    
+    selectedFile = file;
+    
+    // アップロードエリアを非表示にしてフォームを表示
+    document.getElementById('uploadArea').style.display = 'none';
+    document.getElementById('uploadForm').style.display = 'block';
+    
+    // ファイル名をタイトルに自動入力
+    const fileName = file.name.replace(/\.[^/.]+$/, '');
+    document.getElementById('audioTitle').value = fileName;
+}
+
+function cancelUpload() {
+    selectedFile = null;
+    document.getElementById('audioFile').value = '';
+    document.getElementById('uploadArea').style.display = 'block';
+    document.getElementById('uploadForm').style.display = 'none';
+    
+    // フォームをリセット
+    document.getElementById('audioTitle').value = '';
+    document.getElementById('audioDescription').value = '';
+    document.getElementById('audioCategory').value = '';
+    document.getElementById('audioPublic').checked = true;
+}
+
+async function submitUpload() {
+    if (!selectedFile) {
+        alert('ファイルが選択されていません。');
+        return;
+    }
+    
+    const title = document.getElementById('audioTitle').value.trim();
+    const description = document.getElementById('audioDescription').value.trim();
+    const category = document.getElementById('audioCategory').value;
+    const isPublic = document.getElementById('audioPublic').checked;
+    
+    if (!title) {
+        alert('タイトルを入力してください。');
+        return;
+    }
+    
+    if (!category) {
+        alert('カテゴリを選択してください。');
+        return;
+    }
+    
+    // FormDataを作成
+    const formData = new FormData();
+    formData.append('audio', selectedFile);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('is_public', isPublic);
+    
+    try {
+        // フォームを非表示にして進捗表示を表示
+        document.getElementById('uploadForm').style.display = 'none';
+        const progressDiv = document.getElementById('uploadProgress');
+        progressDiv.style.display = 'block';
+        
+        // 進捗情報を設定
+        document.getElementById('progressFileName').textContent = selectedFile.name;
+        document.getElementById('progressFileSize').textContent = formatFileSize(selectedFile.size);
+        
+        // API呼び出し
+        console.log('📤 音声ファイルをアップロードします:', {
+            title,
+            description,
+            category,
+            isPublic,
+            fileSize: selectedFile.size,
+            fileName: selectedFile.name
+        });
+        
+        // XMLHttpRequestで進捗を監視しながらアップロード
+        const xhr = new XMLHttpRequest();
+        const startTime = Date.now();
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                
+                // 進捗バーを更新
+                document.getElementById('progressBar').style.width = percentComplete + '%';
+                document.getElementById('progressPercentage').textContent = percentComplete + '%';
+                
+                // ステータスメッセージを更新
+                if (percentComplete < 30) {
+                    document.getElementById('progressStatus').textContent = 'アップロード開始...';
+                } else if (percentComplete < 70) {
+                    document.getElementById('progressStatus').textContent = 'アップロード中...';
+                } else if (percentComplete < 95) {
+                    document.getElementById('progressStatus').textContent = '処理中...';
+                } else {
+                    document.getElementById('progressStatus').textContent = '完了間近...';
+                }
+                
+                // 予想残り時間を計算
+                const elapsedTime = (Date.now() - startTime) / 1000; // 秒
+                const uploadSpeed = e.loaded / elapsedTime; // バイト/秒
+                const remainingBytes = e.total - e.loaded;
+                const remainingTime = Math.ceil(remainingBytes / uploadSpeed);
+                
+                if (remainingTime > 60) {
+                    const minutes = Math.floor(remainingTime / 60);
+                    const seconds = remainingTime % 60;
+                    document.getElementById('progressTime').textContent = `予想残り時間: ${minutes}分${seconds}秒`;
+                } else if (remainingTime > 0) {
+                    document.getElementById('progressTime').textContent = `予想残り時間: ${remainingTime}秒`;
+                } else {
+                    document.getElementById('progressTime').textContent = '完了間近...';
+                }
+            }
+        });
+        
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                console.log('✅ アップロード成功:', response);
+                
+                document.getElementById('progressStatus').textContent = '完了！';
+                document.getElementById('progressTime').textContent = '';
+                
+                setTimeout(() => {
+                    alert('音声ファイルがアップロードされました！');
+                    progressDiv.style.display = 'none';
+                    cancelUpload();
+                    loadVoiceList();
+                }, 500);
+            } else {
+                throw new Error('アップロードに失敗しました');
+            }
+        });
+        
+        xhr.addEventListener('error', () => {
+            throw new Error('ネットワークエラーが発生しました');
+        });
+        
+        xhr.open('POST', '/api/audio/upload');
+        xhr.send(formData);
+        
+    } catch (error) {
+        console.error('❌ アップロードエラー:', error);
+        document.getElementById('uploadProgress').style.display = 'none';
+        document.getElementById('uploadForm').style.display = 'block';
+        alert('アップロードに失敗しました。もう一度お試しください。');
+    }
+}
+
+// ファイルサイズをフォーマット
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// アップロード進捗をシミュレート
+async function simulateUploadProgress(fileSize) {
+    const totalSteps = 100;
+    const stepDelay = 50; // ミリ秒
+    const startTime = Date.now();
+    
+    for (let i = 0; i <= totalSteps; i++) {
+        const percentage = i;
+        const loaded = (fileSize * i) / 100;
+        
+        // 進捗バーを更新
+        document.getElementById('progressBar').style.width = percentage + '%';
+        document.getElementById('progressPercentage').textContent = percentage + '%';
+        
+        // ステータスメッセージを更新
+        if (percentage < 30) {
+            document.getElementById('progressStatus').textContent = 'アップロード開始...';
+        } else if (percentage < 70) {
+            document.getElementById('progressStatus').textContent = 'アップロード中...';
+        } else if (percentage < 95) {
+            document.getElementById('progressStatus').textContent = '処理中...';
+        } else {
+            document.getElementById('progressStatus').textContent = '完了間近...';
+        }
+        
+        // 予想残り時間を計算
+        if (i > 0) {
+            const elapsedTime = (Date.now() - startTime) / 1000; // 秒
+            const remainingPercentage = 100 - i;
+            const timePerPercent = elapsedTime / i;
+            const remainingTime = Math.ceil(timePerPercent * remainingPercentage);
+            
+            if (remainingTime > 60) {
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                document.getElementById('progressTime').textContent = `予想残り時間: ${minutes}分${seconds}秒`;
+            } else {
+                document.getElementById('progressTime').textContent = `予想残り時間: ${remainingTime}秒`;
+            }
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, stepDelay));
+    }
+}
+
+// ドラッグ＆ドロップ対応
+function initUploadDragDrop() {
+    const uploadArea = document.getElementById('uploadArea');
+    if (!uploadArea) return;
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.style.borderColor = 'var(--primary-blue)';
+            uploadArea.style.background = 'rgba(0, 66, 123, 0.15)';
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => {
+            uploadArea.style.borderColor = 'rgba(79, 172, 254, 0.3)';
+            uploadArea.style.background = 'rgba(0, 66, 123, 0.05)';
+        }, false);
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            document.getElementById('audioFile').files = files;
+            handleFileSelect({ target: { files } });
+        }
+    }, false);
+}
+
+// 音声リストを読み込む
+async function loadVoiceList() {
+    const voiceList = document.getElementById('voiceList');
+    if (!voiceList) return;
+    
+    try {
+        const response = await fetch('/api/audio/list');
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'リスト取得に失敗しました');
+        }
+        
+        const voices = result.data || [];
+        
+        if (voices.length === 0) {
+            voiceList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-microphone-slash"></i>
+                    <p>まだ音声がアップロードされていません</p>
+                </div>
+            `;
+        } else {
+            voiceList.innerHTML = voices.map(voice => `
+                <div class="voice-item">
+                    <div class="voice-header">
+                        <div class="voice-info">
+                            <h4>${voice.title}</h4>
+                            <div class="voice-meta">
+                                <span><i class="fas fa-tag"></i> ${getCategoryName(voice.category)}</span>
+                                <span><i class="fas fa-calendar"></i> ${formatDate(voice.created_at)}</span>
+                                <span><i class="fas fa-${voice.is_public ? 'eye' : 'eye-slash'}"></i> ${voice.is_public ? '公開' : '非公開'}</span>
+                            </div>
+                        </div>
+                        <div class="voice-actions">
+                            <button class="btn-icon" onclick="editVoice('${voice.id}')" title="編集">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon delete" onclick="deleteVoice('${voice.id}')" title="削除">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ${voice.description ? `<p class="voice-description">${voice.description}</p>` : ''}
+                    <div class="voice-player">
+                        <audio controls>
+                            <source src="${voice.url}" type="audio/mpeg">
+                            お使いのブラウザは音声再生に対応していません。
+                        </audio>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('❌ 音声リスト読み込みエラー:', error);
+    }
+}
+
+function getCategoryName(category) {
+    const categories = {
+        'sample': 'サンプルボイス',
+        'delivered': '納品済み作品',
+        'profile': 'プロフィールボイス',
+        'other': 'その他'
+    };
+    return categories[category] || category;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ja-JP');
+}
+
+function editVoice(id) {
+    console.log('編集:', id);
+    // TODO: 編集機能の実装
+}
+
+async function deleteVoice(id) {
+    if (!confirm('この音声ファイルを削除しますか？')) return;
+    
+    try {
+        const response = await fetch(`/api/audio/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || '削除に失敗しました');
+        }
+        
+        alert('削除しました');
+        loadVoiceList();
+    } catch (error) {
+        console.error('❌ 削除エラー:', error);
+        alert('削除に失敗しました: ' + error.message);
+    }
+}
+
+// ページ読み込み時に初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 既存の初期化処理...
+    
+    // アップロード機能を初期化
+    initUploadDragDrop();
+});
 
 // ===== フォロー確認 =====
 async function checkFollowStatus() {
@@ -482,25 +1076,21 @@ function updateAccountDisplay(type, accountData) {
     console.log(`🔍 username:`, accountData?.username);
     
     if (avatarElement && accountData.profile_image_url) {
-        // Twitter APIから取得した画像URLを使用（高解像度版）
+        // Twitter APIから取得した画像URLを使用（高解像度版を試す）
         const highResImageUrl = accountData.profile_image_url.replace('_normal', '_400x400');
         console.log(`🖼️ 画像URL更新: ${highResImageUrl}`);
         
-        // 全てのアカウントに強制更新処理を適用（確実な表示のため）
-        console.log(`🎯 ${type}アカウントの強制更新処理を実行`);
+        // 画像読み込みエラー時のフォールバック処理
+        avatarElement.onerror = function() {
+            console.warn(`⚠️ ${type}: 400x400が存在しないため、元のURLを使用`);
+            this.onerror = null; // 無限ループ防止
+            this.src = accountData.profile_image_url; // 元のURL（_normal）を使用
+        };
         
-        // キャッシュバスターを使用して強制的に新しい画像を読み込む
-        const cacheBustedUrl = highResImageUrl + '?t=' + Date.now();
-        
-        // 画像を一度クリアしてから設定（確実な更新のため）
-        avatarElement.src = '';
-        
-        // 少し待ってから新しい画像を設定
-        setTimeout(() => {
-            avatarElement.src = cacheBustedUrl;
-            avatarElement.alt = accountData.name || username;
-            console.log(`✅ ${type}アバター強制更新完了: ${cacheBustedUrl}`);
-        }, 100);
+        // 画像を設定
+        avatarElement.src = highResImageUrl;
+        avatarElement.alt = accountData.name || 'アカウント';
+        console.log(`✅ ${type}アバター更新完了: ${highResImageUrl}`);
         
     } else {
         console.warn(`⚠️ 問題の詳細:`);
@@ -589,13 +1179,30 @@ function showPlatform() {
         const publicPage = document.getElementById('publicPage');
         const dashboard = document.getElementById('dashboard');
         
+        console.log('🔍 要素確認:', {
+            publicPage: !!publicPage,
+            dashboard: !!dashboard
+        });
+        
         if (!publicPage || !dashboard) {
             console.error('❌ publicPageまたはdashboard要素が見つかりません');
+            alert('エラー: ダッシュボード要素が見つかりません。ページをリロードしてください。');
             return;
         }
         
+        console.log('📝 display変更前:', {
+            publicPage: publicPage.style.display,
+            dashboard: dashboard.style.display
+        });
+        
         publicPage.style.display = 'none';
         dashboard.style.display = 'block';
+        
+        console.log('📝 display変更後:', {
+            publicPage: publicPage.style.display,
+            dashboard: dashboard.style.display
+        });
+        
         console.log('✅ publicPageを非表示、dashboardを表示に切り替えました');
         
         // ユーザー情報を表示
@@ -632,32 +1239,62 @@ function showPlatform() {
     }
     
     // 必須フォローアカウントのプロフィール画像を取得
-    // 開発モードでフォロー確認をスキップする場合はAPIリクエストも省略
-    if (!SKIP_FOLLOW_CHECK) {
+    // フォロー確認をスキップしても画像は取得する（表示のため）
+    try {
+        console.log('🖼️ フォロー状態セクションのサムネイル画像を取得');
         loadRequiredAccountsAvatars();
-    } else {
-        console.log('🚧 開発モード: プロフィール画像取得をスキップ');
+    } catch (error) {
+        console.error('❌ アカウント画像読み込みエラー:', error);
     }
     
     // Twitter タイムラインを読み込み
-    loadTwitterTimeline();
+    try {
+        loadTwitterTimeline();
+    } catch (error) {
+        console.error('❌ タイムライン読み込みエラー:', error);
+    }
 }
 
 // 必須フォローアカウントの画像と名前を取得
 async function loadRequiredAccountsAvatars() {
     try {
+        console.log('🔍 loadRequiredAccountsAvatars() 開始');
+        
         // クリエイター応援アカウント
         const creatorResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.creator.id);
+        console.log('📡 クリエイターレスポンス status:', creatorResponse.status);
+        
         if (creatorResponse.ok) {
             const creatorData = await creatorResponse.json();
+            console.log('📦 クリエイター生データ:', creatorData);
             
             // APIレスポンスの構造を確認（dataプロパティがある場合）
             const userData = creatorData.data || creatorData;
+            console.log('📦 クリエイター処理後データ:', userData);
+            console.log('🖼️ profile_image_url:', userData.profile_image_url);
             
             // 画像を更新
             const creatorAvatar = document.getElementById('creatorAvatar');
+            console.log('🔍 creatorAvatar要素:', creatorAvatar);
+            
             if (creatorAvatar && userData.profile_image_url) {
-                creatorAvatar.src = userData.profile_image_url;
+                // 高解像度版を試す（存在しない場合はフォールバック）
+                const imageUrl = userData.profile_image_url.replace('_normal', '_400x400');
+                console.log('✅ クリエイター画像を更新:', imageUrl);
+                
+                // 画像の読み込みエラーハンドリング
+                creatorAvatar.onerror = function() {
+                    console.warn('⚠️ 400x400が存在しないため、元のURLを使用');
+                    this.onerror = null; // 無限ループ防止
+                    this.src = userData.profile_image_url;
+                };
+                creatorAvatar.src = imageUrl;
+            } else {
+                console.warn('⚠️ クリエイター画像更新失敗:', {
+                    hasElement: !!creatorAvatar,
+                    hasUrl: !!userData.profile_image_url,
+                    url: userData.profile_image_url
+                });
             }
             
             // 表示名を更新
@@ -673,16 +1310,39 @@ async function loadRequiredAccountsAvatars() {
         
         // アイドル応援アカウント
         const idolResponse = await fetch('/api/user/profile/' + REQUIRED_ACCOUNTS.idol.id);
+        console.log('📡 アイドルレスポンス status:', idolResponse.status);
+        
         if (idolResponse.ok) {
             const idolData = await idolResponse.json();
+            console.log('📦 アイドル生データ:', idolData);
             
             // APIレスポンスの構造を確認（dataプロパティがある場合）
             const userData = idolData.data || idolData;
+            console.log('📦 アイドル処理後データ:', userData);
+            console.log('🖼️ profile_image_url:', userData.profile_image_url);
             
             // 画像を更新
             const idolAvatar = document.getElementById('idolAvatar');
+            console.log('🔍 idolAvatar要素:', idolAvatar);
+            
             if (idolAvatar && userData.profile_image_url) {
-                idolAvatar.src = userData.profile_image_url;
+                // 高解像度版を試す（存在しない場合はフォールバック）
+                const imageUrl = userData.profile_image_url.replace('_normal', '_400x400');
+                console.log('✅ アイドル画像を更新:', imageUrl);
+                
+                // 画像の読み込みエラーハンドリング
+                idolAvatar.onerror = function() {
+                    console.warn('⚠️ 400x400が存在しないため、元のURLを使用');
+                    this.onerror = null; // 無限ループ防止
+                    this.src = userData.profile_image_url;
+                };
+                idolAvatar.src = imageUrl;
+            } else {
+                console.warn('⚠️ アイドル画像更新失敗:', {
+                    hasElement: !!idolAvatar,
+                    hasUrl: !!userData.profile_image_url,
+                    url: userData.profile_image_url
+                });
             }
             
             // 表示名を更新
@@ -739,6 +1399,64 @@ async function logout() {
             console.error('ログアウトエラー:', error);
             alert('ログアウトに失敗しました。');
         }
+    }
+}
+
+// ===== アカウント切り替え =====
+function showSwitchAccountModal() {
+    const modal = document.getElementById('switchAccountModal');
+    modal.style.display = 'flex';
+    
+    // 現在のアカウント情報を表示
+    updateSwitchModalAccountInfo();
+    
+    // bodyのスクロールを無効化
+    document.body.style.overflow = 'hidden';
+}
+
+function hideSwitchAccountModal() {
+    const modal = document.getElementById('switchAccountModal');
+    modal.style.display = 'none';
+    
+    // bodyのスクロールを有効化
+    document.body.style.overflow = '';
+}
+
+function updateSwitchModalAccountInfo() {
+    if (currentUser) {
+        const avatarEl = document.getElementById('switchModalAvatar');
+        const nameEl = document.getElementById('switchModalName');
+        const usernameEl = document.getElementById('switchModalUsername');
+        
+        if (avatarEl) avatarEl.src = currentUser.avatar || '';
+        if (nameEl) nameEl.textContent = currentUser.name || currentUser.displayName || 'ユーザー';
+        if (usernameEl) usernameEl.textContent = '@' + (currentUser.username || '');
+    }
+}
+
+async function logoutAndSwitch() {
+    try {
+        // サーバーのセッションを破棄
+        await fetch('/auth/logout', { method: 'POST' });
+        
+        // クライアント側の状態をクリア
+        currentUser = null;
+        followedAccounts = { creator: false, idol: false };
+        
+        // モーダルを閉じる
+        hideSwitchAccountModal();
+        
+        // UIをリセット
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('publicPage').style.display = 'block';
+        
+        // ログインモーダルを表示
+        showLoginModal();
+        
+        console.log('✅ アカウント切り替えのためログアウトしました');
+    } catch (error) {
+        console.error('ログアウトエラー:', error);
+        alert('ログアウトに失敗しました。');
     }
 }
 

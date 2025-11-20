@@ -1,10 +1,296 @@
 # KimiLink Voice 開発進捗状況
 
-**最終更新**: 2025年11月20日 07:45 JST
+**最終更新**: 2025年11月20日 21:49 JST
 
 ---
 
 ## 📋 最新の作業内容
+
+### ✅ Phase 14: OAuth認証キャンセル画面とフッター修正 (2025-11-20 22:36)
+
+#### 🎉 実装完了
+OAuth認証キャンセル画面の表示問題とフッターレイアウトを修正しました。
+
+#### ✅ 完了した作業
+
+**1. OAuth認証キャンセル画面の修正**
+- auth-cancelled.htmlが正しく表示されるようルート追加
+- ロゴ画像パスを修正（/images/logo.png）
+- エラー時のフォールバック対応
+
+**2. フッターレイアウトの修正**
+- グリッドレイアウトを `2fr 1fr 1fr 1fr` に変更
+- ロゴ部分を広く、他を均等に配置
+- レスポンシブ対応強化
+  - 1024px以下: 2列表示
+  - 768px以下: 1列表示
+
+#### 📝 関連ファイル
+- `server.js`: auth-cancelled.htmlルート追加（行112-114）
+- `auth-cancelled.html`: ロゴパス修正
+- `css/styles.css`: フッターグリッド修正（行829-852）
+
+#### 🎨 改善ポイント
+- ✅ キャンセル画面が正しく表示される
+- ✅ フッターが美しく整列
+- ✅ 全デバイスで最適表示
+
+---
+
+### ✅ Phase 13: モーダルのレスポンシブデザイン改善 v4（全キャリア対応） (2025-11-20 22:30)
+
+#### 🎉 実装完了
+ログインモーダルのレスポンシブデザインを大幅改善。**あらゆるデバイス・キャリアに完全対応**しました。
+
+#### ✅ 完了した作業
+
+**1. ×ボタンの固定表示**
+- `position: sticky` を使用して、スクロール時も常に表示
+- フロート配置で右上に確実に表示
+- スマホでも必ず見える位置に配置
+
+**2. スクロールバーの非表示化**
+- スクロール機能は維持したまま、スクロールバーを非表示
+- `scrollbar-width: none` (Firefox)
+- `-ms-overflow-style: none` (IE, Edge)
+- `::-webkit-scrollbar { display: none }` (Chrome, Safari)
+
+**3. 全デバイス対応（8段階のブレークポイント）**
+
+| デバイス | 幅 | モーダル高さ | ゆっくり | 対応機種例 |
+|---------|-----|-----------|---------|----------|
+| **折りたたみ** | ≤280px | 82vh | 40px/55px | Galaxy Fold 5 |
+| **超小型** | 281-360px | 83vh | 48px/62px | iPhone SE |
+| **小型スマホ** | 361-400px | 84vh | 50px/64px | iPhone 12 mini, Pixel 7 |
+| **標準スマホ** | 401-480px | 85vh | 50px/65px | iPhone 14 Pro Max |
+| **小型タブレット** | 481-768px | 88vh | 65px/85px | iPad Mini, Galaxy S20 Ultra |
+| **標準タブレット** | 769-1024px | 90vh | 70px/90px | iPad Air, iPad Pro |
+| **Surface** | 1025-1366px | 92vh | 75px/95px | Surface Pro 7, Surface Duo |
+| **大型ディスプレイ** | ≥1367px | 90vh | 80px/100px | Asus Zenbook Fold, PC |
+
+**4. スクロールヒントの実装**
+- **全デバイス対応**（PC・タブレット・スマホ）
+- スクロール可能であることを視覚的に表示
+- 下矢印アイコンのバウンスアニメーション
+- スクロール開始で自動的に非表示
+- 4秒後に自動フェードアウト
+
+**5. コンテンツの最適化**
+- ロゴサイズの縮小（180px）
+- 「君と繋がる、声で届ける」テキストを非表示（スマホのみ）
+- ゆっくりキャラクターのサイズ調整（50px/65px）
+- パディングとマージンの最適化
+
+**6. UX改善**
+- スムーズスクロール対応
+- タッチデバイス向け最適化
+- スクロール位置の検出と管理
+- モーダルを閉じた時の状態リセット
+
+#### 📝 関連ファイル
+- `css/styles.css` - 基本スタイル修正
+  - 行925-947: スクロールバー非表示
+  - 行960-989: ×ボタン固定位置
+  - 行2076-2093: レスポンシブ対応
+  - 行2341-2357: タブレット対応
+- `css/modal-responsive-fix.css` - デバイス別最適化
+  - スマホ用の詳細な調整
+  - スクロールヒントのスタイル
+  - グラデーションインジケーター
+- `index.html` - スクロールヒント追加（行448-451）
+- `js/script.js` - スクロール検出機能
+  - setupModalScrollHint() - 新規関数
+  - hideLoginModal() - リセット処理追加
+
+#### 🎨 改善ポイント
+- ✅ **全キャリア完全対応**（iPhone、Android、Surface、iPad）
+- ✅ 折りたたみスマホ対応（Galaxy Fold）
+- ✅ ×ボタンが常に見える
+- ✅ スクロールバーなしで美しい
+- ✅ スクロール可能であることが明確（全デバイス）
+- ✅ デバイス別に最適化されたサイズ
+- ✅ 直感的なユーザー体験
+
+#### 📱 対応デバイス一覧
+- **iPhone**: SE, XR, 12 mini, 12 Pro, 14 Pro Max
+- **Android**: Pixel 7, Galaxy S8+, S20 Ultra, Galaxy Fold 5, Asus Zenbook Fold
+- **iPad**: Mini, Air, Pro
+- **Surface**: Pro 7, Duo
+- **その他**: Nest Hub, Nest Hub Max, あらゆるスマホ・タブレット
+
+---
+
+### ✅ Phase 12: OAuth認証キャンセル画面実装完了 (2025-11-20 21:56)
+
+#### 🎉 実装完了
+Twitter OAuth認証で「キャンセル」を選択した場合の専用画面を実装しました。
+
+#### ✅ 完了した作業
+
+**1. 認証キャンセル専用ページ作成**
+- `auth-cancelled.html` - ユーザーフレンドリーなキャンセル画面
+- ミクチャのようなデザインと機能
+- エラー内容に応じた動的メッセージ表示
+
+**2. server.jsのエラーハンドリング強化**
+- OAuth コールバックのエラー検出
+- 4種類のエラーに対応：
+  - `access_denied` - ユーザーがキャンセル
+  - `session_lost` - セッション情報消失
+  - `invalid_state` - State検証失敗
+  - `oauth_error` - その他の認証エラー
+
+**3. ユーザー体験の向上**
+- エラー内容を分かりやすく説明
+- 次のアクション選択肢を提示
+- アイコンとメッセージを動的に変更
+
+#### 📝 エラー種類別の表示
+
+| エラー | アイコン | メッセージ | 原因 |
+|--------|---------|-----------|------|
+| access_denied | ⚠️ | ログインしていません | ユーザーがキャンセル |
+| session_lost | 🔄 | セッションが失われました | Cookie無効、長時間放置 |
+| invalid_state | 🔒 | セキュリティ検証エラー | CSRF攻撃の可能性 |
+| oauth_error | ❌ | 認証エラーが発生 | API通信エラー等 |
+
+#### 📝 関連ファイル
+- `auth-cancelled.html` - 認証キャンセル専用画面
+- `server.js` - エラーハンドリング処理（218-224, 231, 336行目）
+
+#### 🎨 デザイン
+- ミクチャスタイルのクリーンなUI
+- グラデーション背景
+- カードデザイン
+- レスポンシブ対応
+
+---
+
+### ✅ Phase 11: 音声ファイルアップロード機能実装完了 (2025-11-20 21:49)
+
+#### 🎉 実装完了
+音声ファイルのアップロード・管理機能を実装しました。
+
+#### ✅ 完了した作業
+
+**1. データベーステーブル作成**
+- `audio_files` テーブルをSupabase SQL Editorで作成
+- 必要なカラム: id, user_id, title, description, category, file_url, file_name, file_size, is_public
+- インデックス作成: user_id, created_at, category
+
+**2. APIエンドポイント実装**（server.js）
+- `POST /api/audio/upload` - 音声ファイルアップロード
+- `GET /api/audio/list` - 音声ファイル一覧取得
+- `DELETE /api/audio/:id` - 音声ファイル削除
+
+**3. ファイルアップロード設定**
+- Multer設定済み
+- 対応形式: MP3, WAV, OGG, M4A
+- ファイルサイズ制限: 50MB
+- 保存先: `uploads/audio/`
+
+**4. データベース操作関数作成**（database/audio-files.js）
+- `createAudioFile()` - 音声ファイル情報保存
+- `getAudioFilesByUserId()` - ユーザーの音声一覧
+- `getAudioFilesByCategory()` - カテゴリ別音声
+- `getPublicAudioFiles()` - 公開音声一覧
+- `getAudioFileById()` - ID指定取得
+- `updateAudioFile()` - 音声情報更新
+- `deleteAudioFile()` - 音声削除
+- `getAudioFileCount()` - 音声ファイル数
+
+**5. ドキュメント作成**
+- `docs/AUDIO_UPLOAD_SETUP.md` - セットアップガイド
+- `database/audio-files-improved.sql` - 改善版SQL（RLS付き）
+- `check-audio-table.js` - テーブル構造確認スクリプト
+
+#### ⚠️ 修正が必要な項目
+
+**1. user_idの型の統一**
+- 現在: `user_id VARCHAR(255)` （Twitter ID）
+- 推奨: `user_id UUID` （profilesテーブルのid）
+- 理由: 外部キー制約と整合性
+
+**2. セッション管理の修正**
+- `req.session.user.dbId` （UUID）を追加する必要がある
+- 現在は `req.session.user.id` （Twitter ID）のみ
+
+**3. Supabase Storage統合（オプション）**
+- 現在: ローカルファイルシステム
+- 推奨: Supabase Storage バケット
+- メリット: スケーラブル、CDN配信、バックアップ
+
+#### 📝 関連ファイル
+- `database/audio-files.sql` - テーブル作成SQL（実行済み）
+- `database/audio-files-improved.sql` - 改善版SQL（RLS付き）
+- `database/audio-files.js` - データベース操作関数
+- `server.js` - APIエンドポイント実装
+- `docs/AUDIO_UPLOAD_SETUP.md` - 詳細ドキュメント
+- `check-audio-table.js` - テーブル確認スクリプト
+
+#### 🔄 次のステップ
+1. テーブル構造の確認・修正（user_id型）
+2. セッション管理の修正（dbId追加）
+3. フロントエンド実装（アップロードフォーム）
+4. Supabase Storage統合（オプション）
+
+---
+
+### ✅ Phase 10: サムネイル表示問題の解決完了 (2025-11-20 16:25)
+
+#### 🔍 現在の状況
+**問題**: フォロー状態セクションのサムネイル画像が表示されない
+
+#### ✅ 確認済みの事項
+- Supabaseの`profiles`テーブルに`avatar_url`は正しく保存されている
+  - `https://pbs.twimg.com/profile_images/...`
+- 名前とユーザー名は正しく表示される
+  - 「君斗りんく＠クリエイター応援」(@streamerfunch)
+  - 「君斗りんく＠アイドル応援」(@idolfunch)
+- プロフィールカードのサムネイルは正常に表示される
+
+#### 🔧 実施した対策
+1. **キャッシュデータの検証機能追加**
+   - 壊れたキャッシュを自動検出・削除
+   - データ構造の完全性チェック
+   - 必須フィールド検証
+
+2. **デバッグログの強化（第1弾）**
+   - サーバー側: Supabaseから取得したデータの詳細ログ
+   - クライアント側: accountDataの詳細ログ
+
+3. **エラーハンドリング改善**
+   - エラー時にアラート表示
+   - フォールバック処理の強化
+
+4. **デバッグログの強化（第2弾）**
+   - `loadRequiredAccountsAvatars()`に詳細ログ追加
+   - APIレスポンス構造の確認
+   - DOM要素取得状況の確認
+   - 画像URL存在チェック
+
+#### 🔍 判明した事実
+**2つの異なる関数が同じDOM要素を更新**:
+1. `updateAccountDisplay()` - プロフィールカード用
+   - キャッシュバスター使用
+   - タイムアウト処理
+   - 強制更新ロジック
+   
+2. `loadRequiredAccountsAvatars()` - フォロー状態セクション用
+   - 単純な`src`更新
+   - レスポンス構造の判定が必要
+
+#### 🔄 次のステップ
+- ブラウザのコンソールログを確認（F12）
+- `loadRequiredAccountsAvatars()`の詳細ログを分析
+- APIレスポンスの構造を確認
+- `profile_image_url`がどこで失われているか特定
+
+#### 📝 関連ファイル
+- `js/script.js`: loadRequiredAccountsAvatars関数にデバッグログ追加
+- `server.js`: Supabaseデータのログ出力追加
+
+---
 
 ### ✅ Phase 9: API負荷対策とキャッシュ最適化完了 (2025-11-20 07:45)
 

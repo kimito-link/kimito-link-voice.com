@@ -676,3 +676,167 @@ textarea {
         gap: 10px;
     }
 }
+
+/* ゆっくりキャラクター装飾 */
+.modal-content .yukkuri-decoration {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 30px auto;
+    max-width: 350px;
+}
+
+.modal-content .yukkuri-decoration img {
+    max-width: 80px;
+    max-height: 80px;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    animation: yukkuriBounce 2s ease-in-out infinite;
+}
+
+.modal-content .yukkuri-left {
+    animation-delay: 0s;
+}
+
+.modal-content .yukkuri-center {
+    animation-delay: 0.3s;
+    max-width: 100px;
+    max-height: 100px;
+    width: 100px;
+    height: 100px;
+}
+
+.modal-content .yukkuri-right {
+    animation-delay: 0.6s;
+}
+
+@keyframes yukkuriBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 銀河カラーロゴ */
+.logo-ginga {
+    width: 180px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 66, 123, 0.2);
+}
+
+/* ログイン案内ボックス */
+.login-info-box {
+    background: linear-gradient(135deg, #E6EDF4 0%, #FFE8D6 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+    border: 2px solid var(--kimito-blue);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--kimito-blue);
+    margin-bottom: 8px;
+}
+
+.info-text {
+    font-size: 14px;
+    color: var(--kimito-gray);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.info-text a {
+    color: var(--kimito-blue);
+    text-decoration: underline;
+    transition: color 0.3s;
+}
+
+.info-text a:hover {
+    color: var(--kimito-orange);
+}
+
+.info-links {
+    display: flex;
+    gap: 10px;
+}
+
+.link-x {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--kimito-black);
+    color: var(--kimito-white);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.link-x:hover {
+    background: #1DA1F2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.4);
+}
+
+.link-x i {
+    font-size: 18px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .yukkuri-left,
+    .yukkuri-right {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .yukkuri-center {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .login-info-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .info-icon {
+        font-size: 48px;
+    }
+    
+    .info-links {
+        justify-content: center;
+    }
+}
