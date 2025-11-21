@@ -715,7 +715,7 @@ body {
 }
 
 .narrator-followers {
-    color: var(--primary-blue);
+    color: #4FC3F7; /* 明るい水色 */
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 12px;
@@ -727,7 +727,7 @@ body {
 }
 
 .narrator-followers i {
-    color: var(--primary-blue);
+    color: #4FC3F7; /* 明るい水色 */
     font-size: 1.2rem;
 }
 
@@ -775,18 +775,25 @@ body {
     margin-bottom: 15px;
 }
 
-.narrator-rating {
-    color: var(--primary-orange);
+.narrator-achievements {
     margin-bottom: 15px;
 }
 
-.narrator-rating i {
-    margin: 0 2px;
+.achievement-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid #4CAF50;
+    color: #4CAF50;
+    font-weight: 700;
+    font-size: 0.95rem;
 }
 
-.narrator-rating span {
-    color: var(--text-secondary);
-    margin-left: 5px;
+.achievement-count i {
+    font-size: 1.1rem;
 }
 
 .narrator-sample {

@@ -3387,7 +3387,7 @@ async function loadVoiceActorCard() {
  * コラボメンバーカードの情報を取得して表示
  */
 async function loadCollabMemberCard() {
-    const username = 'c0tanpoTeshIta'; // コタのAI紀行 @c0tanpoTeshIta
+    const username = 'c0tanpoTesh1ta'; // コタのAI紀行 @c0tanpoTesh1ta（正しいスペル）
     console.log('🤝 コラボメンバー情報取得中...', username);
     
     try {
