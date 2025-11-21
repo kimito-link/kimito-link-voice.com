@@ -3451,23 +3451,27 @@ async function loadCollabMemberCard() {
         // プロフィールを更新
         const bioEl = document.getElementById('collabBio');
         if (bioEl) {
-            if (userData.description) {
+            if (userData.description && userData.description.trim() !== '') {
                 bioEl.textContent = userData.description;
                 console.log('✅ プロフィール文章を設定:', userData.description);
             } else {
-                console.warn('⚠️ プロフィール文章(description)が存在しません');
+                // プロフィールが空の場合はデフォルトテキストを設定
+                bioEl.textContent = 'あなたの音声を動画化して拡散！';
+                console.warn('⚠️ プロフィール文章が空のため、デフォルトを使用');
             }
         }
         
         // フォロワー数を更新
         const followersEl = document.getElementById('collabFollowers');
         if (followersEl) {
-            if (userData.public_metrics?.followers_count) {
+            if (userData.public_metrics?.followers_count !== undefined) {
                 const count = userData.public_metrics.followers_count.toLocaleString();
                 followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
                 console.log('✅ フォロワー数を設定:', count);
             } else {
-                console.warn('⚠️ フォロワー数(public_metrics.followers_count)が存在しません');
+                // フォロワー数が取得できない場合はデフォルトを表示
+                followersEl.innerHTML = '<i class="fas fa-users"></i> フォロワー情報取得中...';
+                console.warn('⚠️ フォロワー数が取得できませんでした');
                 console.warn('⚠️ public_metrics全体:', userData.public_metrics);
             }
         }
