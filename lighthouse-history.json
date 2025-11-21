@@ -1,0 +1,18 @@
+[
+  {
+    "date": "2025-11-21T20:44:09.441Z",
+    "scores": {
+      "performance": 52,
+      "accessibility": 83,
+      "bestPractices": 96,
+      "seo": 91
+    },
+    "metrics": {
+      "fcp": 9.909,
+      "lcp": 22.029,
+      "tbt": 182,
+      "cls": 0,
+      "si": 10.71
+    }
+  }
+]
