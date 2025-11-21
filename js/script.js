@@ -3391,9 +3391,15 @@ async function loadCollabMemberCard() {
     console.log('🤝 コラボメンバー情報取得中...', username);
     
     try {
-        const response = await fetch(`/api/user/profile/${username}`);
+        const apiUrl = `/api/user/profile/${username}`;
+        console.log('📡 API呼び出し:', apiUrl);
+        const response = await fetch(apiUrl);
+        console.log('📡 API応答ステータス:', response.status);
+        
         if (!response.ok) {
             console.error('❌ コラボメンバー情報取得エラー:', response.status);
+            const errorText = await response.text();
+            console.error('❌ エラー詳細:', errorText);
             return;
         }
         
@@ -3470,6 +3476,13 @@ async function loadCollabMemberCard() {
         
     } catch (error) {
         console.error('❌ コラボメンバーカード取得エラー:', error);
+        console.error('❌ エラースタック:', error.stack);
+        
+        // エラー時もUIを更新
+        const followersEl = document.getElementById('collabFollowers');
+        if (followersEl) {
+            followersEl.innerHTML = '<i class="fas fa-users"></i> 取得に失敗しました';
+        }
     }
 }
 

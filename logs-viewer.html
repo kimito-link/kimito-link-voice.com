@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KimiLink Voice - ログビューアー</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        #logs {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-entry.log {
+            background: #f0f9ff;
+            border-color: #0284c7;
+        }
+
+        .log-entry.error {
+            background: #fef2f2;
+            border-color: #dc2626;
+        }
+
+        .log-entry.warn {
+            background: #fffbeb;
+            border-color: #f59e0b;
+        }
+
+        .log-timestamp {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .log-message {
+            color: #333;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .log-url {
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 KimiLink Voice ログビューアー</h1>
+        
+        <div class="controls">
+            <button onclick="loadLogs()">🔄 更新</button>
+            <button onclick="clearLogs()">🗑️ ログクリア</button>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalLogs">0</div>
+                    <div class="stat-label">総ログ数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="errorCount">0</div>
+                    <div class="stat-label">エラー</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="warnCount">0</div>
+                    <div class="stat-label">警告</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/logs/view');
+                const data = await response.json();
+                
+                const logs = data.logs || [];
+                displayLogs(logs);
+                updateStats(logs);
+            } catch (error) {
+                console.error('ログ読み込みエラー:', error);
+                document.getElementById('logs').innerHTML = `
+                    <div class="empty-state">
+                        <div>❌</div>
+                        <p>ログの読み込みに失敗しました</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayLogs(logs) {
+            const container = document.getElementById('logs');
+            
+            if (logs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div>📭</div>
+                        <p>ログがありません</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = logs.map(log => {
+                const date = new Date(log.timestamp);
+                const time = date.toLocaleString('ja-JP');
+                
+                return `
+                    <div class="log-entry ${log.level}">
+                        <div class="log-timestamp">${time}</div>
+                        <div class="log-message">${escapeHtml(log.message)}</div>
+                        <div class="log-url">${escapeHtml(log.url)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats(logs) {
+            document.getElementById('totalLogs').textContent = logs.length;
+            document.getElementById('errorCount').textContent = logs.filter(l => l.level === 'error').length;
+            document.getElementById('warnCount').textContent = logs.filter(l => l.level === 'warn').length;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function clearLogs() {
+            if (!confirm('本当にログをクリアしますか？')) return;
+            
+            try {
+                // サーバー側のログファイルを削除（実装が必要）
+                alert('ログクリア機能は実装中です');
+            } catch (error) {
+                console.error('ログクリアエラー:', error);
+            }
+        }
+
+        // 初回ロード
+        loadLogs();
+
+        // 5秒ごとに自動更新
+        setInterval(loadLogs, 5000);
+    </script>
+</body>
+</html>

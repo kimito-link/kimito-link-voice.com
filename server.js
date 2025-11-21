@@ -816,8 +816,79 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'KimiLink Voice is running!' });
 });
 
+// ===== エラーログ収集エンドポイント =====
+app.post('/api/logs', (req, res) => {
+    try {
+        const { logs } = req.body;
+        
+        if (!logs || !Array.isArray(logs)) {
+            return res.status(400).json({ error: 'Invalid logs format' });
+        }
+
+        // ログをファイルに書き込み
+        const fs = require('fs');
+        const logFile = './logs/client-logs.json';
+        
+        // logsディレクトリが存在しない場合は作成
+        if (!fs.existsSync('./logs')) {
+            fs.mkdirSync('./logs');
+        }
+
+        // 既存のログを読み込み
+        let existingLogs = [];
+        if (fs.existsSync(logFile)) {
+            try {
+                const data = fs.readFileSync(logFile, 'utf8');
+                existingLogs = JSON.parse(data);
+            } catch (e) {
+                existingLogs = [];
+            }
+        }
+
+        // 新しいログを追加
+        existingLogs.push(...logs);
+
+        // 最新1000件のみ保持
+        if (existingLogs.length > 1000) {
+            existingLogs = existingLogs.slice(-1000);
+        }
+
+        // ファイルに保存
+        fs.writeFileSync(logFile, JSON.stringify(existingLogs, null, 2));
+
+        res.json({ success: true, count: logs.length });
+    } catch (error) {
+        console.error('❌ ログ保存エラー:', error);
+        res.status(500).json({ error: 'Failed to save logs' });
+    }
+});
+
+// ===== ログビューアーエンドポイント =====
+app.get('/api/logs/view', (req, res) => {
+    try {
+        const fs = require('fs');
+        const logFile = './logs/client-logs.json';
+        
+        if (!fs.existsSync(logFile)) {
+            return res.json({ logs: [] });
+        }
+
+        const data = fs.readFileSync(logFile, 'utf8');
+        const logs = JSON.parse(data);
+        
+        // 最新50件のみ返す
+        const recentLogs = logs.slice(-50).reverse();
+        
+        res.json({ logs: recentLogs });
+    } catch (error) {
+        console.error('❌ ログ読み込みエラー:', error);
+        res.status(500).json({ error: 'Failed to load logs' });
+    }
+});
+
 // サーバー起動
 app.listen(PORT, () => {
     console.log(`🎤 KimiLink Voice Server is running on http://localhost:${PORT}`);
     console.log(`🎨 Powered by キミトリンク工房`);
+    console.log(`📊 ログビューアー: http://localhost:${PORT}/api/logs/view`);
 });
