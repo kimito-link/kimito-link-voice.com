@@ -2137,6 +2137,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (targetContent) {
                 targetContent.classList.add('active');
             }
+            
+            // タブごとのデータ読み込み
+            if (targetTab === 'my-requests') {
+                loadMyRequests(); // 依頼履歴を読み込む
+            } else if (targetTab === 'orders') {
+                loadOrders(); // 受注案件を読み込む（後で実装）
+            }
         });
     });
     
@@ -3585,5 +3592,332 @@ async function handleRequestSubmit(e) {
         hideLoading();
         console.error('❌ 依頼送信エラー:', error);
         showToast('依頼の送信中にエラーが発生しました', 'error');
+    }
+}
+
+// ===== 依頼履歴表示機能 =====
+
+// 依頼履歴を読み込む
+async function loadMyRequests() {
+    const requestsList = document.getElementById('requestsList');
+    if (!requestsList) return;
+    
+    // ローディング表示
+    requestsList.innerHTML = `
+        <div class="card" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 20px;"></i>
+            <p>読み込み中...</p>
+        </div>
+    `;
+    
+    try {
+        if (!supabaseClient) {
+            throw new Error('Supabaseが初期化されていません');
+        }
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            requestsList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <p>ログインが必要です</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // 現在のユーザーのプロフィールIDを取得
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (!profile) {
+            console.error('❌ プロフィールが見つかりません');
+            requestsList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <p>プロフィールが見つかりません</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // 依頼履歴を取得（最終更新日時順で新しいものが上）
+        const { data: requests, error } = await supabaseClient
+            .from('voice_requests')
+            .select('*')
+            .eq('client_id', profile.id)
+            .order('updated_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ 依頼履歴取得エラー:', error);
+            throw error;
+        }
+        
+        console.log('✅ 依頼履歴を取得:', requests);
+        
+        // 依頼がない場合
+        if (!requests || requests.length === 0) {
+            requestsList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
+                    まだ依頼がありません
+                </div>
+            `;
+            return;
+        }
+        
+        // 依頼カードを生成
+        requestsList.innerHTML = requests.map(request => createRequestCard(request)).join('');
+        
+    } catch (error) {
+        console.error('❌ 依頼履歴読み込みエラー:', error);
+        requestsList.innerHTML = `
+            <div class="card" style="text-align: center; padding: 40px; color: #f44336;">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <p>エラーが発生しました</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// 依頼カードを生成
+function createRequestCard(request) {
+    const statusBadge = {
+        'pending': '<span class="status-badge status-pending">未対応</span>',
+        'accepted': '<span class="status-badge status-accepted">受注済み</span>',
+        'in_progress': '<span class="status-badge status-progress">進行中</span>',
+        'completed': '<span class="status-badge status-completed">完了</span>',
+        'cancelled': '<span class="status-badge status-cancelled">キャンセル</span>'
+    };
+    
+    const createdDate = new Date(request.created_at).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    return `
+        <div class="card request-card">
+            <div class="request-header">
+                <h3>${request.title}</h3>
+                ${statusBadge[request.status] || statusBadge.pending}
+            </div>
+            <div class="request-body">
+                <div class="request-info">
+                    <p class="request-script">${request.script.substring(0, 100)}${request.script.length > 100 ? '...' : ''}</p>
+                    <div class="request-meta">
+                        <span><i class="fas fa-text-width"></i> ${request.char_count.toLocaleString()}文字</span>
+                        <span><i class="fas fa-yen-sign"></i> ${request.total_price.toLocaleString()}円</span>
+                        <span><i class="fas fa-calendar"></i> ${createdDate}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="request-actions">
+                <button class="btn-secondary" onclick="viewRequestDetail('${request.id}')">
+                    <i class="fas fa-eye"></i> 詳細を見る
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 依頼詳細を表示（後で実装）
+function viewRequestDetail(requestId) {
+    console.log('依頼詳細:', requestId);
+    showToast('依頼詳細機能は実装中です', 'info');
+}
+
+// ===== 受注案件表示機能（声優モード） =====
+
+// 受注案件を読み込む
+async function loadOrders() {
+    const ordersList = document.getElementById('ordersList');
+    if (!ordersList) return;
+    
+    // ローディング表示
+    ordersList.innerHTML = `
+        <div class="card" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary-blue); margin-bottom: 20px;"></i>
+            <p>読み込み中...</p>
+        </div>
+    `;
+    
+    try {
+        if (!supabaseClient) {
+            throw new Error('Supabaseが初期化されていません');
+        }
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            ordersList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <p>ログインが必要です</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // 現在のユーザーのプロフィールIDを取得
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (!profile) {
+            console.error('❌ プロフィールが見つかりません');
+            ordersList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px;">
+                    <p>プロフィールが見つかりません</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // 受注案件を取得（narrator_idが自分のもの、または全体から選択可能）
+        // 現在はnarrator_idがnullなので、全ての依頼を表示（後で改善）
+        const { data: orders, error } = await supabaseClient
+            .from('voice_requests')
+            .select('*')
+            .is('narrator_id', null) // narrator_idがnullの依頼（誰でも受注可能）
+            .order('updated_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ 受注案件取得エラー:', error);
+            throw error;
+        }
+        
+        console.log('✅ 受注案件を取得:', orders);
+        
+        // 案件がない場合
+        if (!orders || orders.length === 0) {
+            ordersList.innerHTML = `
+                <div class="card" style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
+                    まだ受注可能な案件がありません
+                </div>
+            `;
+            return;
+        }
+        
+        // 案件カードを生成
+        ordersList.innerHTML = orders.map(order => createOrderCard(order)).join('');
+        
+    } catch (error) {
+        console.error('❌ 受注案件読み込みエラー:', error);
+        ordersList.innerHTML = `
+            <div class="card" style="text-align: center; padding: 40px; color: #f44336;">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                <p>エラーが発生しました</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// 案件カードを生成
+function createOrderCard(order) {
+    const createdDate = new Date(order.created_at).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    return `
+        <div class="card request-card">
+            <div class="request-header">
+                <h3>${order.title}</h3>
+                <span class="status-badge status-pending">未受注</span>
+            </div>
+            <div class="request-body">
+                <div class="request-info">
+                    <p class="request-script">${order.script.substring(0, 150)}${order.script.length > 150 ? '...' : ''}</p>
+                    <div class="request-meta">
+                        <span><i class="fas fa-text-width"></i> ${order.char_count.toLocaleString()}文字</span>
+                        <span><i class="fas fa-yen-sign"></i> ${order.total_price.toLocaleString()}円</span>
+                        <span><i class="fas fa-coins"></i> 単価: ¥${order.price_per_char}/文字</span>
+                        <span><i class="fas fa-calendar"></i> ${createdDate}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="request-actions">
+                <button class="btn-secondary" onclick="viewOrderDetail('${order.id}')">
+                    <i class="fas fa-eye"></i> 詳細を見る
+                </button>
+                <button class="btn-primary" onclick="acceptOrder('${order.id}')">
+                    <i class="fas fa-check"></i> 受注する
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 案件詳細を表示（後で実装）
+function viewOrderDetail(orderId) {
+    console.log('案件詳細:', orderId);
+    showToast('案件詳細機能は実装中です', 'info');
+}
+
+// 案件を受注する
+async function acceptOrder(orderId) {
+    if (!confirm('この案件を受注しますか？')) return;
+    
+    showLoading();
+    
+    try {
+        if (!supabaseClient) {
+            throw new Error('Supabaseが初期化されていません');
+        }
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            hideLoading();
+            showToast('ログインが必要です', 'warning');
+            return;
+        }
+        
+        // プロフィールIDを取得
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (!profile) {
+            hideLoading();
+            showToast('プロフィールが見つかりません', 'error');
+            return;
+        }
+        
+        // 案件を受注（narrator_idを更新、ステータスをacceptedに）
+        const { error } = await supabaseClient
+            .from('voice_requests')
+            .update({
+                narrator_id: profile.id,
+                status: 'accepted',
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', orderId);
+        
+        hideLoading();
+        
+        if (error) {
+            console.error('❌ 受注エラー:', error);
+            showToast('受注に失敗しました', 'error');
+            return;
+        }
+        
+        console.log('✅ 案件を受注しました:', orderId);
+        showToast('案件を受注しました！', 'success');
+        
+        // 受注案件リストを再読み込み
+        loadOrders();
+        
+    } catch (error) {
+        hideLoading();
+        console.error('❌ 受注エラー:', error);
+        showToast('受注中にエラーが発生しました', 'error');
     }
 }
