@@ -45,3 +45,6 @@ coverage/
 # Misc
 *.swp
 *.swo
+
+# Commit message working file
+commit_message.txt
