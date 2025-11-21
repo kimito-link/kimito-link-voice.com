@@ -2973,6 +2973,289 @@ if (typeof module !== 'undefined' && module.exports) {
         tweetReview,
         requestCollab,
         postThanksToTwitter,
-        updateThanksPreview
+        updateThanksPreview,
+        loadVoiceActorCard,
+        loadCollabMemberCard
     };
 }
+
+// ===== 声優カード・コラボメンバーカードのAPI取得 =====
+
+/**
+ * 声優カードの情報を取得して表示
+ */
+async function loadVoiceActorCard() {
+    const username = 'streamerfunch'; // 君斗りんく
+    console.log('🎤 声優カード情報取得中...', username);
+    
+    try {
+        const response = await fetch(`/api/user/profile/${username}`);
+        if (!response.ok) {
+            console.error('❌ 声優情報取得エラー:', response.status);
+            return;
+        }
+        
+        const data = await response.json();
+        const userData = data.data || data;
+        console.log('✅ 声優情報取得成功:', userData);
+        
+        // アバター画像を更新
+        const avatarEl = document.getElementById('voiceActorAvatar');
+        if (avatarEl && userData.profile_image_url) {
+            const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
+            avatarEl.src = imageUrl;
+            avatarEl.onerror = function() {
+                this.onerror = null;
+                this.src = userData.profile_image_url;
+            };
+        }
+        
+        // 名前を更新
+        const nameEl = document.getElementById('voiceActorName');
+        if (nameEl && userData.name) {
+            nameEl.textContent = userData.name;
+        }
+        
+        // ハンドル(@username)を更新
+        const handleEl = document.getElementById('voiceActorHandle');
+        if (handleEl && userData.username) {
+            handleEl.textContent = `@${userData.username}`;
+        }
+        
+        // プロフィールを更新
+        const bioEl = document.getElementById('voiceActorBio');
+        if (bioEl && userData.description) {
+            bioEl.textContent = userData.description;
+        }
+        
+        // フォロワー数を更新
+        const followersEl = document.getElementById('voiceActorFollowers');
+        if (followersEl && userData.public_metrics?.followers_count) {
+            const count = userData.public_metrics.followers_count.toLocaleString();
+            followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        }
+        
+        console.log('✅ 声優カード更新完了');
+        
+    } catch (error) {
+        console.error('❌ 声優カード取得エラー:', error);
+    }
+}
+
+/**
+ * コラボメンバーカードの情報を取得して表示
+ */
+async function loadCollabMemberCard() {
+    const username = 'c0tanpoTesh1ta'; // コタのAI紀行 @c0tanpoTesh1ta
+    console.log('🤝 コラボメンバー情報取得中...', username);
+    
+    try {
+        const response = await fetch(`/api/user/profile/${username}`);
+        if (!response.ok) {
+            console.error('❌ コラボメンバー情報取得エラー:', response.status);
+            return;
+        }
+        
+        const data = await response.json();
+        const userData = data.data || data;
+        console.log('✅ コラボメンバー情報取得成功:', userData);
+        console.log('📊 コラボメンバー詳細:', {
+            name: userData.name,
+            username: userData.username,
+            description: userData.description,
+            followers: userData.public_metrics?.followers_count,
+            profile_image_url: userData.profile_image_url
+        });
+        
+        // アバター画像を更新
+        const avatarEl = document.getElementById('collabAvatar');
+        if (avatarEl && userData.profile_image_url) {
+            const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
+            console.log('🖼️ コラボメンバー画像URL:', imageUrl);
+            console.log('🖼️ 画像要素を発見:', avatarEl);
+            avatarEl.src = imageUrl;
+            avatarEl.onerror = function() {
+                console.error('❌ 画像読み込みエラー:', imageUrl);
+                console.log('🔄 元のURLにフォールバック:', userData.profile_image_url);
+                this.onerror = null;
+                this.src = userData.profile_image_url;
+            };
+            avatarEl.onload = function() {
+                console.log('✅ 画像読み込み成功:', imageUrl);
+            };
+        } else {
+            console.warn('⚠️ 画像要素またはprofile_image_urlが存在しません');
+            console.warn('⚠️ avatarEl:', avatarEl);
+            console.warn('⚠️ profile_image_url:', userData.profile_image_url);
+        }
+        
+        // 名前を更新
+        const nameEl = document.getElementById('collabName');
+        if (nameEl && userData.name) {
+            nameEl.textContent = userData.name + 'さん';
+        }
+        
+        // ハンドル(@username)を更新
+        const handleEl = document.getElementById('collabHandle');
+        if (handleEl && userData.username) {
+            handleEl.textContent = `@${userData.username}`;
+        }
+        
+        // プロフィールを更新
+        const bioEl = document.getElementById('collabBio');
+        if (bioEl) {
+            if (userData.description) {
+                bioEl.textContent = userData.description;
+                console.log('✅ プロフィール文章を設定:', userData.description);
+            } else {
+                console.warn('⚠️ プロフィール文章(description)が存在しません');
+            }
+        }
+        
+        // フォロワー数を更新
+        const followersEl = document.getElementById('collabFollowers');
+        if (followersEl) {
+            if (userData.public_metrics?.followers_count) {
+                const count = userData.public_metrics.followers_count.toLocaleString();
+                followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+                console.log('✅ フォロワー数を設定:', count);
+            } else {
+                console.warn('⚠️ フォロワー数(public_metrics.followers_count)が存在しません');
+                console.warn('⚠️ public_metrics全体:', userData.public_metrics);
+            }
+        }
+        
+        console.log('✅ コラボメンバーカード更新完了');
+        
+    } catch (error) {
+        console.error('❌ コラボメンバーカード取得エラー:', error);
+    }
+}
+
+/**
+ * TOPページの声優カード1を取得して表示（@streamerfunch）
+ */
+async function loadNarratorCard1() {
+    const username = 'streamerfunch'; // 君斗りんく@クリエイター応援
+    console.log('🎤 声優カード1情報取得中...', username);
+    
+    try {
+        const response = await fetch(`/api/user/profile/${username}`);
+        if (!response.ok) {
+            console.error('❌ 声優カード1取得エラー:', response.status);
+            return;
+        }
+        
+        const data = await response.json();
+        const userData = data.data || data;
+        console.log('✅ 声優カード1取得成功:', userData);
+        console.log('📊 声優カード1詳細:', {
+            name: userData.name,
+            username: userData.username,
+            description: userData.description,
+            followers: userData.public_metrics?.followers_count,
+            profile_image_url: userData.profile_image_url
+        });
+        
+        // アバター画像を更新
+        const avatarEl = document.getElementById('narrator1Avatar');
+        if (avatarEl && userData.profile_image_url) {
+            const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
+            console.log('🖼️ 声優カード1画像URL:', imageUrl);
+            avatarEl.src = imageUrl;
+            avatarEl.onerror = function() {
+                this.onerror = null;
+                this.src = userData.profile_image_url;
+            };
+        }
+        
+        // 名前を更新
+        const nameEl = document.getElementById('narrator1Name');
+        if (nameEl && userData.name) {
+            nameEl.textContent = userData.name;
+        }
+        
+        // ハンドルを更新
+        const handleEl = document.getElementById('narrator1Handle');
+        if (handleEl && userData.username) {
+            handleEl.textContent = `@${userData.username}`;
+        }
+        
+        // フォロワー数を更新
+        const followersEl = document.getElementById('narrator1Followers');
+        if (followersEl && userData.public_metrics?.followers_count) {
+            const count = userData.public_metrics.followers_count.toLocaleString();
+            followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        }
+        
+        console.log('✅ 声優カード1更新完了');
+        
+    } catch (error) {
+        console.error('❌ 声優カード1取得エラー:', error);
+    }
+}
+
+/**
+ * TOPページの声優カード2を取得して表示（@idolfunch）
+ */
+async function loadNarratorCard2() {
+    const username = 'idolfunch'; // 君斗りんく@アイドル応援
+    console.log('🎤 声優カード2情報取得中...', username);
+    
+    try {
+        const response = await fetch(`/api/user/profile/${username}`);
+        if (!response.ok) {
+            console.error('❌ 声優カード2取得エラー:', response.status);
+            return;
+        }
+        
+        const data = await response.json();
+        const userData = data.data || data;
+        console.log('✅ 声優カード2取得成功:', userData);
+        
+        // アバター画像を更新
+        const avatarEl = document.getElementById('narrator2Avatar');
+        if (avatarEl && userData.profile_image_url) {
+            const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
+            avatarEl.src = imageUrl;
+            avatarEl.onerror = function() {
+                this.onerror = null;
+                this.src = userData.profile_image_url;
+            };
+        }
+        
+        // 名前を更新
+        const nameEl = document.getElementById('narrator2Name');
+        if (nameEl && userData.name) {
+            nameEl.textContent = userData.name;
+        }
+        
+        // ハンドルを更新
+        const handleEl = document.getElementById('narrator2Handle');
+        if (handleEl && userData.username) {
+            handleEl.textContent = `@${userData.username}`;
+        }
+        
+        // フォロワー数を更新
+        const followersEl = document.getElementById('narrator2Followers');
+        if (followersEl && userData.public_metrics?.followers_count) {
+            const count = userData.public_metrics.followers_count.toLocaleString();
+            followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        }
+        
+        console.log('✅ 声優カード2更新完了');
+        
+    } catch (error) {
+        console.error('❌ 声優カード2取得エラー:', error);
+    }
+}
+
+// ページ読み込み時に自動的に取得
+window.addEventListener('DOMContentLoaded', function() {
+    // 全てのカードを読み込み
+    loadNarratorCard1();      // TOPページ声優カード1 (@streamerfunch)
+    loadNarratorCard2();      // TOPページ声優カード2 (@idolfunch)
+    // 声優カード3はダミーデータのまま
+    loadVoiceActorCard();     // 声優プロフィールタブ
+    loadCollabMemberCard();   // コラボメンバー (@c0tanpoTeshi1a)
+});

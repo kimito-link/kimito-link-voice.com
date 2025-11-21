@@ -563,7 +563,30 @@ body {
 .narrator-name {
     font-size: 1.3rem;
     color: var(--text-primary);
-    margin-bottom: 10px;
+    margin-bottom: 6px;
+}
+
+.narrator-handle {
+    color: var(--primary-blue);
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+.narrator-followers {
+    color: var(--primary-blue);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(255, 138, 101, 0.1));
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--primary-blue);
+    display: inline-block;
+}
+
+.narrator-followers i {
+    color: var(--primary-blue);
+    font-size: 1.2rem;
 }
 
 .narrator-tags {
@@ -839,8 +862,24 @@ body {
 .collaborator-description > p {
     font-size: 1.05rem;
     font-weight: 600;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+}
+
+.collaborator-followers {
     color: var(--primary-blue);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(255, 138, 101, 0.15));
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 2px solid var(--primary-blue);
+    display: inline-block;
+}
+
+.collaborator-followers i {
+    color: var(--primary-blue);
+    font-size: 1.3rem;
 }
 
 .collaborator-features {
@@ -5185,7 +5224,17 @@ body {
 .actor-handle {
     color: var(--primary-blue);
     font-size: 1.1rem;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
+}
+
+.actor-followers {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.actor-followers i {
+    color: var(--primary-blue);
 }
 
 .actor-tagline {

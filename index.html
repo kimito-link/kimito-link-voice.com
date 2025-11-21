@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=65.0">
+    <link rel="stylesheet" href="css/styles.css?v=71.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
     <link rel="manifest" href="manifest.json">
     
@@ -186,11 +186,13 @@
                 </div>
 
                 <div class="narrator-grid">
-                    <!-- エントリー -->
+                    <!-- エントリー: 君斗りんく@クリエイター応援 -->
                     <div class="narrator-card" data-level="entry">
                         <div class="narrator-badge badge-entry">エントリー</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" loading="lazy">
-                        <h3 class="narrator-name">佐藤 みお</h3>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator1Avatar" loading="lazy">
+                        <h3 class="narrator-name" id="narrator1Name">君斗りんく</h3>
+                        <p class="narrator-handle" id="narrator1Handle">@streamerfunch</p>
+                        <p class="narrator-followers" id="narrator1Followers"><i class="fas fa-users"></i> 読み込み中...</p>
                         <div class="narrator-tags">
                             <span class="tag">少女ボイス</span>
                             <span class="tag">萌え系</span>
@@ -210,11 +212,13 @@
                         </audio>
                     </div>
 
-                    <!-- スタンダード -->
+                    <!-- スタンダード: 君斗りんく@アイドル応援 -->
                     <div class="narrator-card" data-level="standard">
                         <div class="narrator-badge badge-standard">スタンダード</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" loading="lazy">
-                        <h3 class="narrator-name">山田 たける</h3>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator2Avatar" loading="lazy">
+                        <h3 class="narrator-name" id="narrator2Name">君斗りんく</h3>
+                        <p class="narrator-handle" id="narrator2Handle">@idolfunch</p>
+                        <p class="narrator-followers" id="narrator2Followers"><i class="fas fa-users"></i> 読み込み中...</p>
                         <div class="narrator-tags">
                             <span class="tag">青年ボイス</span>
                             <span class="tag">ナレーション</span>
@@ -332,13 +336,13 @@
                 </div>
 
                 <div class="collaborators-grid">
-                    <!-- コラボメンバー1: コタのAI紀行 -->
+                    <!-- コラボメンバー1: コタのAI紀行 @c0tanpoTesh1ta -->
                     <div class="collaborator-card">
                         <div class="collaborator-header">
-                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="コタのAI紀行" class="collaborator-avatar" loading="lazy">
+                            <img src="images/icon/kewXCUOt_400x400.jpg" alt="コタのAI紀行" class="collaborator-avatar" id="collabAvatar" loading="lazy">
                             <div class="collaborator-info">
-                                <h3>コタのAI紀行さん</h3>
-                                <p class="collaborator-handle">@c0tanpoTeshi1a</p>
+                                <h3 id="collabName">コタのAI紀行さん</h3>
+                                <p class="collaborator-handle" id="collabHandle">@c0tanpoTesh1ta</p>
                                 <div class="collaborator-tags">
                                     <span class="tag">動画編集</span>
                                     <span class="tag">AI活用</span>
@@ -348,7 +352,8 @@
                         </div>
                         
                         <div class="collaborator-description">
-                            <p>あなたの音声を動画化して拡散!</p>
+                            <p id="collabBio">あなたの音声を動画化して拡散!</p>
+                            <p class="collaborator-followers" id="collabFollowers"><i class="fas fa-users"></i> フォロワー読み込み中...</p>
                             <ul class="collaborator-features">
                                 <li><i class="fas fa-check-circle"></i> プロフェッショナルな動画編集</li>
                                 <li><i class="fas fa-check-circle"></i> AI技術を活用した高品質な動画</li>
@@ -1721,11 +1726,12 @@
                         <!-- プロフィールカード -->
                         <div class="voice-actor-card-large featured">
                             <div class="actor-banner"></div>
-                            <img src="images/icon/yukkuri-link-nikoniko-kuchiake.png" alt="君斗りんく" class="actor-avatar-xl">
+                            <img src="images/icon/yukkuri-link-nikoniko-kuchiake.png" alt="君斗りんく" class="actor-avatar-xl" id="voiceActorAvatar" loading="lazy">
                             <div class="actor-info-large">
-                                <h3>君斗りんく</h3>
-                                <p class="actor-handle">@streamerfunch</p>
-                                <p class="actor-tagline">明るく元気なボイスが特徴</p>
+                                <h3 id="voiceActorName">君斗りんく</h3>
+                                <p class="actor-handle" id="voiceActorHandle">@streamerfunch</p>
+                                <p class="actor-followers" id="voiceActorFollowers"><i class="fas fa-users"></i> フォロワー読み込み中...</p>
+                                <p class="actor-tagline" id="voiceActorBio">明るく元気なボイスが特徴</p>
                                 <div class="actor-tags-large">
                                     <span class="tag-actor">明るい</span>
                                     <span class="tag-actor">元気</span>
@@ -1896,6 +1902,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=48.0"></script>
+    <script src="js/script.js?v=55.0"></script>
 </body>
 </html>

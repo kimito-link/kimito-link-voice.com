@@ -408,17 +408,13 @@ app.get('/api/user/profile/:username', async (req, res) => {
                     id: dbProfile.twitter_id,
                     username: dbProfile.twitter_username,
                     name: dbProfile.display_name,
-                    profile_image_url: dbProfile.avatar_url
+                    profile_image_url: dbProfile.avatar_url,
+                    description: dbProfile.bio || '', // プロフィール文章を追加
+                    public_metrics: {
+                        followers_count: dbProfile.followers || 0,
+                        following_count: dbProfile.following || 0
+                    }
                 };
-                
-                // デバッグ: avatar_urlが正しく取得できているか確認
-                console.log(`📊 Supabaseから取得したデータ (${username}):`, {
-                    id: profileData.id,
-                    username: profileData.username,
-                    name: profileData.name,
-                    profile_image_url: profileData.profile_image_url,
-                    avatar_url_exists: !!dbProfile.avatar_url
-                });
                 
                 // メモリキャッシュにも保存
                 accountProfileCache.set(cacheKey, {
