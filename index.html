@@ -25,11 +25,6 @@
         <link rel="stylesheet" href="css/faq.css?v=1.0">
     </noscript>
     <link rel="manifest" href="manifest.json">
-    
-    <!-- Cache Control -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
 </head>
 <body>
     <!-- 宇宙背景エフェクト -->
@@ -69,7 +64,7 @@
                 <div class="hero-character">
                     <picture>
                         <source srcset="images/webp/yukkuri-link-nikoniko-kuchiake.webp" type="image/webp">
-                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img" width="400" height="400" loading="eager">
+                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img" width="400" height="400" loading="eager" fetchpriority="high">
                     </picture>
                 </div>
                 <h1 class="hero-title">
@@ -2545,8 +2540,17 @@
 
     <!-- Scripts -->
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="js/galaxy-effects.js?v=2.0"></script>
     <script defer src="js/loading.js?v=1.0"></script>
     <script defer src="js/script.js?v=93.0"></script>
+    <!-- Decorative effects - Low priority -->
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var script = document.createElement('script');
+                script.src = 'js/galaxy-effects.js?v=2.0';
+                document.body.appendChild(script);
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
