@@ -827,11 +827,14 @@ app.post('/api/logs', (req, res) => {
 
         // ログをファイルに書き込み
         const fs = require('fs');
-        const logFile = './logs/client-logs.json';
+        const path = require('path');
+        const logFile = path.join(__dirname, 'logs', 'client-logs.json');
         
         // logsディレクトリが存在しない場合は作成
-        if (!fs.existsSync('./logs')) {
-            fs.mkdirSync('./logs');
+        const logsDir = path.join(__dirname, 'logs');
+        if (!fs.existsSync(logsDir)) {
+            console.log('📁 logsディレクトリを作成');
+            fs.mkdirSync(logsDir, { recursive: true });
         }
 
         // 既存のログを読み込み
@@ -841,6 +844,7 @@ app.post('/api/logs', (req, res) => {
                 const data = fs.readFileSync(logFile, 'utf8');
                 existingLogs = JSON.parse(data);
             } catch (e) {
+                console.warn('⚠️ 既存ログの読み込みエラー:', e.message);
                 existingLogs = [];
             }
         }
@@ -855,11 +859,13 @@ app.post('/api/logs', (req, res) => {
 
         // ファイルに保存
         fs.writeFileSync(logFile, JSON.stringify(existingLogs, null, 2));
+        console.log(`✅ ${logs.length}件のログを保存（合計: ${existingLogs.length}件）`);
 
-        res.json({ success: true, count: logs.length });
+        res.json({ success: true, count: logs.length, total: existingLogs.length });
     } catch (error) {
         console.error('❌ ログ保存エラー:', error);
-        res.status(500).json({ error: 'Failed to save logs' });
+        console.error('❌ エラー詳細:', error.stack);
+        res.status(500).json({ error: 'Failed to save logs', message: error.message });
     }
 });
 
@@ -867,14 +873,27 @@ app.post('/api/logs', (req, res) => {
 app.get('/api/logs/view', (req, res) => {
     try {
         const fs = require('fs');
-        const logFile = './logs/client-logs.json';
+        const path = require('path');
+        const logFile = path.join(__dirname, 'logs', 'client-logs.json');
+        
+        console.log('📖 ログファイルを読み込み中:', logFile);
+        
+        // logsディレクトリが存在しない場合は作成
+        const logsDir = path.join(__dirname, 'logs');
+        if (!fs.existsSync(logsDir)) {
+            console.log('📁 logsディレクトリを作成');
+            fs.mkdirSync(logsDir, { recursive: true });
+        }
         
         if (!fs.existsSync(logFile)) {
+            console.log('📭 ログファイルが存在しません（空のログを返します）');
             return res.json({ logs: [] });
         }
 
         const data = fs.readFileSync(logFile, 'utf8');
         const logs = JSON.parse(data);
+        
+        console.log(`✅ ${logs.length}件のログを読み込み`);
         
         // 最新50件のみ返す
         const recentLogs = logs.slice(-50).reverse();
@@ -882,7 +901,11 @@ app.get('/api/logs/view', (req, res) => {
         res.json({ logs: recentLogs });
     } catch (error) {
         console.error('❌ ログ読み込みエラー:', error);
-        res.status(500).json({ error: 'Failed to load logs' });
+        console.error('❌ エラー詳細:', error.stack);
+        res.status(500).json({ 
+            error: 'Failed to load logs',
+            message: error.message 
+        });
     }
 });
 
