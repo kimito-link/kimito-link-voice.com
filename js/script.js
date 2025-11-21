@@ -6,7 +6,24 @@ const DEVELOPMENT_MODE = true; // 一時的にtrue: キャッシュをクリア�
 const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 // 認証をスキップ（開発中のみ）
-const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse
+const SKIP_AUTHENTICATION = true; // 本番環境では必ずfalse - 開発中は認証をスキップ
+
+// ===== Supabase初期化 =====
+const SUPABASE_URL = 'https://ljidnprwxniixrigktss.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqaWRucHJ3eG5paXhyaWdrdHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0OTU3MTUsImV4cCI6MjA3ODA3MTcxNX0.PyqHGu4zKEI2eKivLM3syIjntgtPU0ohX_6aMgUWFcI';
+
+let supabaseClient = null;
+
+// ページ読み込み後にSupabaseクライアントを初期化
+window.addEventListener('DOMContentLoaded', function() {
+    if (typeof supabase !== 'undefined') {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabaseクライアント初期化完了');
+        console.log('📊 Supabase URL:', SUPABASE_URL);
+    } else {
+        console.error('❌ Supabase JSライブラリが読み込まれていません');
+    }
+});
 
 let currentUser = null;
 let followedAccounts = {
@@ -2100,6 +2117,669 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ===== ダッシュボードタブ切り替え =====
+document.addEventListener('DOMContentLoaded', function() {
+    // タブボタンの初期化
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // すべてのタブとコンテンツから active クラスを削除
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // クリックされたタブとコンテンツに active クラスを追加
+            button.classList.add('active');
+            const targetContent = document.getElementById(`${targetTab}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        });
+    });
+    
+    // 感謝のメッセージのプレビュー更新
+    const thanksMessageInput = document.getElementById('thanksMessage');
+    if (thanksMessageInput) {
+        thanksMessageInput.addEventListener('input', updateThanksPreview);
+    }
+    
+    // TOPページの感謝のメッセージを読み込む
+    loadThanksMessagesForTopPage();
+    
+    // ダッシュボードの感謝のメッセージ一覧を読み込む
+    loadThanksMessagesForDashboard();
+    
+    // 声優ページの感謝のメッセージを読み込む
+    loadThanksMessagesForVoiceActor();
+    
+    // 新着感謝のメッセージをチェック
+    checkNewThanksMessages();
+    
+    // ウェルカムメッセージにユーザー名を設定
+    if (currentUser) {
+        const welcomeUserName = document.getElementById('welcomeUserName');
+        if (welcomeUserName) {
+            welcomeUserName.textContent = currentUser.name || currentUser.displayName || 'ユーザーさん';
+        }
+    }
+});
+
+/**
+ * 新着感謝のメッセージをチェック
+ */
+async function checkNewThanksMessages() {
+    if (!supabaseClient) return;
+    
+    try {
+        // 最後のログイン時刻を取得（localStorage）
+        const lastLogin = localStorage.getItem('lastLoginTime') || new Date(0).toISOString();
+        
+        // 最後のログイン以降の新着メッセージを取得
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .select('*')
+            .gte('created_at', lastLogin)
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error('❌ 新着メッセージチェックエラー:', error);
+            return;
+        }
+        
+        if (data && data.length > 0) {
+            // 新着通知を表示
+            const notificationCard = document.getElementById('newThanksNotification');
+            const countElement = document.getElementById('newThanksCount');
+            
+            if (notificationCard && countElement) {
+                countElement.textContent = data.length;
+                notificationCard.style.display = 'block';
+                console.log(`✨ 新着感謝メッセージ: ${data.length}件`);
+            }
+        }
+        
+        // 現在の時刻をlastLoginTimeとして保存
+        localStorage.setItem('lastLoginTime', new Date().toISOString());
+        
+    } catch (err) {
+        console.error('❌ エラー:', err);
+    }
+}
+
+/**
+ * 新着メッセージを見るボタン
+ */
+function viewNewThanksMessages() {
+    // みんなの感謝タブに移動
+    const tabButton = document.querySelector('[data-tab="all-thanks"]');
+    if (tabButton) {
+        tabButton.click();
+    }
+    
+    // 通知カードを非表示
+    const notificationCard = document.getElementById('newThanksNotification');
+    if (notificationCard) {
+        notificationCard.style.display = 'none';
+    }
+}
+
+// ===== 感謝のメッセージ機能 =====
+
+/**
+ * プレビューを更新
+ */
+function updateThanksPreview() {
+    const messageInput = document.getElementById('thanksMessage');
+    const previewMessage = document.getElementById('previewMessage');
+    
+    if (messageInput && previewMessage) {
+        const message = messageInput.value || '素敵なボイスありがとうございました！\n台本のよさを3倍にも4倍にもしてくれたね！';
+        previewMessage.innerHTML = message.replace(/\n/g, '<br>');
+    }
+    
+    // ユーザー情報をプレビューに反映
+    updateTwitterPreviewUser();
+}
+
+/**
+ * Twitter風プレビューのユーザー情報を更新
+ */
+function updateTwitterPreviewUser() {
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewUserName = document.getElementById('previewUserName');
+    const previewUserHandle = document.getElementById('previewUserHandle');
+    
+    if (currentUser) {
+        if (previewAvatar) previewAvatar.src = currentUser.avatar || 'https://via.placeholder.com/48';
+        if (previewUserName) previewUserName.textContent = currentUser.name || currentUser.displayName || 'あなたの名前';
+        if (previewUserHandle) previewUserHandle.textContent = `@${currentUser.username}` || '@your_handle';
+    }
+}
+
+// 現在のメッセージを保存（拡散用）
+let currentThanksMessage = null;
+let uploadedMediaFiles = [];
+
+/**
+ * メディアファイルのプレビュー
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    const mediaInput = document.getElementById('thanksMedia');
+    if (mediaInput) {
+        mediaInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            uploadedMediaFiles = files;
+            displayMediaPreview(files);
+            updateTwitterMediaPreview(files); // Twitter風プレビューにも反映
+        });
+    }
+});
+
+function displayMediaPreview(files) {
+    const previewContainer = document.getElementById('mediaPreview');
+    previewContainer.innerHTML = '';
+    
+    files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const mediaElement = document.createElement('div');
+            mediaElement.className = 'media-preview-item';
+            
+            if (file.type.startsWith('image/')) {
+                mediaElement.innerHTML = `
+                    <img src="${e.target.result}" alt="プレビュー">
+                    <button class="remove-media" onclick="removeMedia(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            } else if (file.type.startsWith('video/')) {
+                mediaElement.innerHTML = `
+                    <video src="${e.target.result}" controls></video>
+                    <button class="remove-media" onclick="removeMedia(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            }
+            
+            previewContainer.appendChild(mediaElement);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function removeMedia(index) {
+    uploadedMediaFiles.splice(index, 1);
+    displayMediaPreview(uploadedMediaFiles);
+    updateTwitterMediaPreview(uploadedMediaFiles);
+}
+
+/**
+ * Twitter風プレビューにメディアを表示
+ */
+function updateTwitterMediaPreview(files) {
+    const previewContainer = document.getElementById('previewMediaContainer');
+    if (!previewContainer) return;
+    
+    previewContainer.innerHTML = '';
+    
+    if (files.length === 0) {
+        previewContainer.style.display = 'none';
+        return;
+    }
+    
+    previewContainer.style.display = 'grid';
+    
+    files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const mediaElement = document.createElement('div');
+            mediaElement.className = 'twitter-media-item';
+            
+            if (file.type.startsWith('image/')) {
+                mediaElement.innerHTML = `<img src="${e.target.result}" alt="添付画像">`;
+            } else if (file.type.startsWith('video/')) {
+                mediaElement.innerHTML = `<video src="${e.target.result}" controls></video>`;
+            }
+            
+            previewContainer.appendChild(mediaElement);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+/**
+ * 感謝のメッセージ投稿前の確認
+ */
+function submitThanksMessage() {
+    const messageInput = document.getElementById('thanksMessage');
+    
+    if (!messageInput) {
+        showToast('エラー', 'メッセージ入力欄が見つかりません', 'error');
+        return;
+    }
+    
+    const message = messageInput.value.trim();
+    
+    if (!message) {
+        showToast('エラー', 'メッセージを入力してください', 'error');
+        return;
+    }
+    
+    // 確認モーダルを表示
+    showConfirmModal(message);
+}
+
+/**
+ * 確認モーダルを表示
+ */
+function showConfirmModal(message) {
+    const modal = document.getElementById('confirmModal');
+    const confirmMessage = document.getElementById('confirmPreviewMessage');
+    const confirmMedia = document.getElementById('confirmPreviewMedia');
+    
+    // メッセージをプレビュー
+    confirmMessage.innerHTML = message.replace(/\n/g, '<br>');
+    
+    // メディアをプレビュー
+    confirmMedia.innerHTML = '';
+    uploadedMediaFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const mediaElement = document.createElement('div');
+            mediaElement.className = 'confirm-media-item';
+            
+            if (file.type.startsWith('image/')) {
+                mediaElement.innerHTML = `<img src="${e.target.result}" alt="プレビュー">`;
+            } else if (file.type.startsWith('video/')) {
+                mediaElement.innerHTML = `<video src="${e.target.result}" controls></video>`;
+            }
+            
+            confirmMedia.appendChild(mediaElement);
+        };
+        reader.readAsDataURL(file);
+    });
+    
+    // モーダル表示
+    modal.style.display = 'flex';
+}
+
+/**
+ * 確認モーダルを閉じる
+ */
+function closeConfirmModal() {
+    const modal = document.getElementById('confirmModal');
+    modal.style.display = 'none';
+}
+
+/**
+ * 確認後、実際に投稿
+ */
+async function confirmAndSubmit() {
+    const messageInput = document.getElementById('thanksMessage');
+    const message = messageInput.value.trim();
+    
+    // 現在のユーザー情報を取得（担当声優を判定）
+    const voiceActorMention = '@streamerfunch'; // デフォルトは君斗りんく
+    
+    // Supabaseクライアントチェック
+    if (!supabaseClient) {
+        console.error('❌ Supabaseクライアントが初期化されていません');
+        showToast('エラー', 'データベース接続エラー', 'error');
+        return;
+    }
+    
+    // Supabaseに投稿
+    try {
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .insert([
+                {
+                    user_id: 'test_user_' + Date.now(),
+                    user_name: currentUser?.name || '匿名ユーザー',
+                    user_handle: currentUser?.username || '@anonymous',
+                    user_avatar: currentUser?.avatar || 'https://via.placeholder.com/50',
+                    followers_count: currentUser?.followers || 0,
+                    message: message,
+                    target_voice_actor: voiceActorMention
+                }
+            ])
+            .select();
+        
+        if (error) {
+            console.error('❌ メッセージ投稿エラー:', error);
+            showToast('エラー', 'メッセージの投稿に失敗しました', 'error');
+            return;
+        }
+        
+        console.log('✅ メッセージ投稿成功:', data);
+        
+        // 確認モーダルを閉じる
+        closeConfirmModal();
+        
+        showToast('成功', 'メッセージを投稿しました', 'success');
+        
+        // メッセージを保存（拡散用）
+        currentThanksMessage = {
+            message: message,
+            voiceActorMention: voiceActorMention
+        };
+        
+        // 拡散セクションを表示
+        const spreadSection = document.getElementById('spreadSection');
+        if (spreadSection) {
+            spreadSection.style.display = 'block';
+        }
+        
+        // メッセージ一覧を再読み込み
+        loadThanksMessagesForDashboard();
+        loadThanksMessagesForTopPage();
+        
+        // フォームをリセット
+        messageInput.value = '';
+        uploadedMediaFiles = [];
+        displayMediaPreview([]);
+        
+    } catch (err) {
+        console.error('❌ エラー:', err);
+        showToast('エラー', 'メッセージの投稿に失敗しました', 'error');
+    }
+}
+
+/**
+ * Twitterで拡散する
+ */
+function spreadToTwitter() {
+    if (!currentThanksMessage) {
+        showToast('エラー', 'メッセージが見つかりません', 'error');
+        return;
+    }
+    
+    const tweetText = `${currentThanksMessage.message}\n\n#KimitoLinkVoice ${currentThanksMessage.voiceActorMention}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+    showToast('成功', 'Twitter投稿画面を開きました', 'success');
+}
+
+/**
+ * 感謝のメッセージをTwitterに拡散
+ */
+async function shareThanksMessageOnTwitter() {
+    const messageInput = document.getElementById('thanksMessage');
+    
+    if (!messageInput) {
+        showToast('エラー', 'メッセージ入力欄が見つかりません', 'error');
+        return;
+    }
+    
+    const message = messageInput.value.trim();
+    
+    if (!message) {
+        showToast('エラー', 'メッセージを入力してください', 'error');
+        return;
+    }
+    
+    // 現在のユーザー情報を取得（担当声優を判定）
+    const voiceActorMention = '@streamerfunch'; // デフォルトは君斗りんく
+    
+    // Twitter投稿用のテキストを構築
+    const tweetText = `${message}\n\n#KimitoLinkVoice ${voiceActorMention}`;
+    
+    // Twitter Web Intentで投稿画面を開く
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    
+    // 新しいウィンドウで開く
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+    
+    showToast('成功', 'Twitterの投稿画面を開きました', 'success');
+    
+    // 投稿後、メッセージをリセット（オプション）
+    // messageInput.value = '';
+}
+
+/**
+ * TOPページの感謝のメッセージを読み込む
+ */
+async function loadThanksMessagesForTopPage() {
+    if (!supabaseClient) return;
+    
+    const archiveGrid = document.querySelector('.thanks-archive-grid');
+    if (!archiveGrid) return;
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(6);
+        
+        if (error) {
+            console.error('❌ メッセージ取得エラー:', error);
+            return;
+        }
+        
+        if (data && data.length > 0) {
+            archiveGrid.innerHTML = '';
+            data.forEach(message => {
+                const card = createThanksArchiveCard(message);
+                archiveGrid.appendChild(card);
+            });
+            console.log(`✅ TOPページ: ${data.length}件表示`);
+        }
+    } catch (err) {
+        console.error('❌ エラー:', err);
+    }
+}
+
+/**
+ * 感謝のメッセージカードを生成
+ */
+function createThanksArchiveCard(message) {
+    const card = document.createElement('div');
+    card.className = 'thanks-archive-card';
+    
+    const createdDate = new Date(message.created_at).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    card.innerHTML = `
+        <div class="archive-user-info">
+            <img src="${message.user_avatar || 'https://via.placeholder.com/50'}" alt="${message.user_name}" class="archive-avatar">
+            <div class="archive-user-details">
+                <h4>${message.user_name}</h4>
+                <p class="archive-handle">${message.user_handle}</p>
+                <p class="archive-followers"><i class="fas fa-users"></i> ${message.followers_count.toLocaleString()} フォロワー</p>
+            </div>
+        </div>
+        <div class="archive-message">
+            <p>${message.message.replace(/\n/g, '<br>')}</p>
+        </div>
+        <div class="archive-meta">
+            <span class="archive-date"><i class="far fa-clock"></i> ${createdDate}</span>
+            <span class="archive-voice-actor"><i class="fas fa-microphone"></i> ${message.target_voice_actor}</span>
+        </div>
+    `;
+    
+    return card;
+}
+
+/**
+ * ダッシュボードの感謝のメッセージ一覧を読み込む
+ */
+async function loadThanksMessagesForDashboard() {
+    if (!supabaseClient) return;
+    
+    try {
+        // 全てのメッセージを取得
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+        
+        if (error) {
+            console.error('❌ ダッシュボードメッセージ取得エラー:', error);
+            return;
+        }
+        
+        if (data && data.length > 0) {
+            // 自分の投稿とみんなの投稿を分ける
+            const myMessages = data.filter(msg => msg.user_id === currentUser?.id);
+            const allMessages = data.filter(msg => msg.user_id !== currentUser?.id);
+            
+            // 自分の投稿を表示
+            const myMessagesList = document.getElementById('myThanksMessages');
+            if (myMessagesList) {
+                const emptyState = myMessagesList.querySelector('.empty-state');
+                if (emptyState) emptyState.remove();
+                
+                const existingCards = myMessagesList.querySelectorAll('.thanks-message-card');
+                existingCards.forEach(card => card.remove());
+                
+                if (myMessages.length > 0) {
+                    myMessages.forEach(message => {
+                        const card = createDashboardMessageCard(message, true);
+                        myMessagesList.appendChild(card);
+                    });
+                    console.log(`✅ 自分の投稿: ${myMessages.length}件`);
+                } else {
+                    myMessagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>まだ感謝のメッセージを投稿していません</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // みんなの投稿を表示
+            const allMessagesList = document.getElementById('allThanksMessages');
+            if (allMessagesList) {
+                const existingCards = allMessagesList.querySelectorAll('.thanks-message-card');
+                existingCards.forEach(card => card.remove());
+                
+                if (allMessages.length > 0) {
+                    allMessages.forEach(message => {
+                        const card = createDashboardMessageCard(message, false);
+                        allMessagesList.appendChild(card);
+                    });
+                    console.log(`✅ みんなの投稿: ${allMessages.length}件`);
+                } else {
+                    allMessagesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-heart"></i>
+                            <p>まだ感謝のメッセージはありません</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+    } catch (err) {
+        console.error('❌ エラー:', err);
+    }
+}
+
+/**
+ * ダッシュボード用メッセージカードを生成
+ */
+function createDashboardMessageCard(message, isMyMessage = false) {
+    const card = document.createElement('div');
+    card.className = 'thanks-message-card';
+    
+    const createdDate = new Date(message.created_at).toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    const actionsHtml = isMyMessage ? `
+        <div class="message-actions">
+            <button class="btn-edit-message" onclick="editThanksMessage('${message.id}')">
+                <i class="fas fa-edit"></i> 編集
+            </button>
+            <button class="btn-delete-message" onclick="deleteThanksMessage('${message.id}')">
+                <i class="fas fa-trash"></i> 削除
+            </button>
+        </div>
+    ` : '';
+    
+    card.innerHTML = `
+        <div class="message-user-info">
+            <img src="${message.user_avatar || 'https://via.placeholder.com/60'}" alt="${message.user_name}" class="message-avatar">
+            <div class="message-user-details">
+                <h4>${message.user_name}</h4>
+                <p class="message-handle">${message.user_handle}</p>
+                <p class="message-followers"><i class="fas fa-users"></i> ${message.followers_count.toLocaleString()} フォロワー</p>
+            </div>
+            <span class="message-date">${createdDate}</span>
+        </div>
+        <div class="message-content">
+            <p>${message.message.replace(/\n/g, '<br>')}</p>
+        </div>
+        ${actionsHtml}
+    `;
+    
+    return card;
+}
+
+/**
+ * 声優ページの感謝のメッセージを読み込む
+ */
+async function loadThanksMessagesForVoiceActor() {
+    if (!supabaseClient) return;
+    
+    const actorThanksList = document.querySelector('.actor-thanks-list');
+    if (!actorThanksList) return;
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .select('*')
+            .eq('target_voice_actor', '@streamerfunch')
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        if (error) {
+            console.error('❌ 声優ページメッセージ取得エラー:', error);
+            return;
+        }
+        
+        if (data && data.length > 0) {
+            const existingCards = actorThanksList.querySelectorAll('.thanks-message-card');
+            existingCards.forEach(card => card.remove());
+            
+            data.forEach(message => {
+                const card = createDashboardMessageCard(message);
+                actorThanksList.appendChild(card);
+            });
+            
+            console.log(`✅ 声優ページ: ${data.length}件表示`);
+        }
+    } catch (err) {
+        console.error('❌ エラー:', err);
+    }
+}
+
+/**
+ * コラボを依頼（既存の関数を拡張）
+ */
+function requestCollab() {
+    const message = 'こんにちは！コラボをお願いしたいです。';
+    const mention = '@c0tanpoTeshi1a';
+    const hashtag = '#KimitoLinkVoice';
+    
+    const tweetText = `${mention} ${message}\n\n${hashtag}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+    showToast('成功', 'コラボ依頼画面を開きました', 'success');
+}
+
 // ===== エクスポート =====
 // モジュール化が必要な場合
 if (typeof module !== 'undefined' && module.exports) {
@@ -2108,6 +2788,8 @@ if (typeof module !== 'undefined' && module.exports) {
         checkFollowStatus,
         logout,
         tweetReview,
-        requestCollab
+        requestCollab,
+        postThanksToTwitter,
+        updateThanksPreview
     };
 }
