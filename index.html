@@ -4,16 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KimiLink Voice - 君と声でつながる</title>
+    <meta name="description" content="KimiLink Voiceは、あなたの推しに想いを届けるゆっくり音声プラットフォーム。1文字¥1から始める特別なボイスメッセージ。プロもアマも、みんなで作る新しい声の世界。">
     
     <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
     
     <!-- Styles -->
+    <link rel="preload" href="css/styles.css?v=106.0" as="style">
     <link rel="stylesheet" href="css/styles.css?v=106.0">
-    <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0">
-    <link rel="stylesheet" href="css/loading-animation.css?v=1.0">
-    <link rel="stylesheet" href="css/faq.css?v=1.0">
+    <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/loading-animation.css?v=1.0" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="css/faq.css?v=1.0" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0">
+        <link rel="stylesheet" href="css/loading-animation.css?v=1.0">
+        <link rel="stylesheet" href="css/faq.css?v=1.0">
+    </noscript>
     <link rel="manifest" href="manifest.json">
     
     <!-- Cache Control -->
@@ -59,7 +69,7 @@
                 <div class="hero-character">
                     <picture>
                         <source srcset="images/webp/yukkuri-link-nikoniko-kuchiake.webp" type="image/webp">
-                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img" loading="lazy">
+                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img" width="400" height="400" loading="eager">
                     </picture>
                 </div>
                 <h1 class="hero-title">
@@ -200,7 +210,7 @@
                     <!-- エントリー: 君斗りんく@クリエイター応援 -->
                     <div class="narrator-card" data-level="entry">
                         <div class="narrator-badge badge-entry">エントリー</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator1Avatar" loading="lazy">
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator1Avatar" width="120" height="120" loading="lazy">
                         <h3 class="narrator-name" id="narrator1Name">君斗りんく</h3>
                         <p class="narrator-handle" id="narrator1Handle">@streamerfunch</p>
                         <p class="narrator-followers" id="narrator1Followers"><i class="fas fa-users"></i> 読み込み中...</p>
@@ -227,7 +237,7 @@
                     <!-- スタンダード: 君斗りんく@アイドル応援 -->
                     <div class="narrator-card" data-level="standard">
                         <div class="narrator-badge badge-standard">スタンダード</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator2Avatar" loading="lazy">
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator2Avatar" width="120" height="120" loading="lazy">
                         <h3 class="narrator-name" id="narrator2Name">君斗りんく</h3>
                         <p class="narrator-handle" id="narrator2Handle">@idolfunch</p>
                         <p class="narrator-followers" id="narrator2Followers"><i class="fas fa-users"></i> 読み込み中...</p>
@@ -254,7 +264,7 @@
                     <!-- プロフェッショナル -->
                     <div class="narrator-card" data-level="professional">
                         <div class="narrator-badge badge-professional">プロ</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" loading="lazy">
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" width="120" height="120" loading="lazy">
                         <h3 class="narrator-name">鈴木 あかね</h3>
                         <div class="narrator-tags">
                             <span class="tag">CM</span>
@@ -2534,9 +2544,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/galaxy-effects.js?v=2.0"></script>
-    <script src="js/loading.js?v=1.0"></script>
-    <script src="js/script.js?v=93.0"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script defer src="js/galaxy-effects.js?v=2.0"></script>
+    <script defer src="js/loading.js?v=1.0"></script>
+    <script defer src="js/script.js?v=93.0"></script>
 </body>
 </html>
