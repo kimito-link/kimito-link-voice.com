@@ -417,19 +417,23 @@ body {
 }
 
 .btn-secondary-large {
-    background: transparent;
-    color: var(--text-primary);
-    border: 2px solid var(--primary-orange);
+    background: linear-gradient(135deg, #FF8C00, #FFA500);
+    color: white;
+    border: 3px solid #FF6B00;
+    font-weight: 700;
+    box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5);
 }
 
 .btn-secondary-large:hover {
-    background: var(--primary-orange);
+    background: linear-gradient(135deg, #FFA500, #FFB84D);
     transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(255, 140, 0, 0.6);
+    border-color: #FF8C00;
 }
 
 .btn-secondary-large:active {
     transform: translateY(-1px) scale(0.98);
-    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 5px 20px rgba(255, 140, 0, 0.4);
 }
 
 .btn-secondary-large:disabled {
