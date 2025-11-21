@@ -6,7 +6,7 @@ const DEVELOPMENT_MODE = true; // 一時的にtrue: キャッシュをクリア�
 const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 // 認証をスキップ（開発中のみ）
-const SKIP_AUTHENTICATION = true; // 本番環境では必ずfalse - 認証を必須にする
+const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse - 認証を必須にする
 
 // ===== Supabase初期化 =====
 const SUPABASE_URL = 'https://ljidnprwxniixrigktss.supabase.co';
@@ -3373,7 +3373,7 @@ async function loadVoiceActorCard() {
  * コラボメンバーカードの情報を取得して表示
  */
 async function loadCollabMemberCard() {
-    const username = 'c0tanpoTesh1ta'; // コタのAI紀行 @c0tanpoTesh1ta
+    const username = 'c0tanpoTeshIta'; // コタのAI紀行 @c0tanpoTeshIta
     console.log('🤝 コラボメンバー情報取得中...', username);
     
     try {

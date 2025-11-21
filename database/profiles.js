@@ -12,6 +12,9 @@ async function upsertProfile(profileData) {
         twitter_username,
         display_name,
         avatar_url,
+        bio = '',
+        followers = 0,
+        following = 0,
         user_type = 'client',
         is_following_creator = false,
         is_following_idol = false
@@ -30,18 +33,25 @@ async function upsertProfile(profileData) {
             throw selectError;
         }
 
+        const updateData = {
+            twitter_username,
+            display_name,
+            avatar_url,
+            is_following_creator,
+            is_following_idol,
+            updated_at: new Date().toISOString()
+        };
+
+        // オプションフィールドを追加
+        if (bio) updateData.bio = bio;
+        if (followers !== undefined) updateData.followers = followers;
+        if (following !== undefined) updateData.following = following;
+
         if (existingProfile) {
             // プロフィールが既に存在する場合は更新
             const { data, error } = await supabase
                 .from('profiles')
-                .update({
-                    twitter_username,
-                    display_name,
-                    avatar_url,
-                    is_following_creator,
-                    is_following_idol,
-                    updated_at: new Date().toISOString()
-                })
+                .update(updateData)
                 .eq('twitter_id', twitter_id)
                 .select()
                 .single();
@@ -51,18 +61,25 @@ async function upsertProfile(profileData) {
             console.log('✅ プロフィールを更新しました:', twitter_username);
             return data;
         } else {
-            // 新規プロフィールを作成（必須カラムのみ）
+            // 新規プロフィールを作成
+            const insertData = {
+                twitter_id,
+                twitter_username,
+                display_name,
+                avatar_url,
+                user_type,
+                is_following_creator,
+                is_following_idol
+            };
+
+            // オプションフィールドを追加
+            if (bio) insertData.bio = bio;
+            if (followers !== undefined) insertData.followers = followers;
+            if (following !== undefined) insertData.following = following;
+
             const { data, error } = await supabase
                 .from('profiles')
-                .insert({
-                    twitter_id,
-                    twitter_username,
-                    display_name,
-                    avatar_url,
-                    user_type,
-                    is_following_creator,
-                    is_following_idol
-                })
+                .insert(insertData)
                 .select()
                 .single();
 

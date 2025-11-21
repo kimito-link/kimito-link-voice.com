@@ -463,6 +463,9 @@ app.get('/api/user/profile/:username', async (req, res) => {
                 twitter_username: profileData.username,
                 display_name: profileData.name,
                 avatar_url: profileData.profile_image_url,
+                bio: profileData.description || '',
+                followers: profileData.public_metrics?.followers_count || 0,
+                following: profileData.public_metrics?.following_count || 0,
                 user_type: 'narrator' // フォロー必須アカウントは声優として扱う
             });
             if (isDevelopment) console.log(`💾 Supabaseにプロフィールを保存: ${username}`);
@@ -799,6 +802,13 @@ app.delete('/api/audio/:id', async (req, res) => {
             details: error.message
         });
     }
+});
+
+// キャッシュクリア（開発用）
+app.post('/api/clear-cache', (req, res) => {
+    accountProfileCache.clear();
+    console.log('🗑️ メモリキャッシュをクリアしました');
+    res.json({ success: true, message: 'キャッシュをクリアしました' });
 });
 
 // ヘルスチェック
