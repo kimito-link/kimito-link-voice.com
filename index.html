@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="css/styles.css?v=107.0" as="style">
     <link rel="preload" href="images/webp/yukkuri-link-nikoniko-kuchiake.webp" as="image" type="image/webp">
+    <link rel="preload" href="css/styles.css?v=106.0" as="style">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=107.0">
+    <link rel="stylesheet" href="css/styles.css?v=106.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/loading-animation.css?v=1.0" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/faq.css?v=1.0" media="print" onload="this.media='all'">
@@ -2547,19 +2547,9 @@
     </div>
 
     <!-- Scripts -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="js/loading.js?v=1.0"></script>
     <script defer src="js/script.js?v=93.0"></script>
-    <!-- Supabase - Load on demand -->
-    <script>
-        // Supabaseが必要な場合のみ読み込む
-        window.loadSupabase = function() {
-            if (!window.supabase) {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-                document.head.appendChild(script);
-            }
-        };
-    </script>
     <!-- Decorative effects - Low priority -->
     <script>
         window.addEventListener('load', function() {
