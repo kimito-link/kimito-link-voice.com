@@ -3257,5 +3257,333 @@ window.addEventListener('DOMContentLoaded', function() {
     loadNarratorCard2();      // TOPページ声優カード2 (@idolfunch)
     // 声優カード3はダミーデータのまま
     loadVoiceActorCard();     // 声優プロフィールタブ
-    loadCollabMemberCard();   // コラボメンバー (@c0tanpoTeshi1a)
+    loadCollabMemberCard();   // コラボメンバー (@c0tanpoTesh1ta)
+    
+    // 依頼フォームの初期化
+    initializeRequestForm();
+    
+    // 役割切り替えの初期化
+    initializeRoleSwitch();
 });
+
+// ===== 役割切り替え機能 =====
+
+let currentRole = 'client'; // 'client' or 'narrator'
+
+function initializeRoleSwitch() {
+    // localStorageから前回の役割を取得
+    const savedRole = localStorage.getItem('dashboardRole') || 'client';
+    currentRole = savedRole;
+    
+    // 初期表示を設定
+    updateRoleDisplay();
+}
+
+function switchRole(role) {
+    if (role === currentRole) return;
+    
+    currentRole = role;
+    localStorage.setItem('dashboardRole', role);
+    
+    console.log(`🔄 役割切り替え: ${role === 'client' ? '依頼者モード' : '声優モード'}`);
+    
+    // 表示を更新
+    updateRoleDisplay();
+    
+    // トースト通知
+    const message = role === 'client' ? '依頼者モードに切り替えました' : '声優モードに切り替えました';
+    showToast(message, 'info');
+}
+
+function updateRoleDisplay() {
+    // ボタンの状態を更新
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        const btnRole = btn.getAttribute('data-role');
+        if (btnRole === currentRole) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // タブの表示/非表示を切り替え
+    const clientTabs = document.getElementById('clientTabs');
+    const narratorTabs = document.getElementById('narratorTabs');
+    
+    if (currentRole === 'client') {
+        if (clientTabs) clientTabs.style.display = 'block';
+        if (narratorTabs) narratorTabs.style.display = 'none';
+        
+        // 依頼者用のタブを表示
+        showClientDashboard();
+    } else {
+        if (clientTabs) clientTabs.style.display = 'none';
+        if (narratorTabs) narratorTabs.style.display = 'block';
+        
+        // 声優用のタブを表示
+        showNarratorDashboard();
+    }
+}
+
+function showClientDashboard() {
+    // 全てのタブコンテンツを非表示
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // 依頼者用のダッシュボードを表示
+    const overviewTab = document.getElementById('overview-tab');
+    if (overviewTab) {
+        overviewTab.classList.add('active');
+    }
+    
+    // タブボタンの状態をリセット
+    document.querySelectorAll('#clientTabs .tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector('#clientTabs .tab-button[data-tab="overview"]')?.classList.add('active');
+}
+
+function showNarratorDashboard() {
+    // 全てのタブコンテンツを非表示
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // 声優用のダッシュボードを表示
+    const narratorOverviewTab = document.getElementById('narrator-overview-tab');
+    if (narratorOverviewTab) {
+        narratorOverviewTab.classList.add('active');
+        narratorOverviewTab.style.display = 'block';
+    }
+    
+    // タブボタンの状態をリセット
+    document.querySelectorAll('#narratorTabs .tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector('#narratorTabs .tab-button[data-tab="narrator-overview"]')?.classList.add('active');
+}
+
+// ===== 依頼フォーム機能 =====
+
+// 依頼フォームの初期化
+function initializeRequestForm() {
+    // 台本入力時の文字数カウント・料金計算
+    const scriptInput = document.getElementById('requestScript');
+    if (scriptInput) {
+        scriptInput.addEventListener('input', updateEstimate);
+    }
+    
+    // 依頼フォーム送信
+    const requestForm = document.getElementById('requestForm');
+    if (requestForm) {
+        requestForm.addEventListener('submit', handleRequestSubmit);
+    }
+    
+    // 希望納期の最小日を設定（今日から）
+    const deadlineInput = document.getElementById('requestDeadline');
+    if (deadlineInput) {
+        const today = new Date().toISOString().split('T')[0];
+        deadlineInput.min = today;
+    }
+}
+
+// 依頼モーダルを開く
+let currentActorData = null; // 現在選択中の声優データ
+
+function openRequestModal(actorData) {
+    currentActorData = actorData;
+    
+    // 声優情報を設定
+    const avatar = document.getElementById('requestActorAvatar');
+    const name = document.getElementById('requestActorName');
+    const handle = document.getElementById('requestActorHandle');
+    const price = document.getElementById('requestActorPrice');
+    
+    if (avatar) avatar.src = actorData.avatar || 'images/icon/yukkuri-link-nikoniko-kuchiake.png';
+    if (name) name.textContent = actorData.name || '声優名';
+    if (handle) handle.textContent = actorData.handle || '@username';
+    if (price) price.textContent = actorData.price || '¥1/文字〜';
+    
+    // フォームをリセット
+    const form = document.getElementById('requestForm');
+    if (form) form.reset();
+    
+    // 見積もりをリセット
+    updateEstimate();
+    
+    // モーダルを表示
+    const modal = document.getElementById('requestModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    console.log('✅ 依頼モーダルを開きました:', actorData);
+}
+
+// 依頼モーダルを閉じる
+function closeRequestModal() {
+    const modal = document.getElementById('requestModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    currentActorData = null;
+}
+
+// 文字数カウントと料金見積もりを更新
+function updateEstimate() {
+    const scriptInput = document.getElementById('requestScript');
+    const charCountEl = document.getElementById('charCount');
+    const estimatedPriceEl = document.getElementById('estimatedPrice');
+    
+    if (!scriptInput || !charCountEl || !estimatedPriceEl) return;
+    
+    // 文字数をカウント（空白除く）
+    const text = scriptInput.value;
+    const charCount = text.replace(/\s/g, '').length;
+    
+    // 基本料金（デフォルト¥1/文字）
+    const pricePerChar = currentActorData?.pricePerChar || 1;
+    const minPrice = currentActorData?.minPrice || 500;
+    
+    // 料金計算
+    let estimatedPrice = charCount * pricePerChar;
+    if (estimatedPrice > 0 && estimatedPrice < minPrice) {
+        estimatedPrice = minPrice;
+    }
+    
+    // 表示を更新
+    charCountEl.textContent = charCount.toLocaleString();
+    estimatedPriceEl.textContent = `¥${estimatedPrice.toLocaleString()}`;
+}
+
+// 依頼フォーム送信処理
+async function handleRequestSubmit(e) {
+    e.preventDefault();
+    
+    // ログインチェック
+    if (!supabaseClient) {
+        showToast('Supabaseが初期化されていません', 'error');
+        return;
+    }
+    
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) {
+        showToast('依頼するにはログインが必要です', 'warning');
+        openLoginModal();
+        return;
+    }
+    
+    // フォームデータを取得
+    const script = document.getElementById('requestScript').value;
+    const category = document.getElementById('requestCategory').value;
+    const notes = document.getElementById('requestNotes').value;
+    const deadline = document.getElementById('requestDeadline').value;
+    
+    // 文字数と料金を計算
+    const charCount = script.replace(/\s/g, '').length;
+    const pricePerChar = currentActorData?.pricePerChar || 1;
+    const minPrice = currentActorData?.minPrice || 500;
+    let totalPrice = charCount * pricePerChar;
+    if (totalPrice > 0 && totalPrice < minPrice) {
+        totalPrice = minPrice;
+    }
+    
+    // タイトルを生成（カテゴリ + 文字数）
+    const categoryName = {
+        'youtube': 'YouTube動画',
+        'stream': '配信',
+        'vtuber': 'VTuber活動',
+        'game': 'ゲーム実況',
+        'commercial': 'CM・広告',
+        'narration': 'ナレーション',
+        'other': 'その他'
+    }[category] || 'ボイス依頼';
+    const title = `${categoryName}（${charCount}文字）`;
+    
+    // narrator_idを取得（現在はnullだが、将来的にはTwitter IDから取得）
+    const narratorId = currentActorData?.narratorId || null;
+    
+    // ローディング表示
+    showLoading();
+    
+    try {
+        // まず、現在のユーザーのprofile IDを取得
+        // profilesテーブルのidはauth.usersのidと一致するはず
+        let profileData;
+        const { data: existingProfile, error: profileError } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (profileError || !existingProfile) {
+            console.error('❌ プロフィール取得エラー:', profileError);
+            console.warn('📌 プロフィールが見つかりません。新規作成を試みます。');
+            
+            // プロフィールが存在しない場合は作成を試みる
+            const { data: newProfile, error: createError } = await supabaseClient
+                .from('profiles')
+                .insert([{
+                    id: session.user.id,
+                    twitter_id: session.user.user_metadata?.provider_id || '',
+                    twitter_username: session.user.user_metadata?.user_name || '',
+                    display_name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'ユーザー',
+                    avatar_url: session.user.user_metadata?.avatar_url || ''
+                }])
+                .select()
+                .single();
+            
+            if (createError) {
+                console.error('❌ プロフィール作成エラー:', createError);
+                hideLoading();
+                showToast('ユーザー情報の作成に失敗しました', 'error');
+                return;
+            }
+            
+            profileData = newProfile;
+        } else {
+            profileData = existingProfile;
+        }
+        
+        // Supabaseに依頼を保存
+        const { data, error } = await supabaseClient
+            .from('voice_requests')
+            .insert([
+                {
+                    client_id: profileData.id,
+                    narrator_id: narratorId,
+                    title: title,
+                    script: script,
+                    char_count: charCount,
+                    price_per_char: pricePerChar,
+                    total_price: totalPrice,
+                    status: 'pending'
+                }
+            ])
+            .select();
+        
+        hideLoading();
+        
+        if (error) {
+            console.error('❌ 依頼保存エラー:', error);
+            showToast('依頼の送信に失敗しました', 'error');
+            return;
+        }
+        
+        console.log('✅ 依頼を保存しました:', data);
+        
+        // 成功メッセージ
+        showToast('依頼を送信しました！声優から連絡をお待ちください。', 'success');
+        
+        // モーダルを閉じる
+        closeRequestModal();
+        
+    } catch (error) {
+        hideLoading();
+        console.error('❌ 依頼送信エラー:', error);
+        showToast('依頼の送信中にエラーが発生しました', 'error');
+    }
+}

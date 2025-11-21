@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=71.0">
+    <link rel="stylesheet" href="css/styles.css?v=74.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
     <link rel="manifest" href="manifest.json">
     
@@ -72,7 +72,7 @@
                     <button class="btn-primary-large" onclick="showLoginModal()">
                         <i class="fas fa-microphone"></i> 声優として登録
                     </button>
-                    <button class="btn-secondary-large" onclick="scrollToSection('voices')">
+                    <button class="btn-secondary-large" onclick="showLoginModal()">
                         <i class="fas fa-heart"></i> ボイスを依頼する
                     </button>
                 </div>
@@ -1259,11 +1259,30 @@
             </div>
         </header>
 
+        <!-- 役割切り替え -->
+        <div class="role-switch-container">
+            <div class="container">
+                <div class="role-switch">
+                    <button class="role-btn active" data-role="client" onclick="switchRole('client')">
+                        <i class="fas fa-heart"></i>
+                        <span>依頼者モード</span>
+                    </button>
+                    <button class="role-btn" data-role="narrator" onclick="switchRole('narrator')">
+                        <i class="fas fa-microphone"></i>
+                        <span>声優モード</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- ダッシュボードタブナビゲーション -->
         <nav class="dashboard-tabs">
-            <div class="container">
+            <div class="container" id="clientTabs">
                 <button class="tab-button active" data-tab="overview">
                     <i class="fas fa-chart-line"></i> ダッシュボード
+                </button>
+                <button class="tab-button" data-tab="my-requests">
+                    <i class="fas fa-list"></i> 依頼履歴
                 </button>
                 <button class="tab-button" data-tab="collabs">
                     <i class="fas fa-users"></i> コラボメンバー
@@ -1274,8 +1293,22 @@
                 <button class="tab-button" data-tab="all-thanks">
                     <i class="fas fa-heart"></i> みんなの感謝
                 </button>
-                <button class="tab-button" data-tab="voice-actors">
-                    <i class="fas fa-microphone-alt"></i> 声優カード
+            </div>
+            <div class="container" id="narratorTabs" style="display: none;">
+                <button class="tab-button active" data-tab="narrator-overview">
+                    <i class="fas fa-chart-line"></i> ダッシュボード
+                </button>
+                <button class="tab-button" data-tab="orders">
+                    <i class="fas fa-inbox"></i> 受注案件
+                </button>
+                <button class="tab-button" data-tab="narrator-profile">
+                    <i class="fas fa-user-circle"></i> プロフィール設定
+                </button>
+                <button class="tab-button" data-tab="earnings">
+                    <i class="fas fa-yen-sign"></i> 収益管理
+                </button>
+                <button class="tab-button" data-tab="all-thanks">
+                    <i class="fas fa-heart"></i> みんなの感謝
                 </button>
             </div>
         </nav>
@@ -1741,7 +1774,15 @@
                                     <span class="price-label">料金</span>
                                     <span class="price-range">¥500〜¥1,500</span>
                                 </div>
-                                <button class="btn-actor-request">
+                                <button class="btn-actor-request" onclick="openRequestModal({
+                                    name: '君斗りんく',
+                                    handle: '@streamerfunch',
+                                    avatar: 'images/icon/yukkuri-link-nikoniko-kuchiake.png',
+                                    price: '¥1/文字〜',
+                                    pricePerChar: 1,
+                                    minPrice: 500,
+                                    narratorId: null
+                                })">
                                     <i class="fas fa-microphone"></i> 依頼する
                                 </button>
                             </div>
@@ -1840,6 +1881,122 @@
             </div>
             <!-- 声優カードタブ終了 -->
 
+            <!-- 依頼履歴タブ（依頼者モード） -->
+            <div class="tab-content" id="my-requests-tab">
+                <div class="container">
+                    <div class="page-header">
+                        <h1><i class="fas fa-list"></i> 依頼履歴</h1>
+                        <p class="page-subtitle">あなたの依頼一覧</p>
+                    </div>
+
+                    <!-- 新規依頼ボタン -->
+                    <div class="action-card">
+                        <button class="btn-primary-large" onclick="openRequestModal({
+                            name: '君斗りんく',
+                            handle: '@streamerfunch',
+                            avatar: 'images/icon/yukkuri-link-nikoniko-kuchiake.png',
+                            price: '¥1/文字〜',
+                            pricePerChar: 1,
+                            minPrice: 500,
+                            narratorId: null
+                        })">
+                            <i class="fas fa-plus-circle"></i> 新しい依頼を作成
+                        </button>
+                    </div>
+
+                    <!-- 依頼一覧 -->
+                    <div class="requests-list" id="requestsList">
+                        <div class="card">
+                            <p style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
+                                まだ依頼がありません
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 依頼履歴タブ終了 -->
+
+            <!-- 声優ダッシュボード（声優モード） -->
+            <div class="tab-content" id="narrator-overview-tab" style="display: none;">
+                <div class="container">
+                    <div class="page-header">
+                        <h1><i class="fas fa-chart-line"></i> 声優ダッシュボード</h1>
+                        <p class="page-subtitle">あなたの声優活動の概要</p>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <!-- 統計カード -->
+                        <div class="card stats-card">
+                            <h3><i class="fas fa-inbox"></i> 受注案件</h3>
+                            <p class="stats-number">0件</p>
+                            <p class="stats-label">進行中の案件</p>
+                        </div>
+
+                        <div class="card stats-card">
+                            <h3><i class="fas fa-check-circle"></i> 完了案件</h3>
+                            <p class="stats-number">0件</p>
+                            <p class="stats-label">累計納品数</p>
+                        </div>
+
+                        <div class="card stats-card">
+                            <h3><i class="fas fa-yen-sign"></i> 収益</h3>
+                            <p class="stats-number">¥0</p>
+                            <p class="stats-label">今月の収益</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 受注案件タブ（声優モード） -->
+            <div class="tab-content" id="orders-tab" style="display: none;">
+                <div class="container">
+                    <div class="page-header">
+                        <h1><i class="fas fa-inbox"></i> 受注案件</h1>
+                        <p class="page-subtitle">依頼された案件を確認</p>
+                    </div>
+
+                    <div class="orders-list" id="ordersList">
+                        <div class="card">
+                            <p style="text-align: center; padding: 40px; color: #666;">
+                                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 20px; display: block; opacity: 0.3;"></i>
+                                まだ受注案件がありません
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- プロフィール設定タブ（声優モード） -->
+            <div class="tab-content" id="narrator-profile-tab" style="display: none;">
+                <div class="container">
+                    <div class="page-header">
+                        <h1><i class="fas fa-user-circle"></i> プロフィール設定</h1>
+                        <p class="page-subtitle">声優としてのプロフィールを設定</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>声優プロフィール設定</h3>
+                        <p style="color: #666; margin-top: 20px;">この機能は開発中です。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 収益管理タブ（声優モード） -->
+            <div class="tab-content" id="earnings-tab" style="display: none;">
+                <div class="container">
+                    <div class="page-header">
+                        <h1><i class="fas fa-yen-sign"></i> 収益管理</h1>
+                        <p class="page-subtitle">あなたの収益を確認</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>収益サマリー</h3>
+                        <p style="color: #666; margin-top: 20px;">この機能は開発中です。</p>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <!-- ダッシュボードフッター -->
@@ -1859,6 +2016,73 @@
 
     <!-- トースト通知コンテナ -->
     <div id="toastContainer" class="toast-container"></div>
+
+    <!-- 依頼フォームモーダル -->
+    <div id="requestModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-microphone"></i> ボイス依頼フォーム</h2>
+                <button class="modal-close" onclick="closeRequestModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 声優情報表示 -->
+                <div class="request-actor-info">
+                    <img src="" alt="声優" class="request-actor-avatar" id="requestActorAvatar">
+                    <div class="request-actor-details">
+                        <h3 id="requestActorName">声優名</h3>
+                        <p class="request-actor-handle" id="requestActorHandle">@username</p>
+                        <div class="request-actor-price">
+                            <span class="price-label">基本料金:</span>
+                            <span class="price-value" id="requestActorPrice">¥1/文字〜</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 依頼フォーム -->
+                <form id="requestForm" class="request-form">
+                    <div class="form-group">
+                        <label for="requestScript">台本 <span class="required">*</span></label>
+                        <textarea id="requestScript" rows="8" placeholder="読み上げてほしい台本を入力してください..." required></textarea>
+                        <div class="form-stats">
+                            <span class="char-count">文字数: <strong id="charCount">0</strong>文字</span>
+                            <span class="estimated-price">概算料金: <strong id="estimatedPrice">¥0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requestCategory">カテゴリ <span class="required">*</span></label>
+                        <select id="requestCategory" required>
+                            <option value="">選択してください</option>
+                            <option value="youtube">YouTube動画</option>
+                            <option value="stream">配信</option>
+                            <option value="vtuber">VTuber活動</option>
+                            <option value="game">ゲーム実況</option>
+                            <option value="commercial">CM・広告</option>
+                            <option value="narration">ナレーション</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requestNotes">備考・要望</label>
+                        <textarea id="requestNotes" rows="4" placeholder="声のトーン、演技の方向性など、ご要望があれば入力してください..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requestDeadline">希望納期</label>
+                        <input type="date" id="requestDeadline" min="">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeRequestModal()">キャンセル</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i> 依頼を送信
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- ローディングオーバーレイ -->
     <div id="loadingOverlay" class="loading-overlay">
@@ -1902,6 +2126,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=55.0"></script>
+    <script src="js/script.js?v=62.0"></script>
 </body>
 </html>
