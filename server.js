@@ -102,6 +102,12 @@ app.use(express.static(path.join(__dirname), {
         else if (filePath.endsWith('.html')) {
             res.setHeader('Cache-Control', 'no-cache, must-revalidate');
         }
+        // CSS/JS は開発中はキャッシュ無効
+        else if (filePath.match(/\.(css|js)$/i)) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
     }
 }));
 

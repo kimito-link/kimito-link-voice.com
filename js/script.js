@@ -558,6 +558,7 @@ function loginWithTwitter(event) {
 
 // ===== 音声アップロード機能 =====
 let selectedFile = null;
+let narratorSelectedFile = null;
 
 function handleFileSelect(event) {
     const file = event.target.files[0];
@@ -731,6 +732,165 @@ function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// ===== 声優用音声アップロード機能 =====
+function handleNarratorFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // ファイルサイズチェック (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+        alert('ファイルサイズが大きすぎます。50MB以下のファイルを選択してください。');
+        return;
+    }
+    
+    // ファイル形式チェック
+    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/m4a'];
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|ogg|m4a)$/i)) {
+        alert('対応していないファイル形式です。MP3, WAV, OGG, M4A形式のファイルを選択してください。');
+        return;
+    }
+    
+    narratorSelectedFile = file;
+    
+    // アップロードエリアを非表示にしてフォームを表示
+    document.getElementById('narratorUploadArea').style.display = 'none';
+    document.getElementById('narratorUploadForm').style.display = 'block';
+    
+    // ファイル名をタイトルに自動入力
+    const fileName = file.name.replace(/\.[^/.]+$/, '');
+    document.getElementById('narratorAudioTitle').value = fileName;
+}
+
+function cancelNarratorUpload() {
+    narratorSelectedFile = null;
+    document.getElementById('narratorAudioFile').value = '';
+    document.getElementById('narratorUploadArea').style.display = 'block';
+    document.getElementById('narratorUploadForm').style.display = 'none';
+    
+    // フォームをリセット
+    document.getElementById('narratorAudioTitle').value = '';
+    document.getElementById('narratorAudioDescription').value = '';
+    document.getElementById('narratorAudioCategory').value = '';
+    document.getElementById('narratorAudioPortfolio').checked = true;
+    document.getElementById('narratorAudioPublic').checked = true;
+}
+
+async function submitNarratorUpload() {
+    if (!narratorSelectedFile) {
+        alert('ファイルが選択されていません。');
+        return;
+    }
+    
+    const title = document.getElementById('narratorAudioTitle').value.trim();
+    const description = document.getElementById('narratorAudioDescription').value.trim();
+    const category = document.getElementById('narratorAudioCategory').value;
+    const addToPortfolio = document.getElementById('narratorAudioPortfolio').checked;
+    const isPublic = document.getElementById('narratorAudioPublic').checked;
+    
+    if (!title) {
+        alert('タイトルを入力してください。');
+        return;
+    }
+    
+    if (!category) {
+        alert('カテゴリを選択してください。');
+        return;
+    }
+    
+    // FormDataを作成
+    const formData = new FormData();
+    formData.append('audio', narratorSelectedFile);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category);
+    formData.append('add_to_portfolio', addToPortfolio);
+    formData.append('is_public', isPublic);
+    
+    try {
+        // フォームを非表示にして進捗表示を表示
+        document.getElementById('narratorUploadForm').style.display = 'none';
+        const progressDiv = document.getElementById('narratorUploadProgress');
+        progressDiv.style.display = 'block';
+        
+        // 進捗情報を設定
+        document.getElementById('narratorProgressFileName').textContent = narratorSelectedFile.name;
+        document.getElementById('narratorProgressFileSize').textContent = formatFileSize(narratorSelectedFile.size);
+        
+        // API呼び出し（未実装）
+        console.log('📤 声優音声ファイルをアップロードします:', {
+            title,
+            description,
+            category,
+            addToPortfolio,
+            isPublic,
+            fileSize: narratorSelectedFile.size,
+            fileName: narratorSelectedFile.name
+        });
+        
+        // 進捗をシミュレート（実際のAPI実装時に置き換え）
+        await simulateNarratorUploadProgress(narratorSelectedFile.size);
+        
+        // 成功後の処理
+        showToast('音声のアップロードが完了しました！', 'success');
+        
+        // リセット
+        narratorSelectedFile = null;
+        document.getElementById('narratorAudioFile').value = '';
+        document.getElementById('narratorUploadProgress').style.display = 'none';
+        document.getElementById('narratorUploadArea').style.display = 'block';
+        
+        // フォームをリセット
+        document.getElementById('narratorAudioTitle').value = '';
+        document.getElementById('narratorAudioDescription').value = '';
+        document.getElementById('narratorAudioCategory').value = '';
+        document.getElementById('narratorAudioPortfolio').checked = true;
+        document.getElementById('narratorAudioPublic').checked = true;
+        
+    } catch (error) {
+        console.error('❌ アップロードエラー:', error);
+        showToast('アップロードに失敗しました', 'error');
+        
+        // エラー時は進捗を非表示にしてフォームを再表示
+        document.getElementById('narratorUploadProgress').style.display = 'none';
+        document.getElementById('narratorUploadForm').style.display = 'block';
+    }
+}
+
+async function simulateNarratorUploadProgress(fileSize) {
+    const totalSteps = 100;
+    const stepDelay = 50;
+    const startTime = Date.now();
+    
+    for (let i = 0; i <= totalSteps; i++) {
+        const percentage = i;
+        const loaded = (fileSize * i) / 100;
+        
+        // 進捗バーを更新
+        document.getElementById('narratorProgressBar').style.width = percentage + '%';
+        document.getElementById('narratorProgressPercentage').textContent = percentage + '%';
+        
+        // ステータスを更新
+        if (i < 30) {
+            document.getElementById('narratorProgressStatus').textContent = 'アップロード中...';
+        } else if (i < 80) {
+            document.getElementById('narratorProgressStatus').textContent = '処理中...';
+        } else if (i < 100) {
+            document.getElementById('narratorProgressStatus').textContent = '完了しています...';
+        } else {
+            document.getElementById('narratorProgressStatus').textContent = '完了！';
+        }
+        
+        // 予想時間を計算
+        if (i > 0) {
+            const elapsed = (Date.now() - startTime) / 1000;
+            const remaining = (elapsed / i) * (100 - i);
+            document.getElementById('narratorProgressTime').textContent = `予想時間: ${Math.ceil(remaining)}秒`;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, stepDelay));
+    }
 }
 
 // アップロード進捗をシミュレート
@@ -1833,6 +1993,131 @@ function hideLoading() {
     overlay.classList.remove('show');
 }
 
+// ===== アカウント情報モーダル =====
+function showAccountInfoModal() {
+    hideUserMenu();
+    const modal = document.getElementById('accountInfoModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        // プロフィール情報を読み込む
+        loadModalAccountInfo();
+    }
+}
+
+function hideAccountInfoModal() {
+    const modal = document.getElementById('accountInfoModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+async function loadModalAccountInfo() {
+    if (!currentUser || !currentUser.username) return;
+    
+    try {
+        const response = await fetch(`/api/twitter/user-info/${currentUser.username}`);
+        
+        if (!response.ok) {
+            console.error('❌ アカウント情報取得エラー:', response.status);
+            return;
+        }
+        
+        const userData = await response.json();
+        console.log('✅ アカウント情報取得成功:', userData);
+        
+        // ヘッダー画像
+        const headerImage = document.getElementById('modalProfileHeaderImage');
+        if (headerImage && userData.banner_url) {
+            headerImage.style.backgroundImage = `url(${userData.banner_url})`;
+        }
+        
+        // アバター画像
+        const avatar = document.getElementById('modalProfileAvatar');
+        if (avatar) {
+            let avatarUrl = userData.profile_image_url || currentUser.avatar || '';
+            if (avatarUrl.includes('_normal')) {
+                avatarUrl = avatarUrl.replace('_normal', '_200x200');
+            }
+            avatar.src = avatarUrl;
+        }
+        
+        // プロフィール情報
+        const nameEl = document.getElementById('modalProfileName');
+        if (nameEl) nameEl.textContent = userData.name || currentUser.name;
+        
+        const handleEl = document.getElementById('modalProfileHandle');
+        if (handleEl) handleEl.textContent = `@${userData.username || currentUser.username}`;
+        
+        const bioEl = document.getElementById('modalProfileBio');
+        if (bioEl && userData.description) {
+            bioEl.textContent = userData.description;
+        }
+        
+        // ウェブサイト
+        if (userData.url) {
+            const websiteContainer = document.getElementById('modalProfileWebsiteContainer');
+            const websiteLink = document.getElementById('modalProfileWebsite');
+            if (websiteContainer && websiteLink) {
+                websiteContainer.style.display = 'flex';
+                websiteLink.href = userData.url;
+                websiteLink.textContent = userData.url.replace(/^https?:\/\//,'');
+            }
+        }
+        
+        // 登録日
+        const joinDate = document.getElementById('modalProfileJoinDate');
+        if (joinDate && userData.created_at) {
+            const date = new Date(userData.created_at);
+            joinDate.textContent = `${date.getFullYear()}年${date.getMonth() + 1}月から利用しています`;
+        }
+        
+        // フォロー統計
+        const followingCount = document.getElementById('modalFollowingCount');
+        if (followingCount) {
+            followingCount.textContent = userData.following_count !== undefined ? 
+                userData.following_count.toLocaleString() : '--';
+        }
+        
+        const followerCount = document.getElementById('modalFollowerCount');
+        if (followerCount) {
+            followerCount.textContent = userData.followers_count !== undefined ? 
+                userData.followers_count.toLocaleString() : '--';
+        }
+        
+        // フォロー状態
+        loadModalFollowStatus();
+        
+    } catch (error) {
+        console.error('❌ アカウント情報取得エラー:', error);
+    }
+}
+
+async function loadModalFollowStatus() {
+    // クリエイターアカウント
+    const creatorData = CORRECT_ACCOUNT_DATA['creator'];
+    if (creatorData) {
+        const creatorAvatar = document.getElementById('modalCreatorAvatar');
+        const creatorName = document.getElementById('modalCreatorName');
+        const creatorHandle = document.getElementById('modalCreatorHandle');
+        
+        if (creatorAvatar) creatorAvatar.src = creatorData.avatar;
+        if (creatorName) creatorName.textContent = creatorData.name;
+        if (creatorHandle) creatorHandle.textContent = creatorData.username;
+    }
+    
+    // アイドルアカウント
+    const idolData = CORRECT_ACCOUNT_DATA['idol'];
+    if (idolData) {
+        const idolAvatar = document.getElementById('modalIdolAvatar');
+        const idolName = document.getElementById('modalIdolName');
+        const idolHandle = document.getElementById('modalIdolHandle');
+        
+        if (idolAvatar) idolAvatar.src = idolData.avatar;
+        if (idolName) idolName.textContent = idolData.name;
+        if (idolHandle) idolHandle.textContent = idolData.username;
+    }
+}
+
 // ===== 複数アカウント同時利用ガイド =====
 function showMultiAccountGuide() {
     hideUserMenu();
@@ -2160,21 +2445,8 @@ document.addEventListener('DOMContentLoaded', function() {
     loadThanksMessagesForDashboard();
     
     // 声優ページの感謝のメッセージを読み込む
-    loadThanksMessagesForVoiceActor();
-    
     // 新着感謝のメッセージをチェック
     checkNewThanksMessages();
-    
-    // ウェルカムメッセージにユーザー名を設定
-    if (currentUser) {
-        const welcomeUserName = document.getElementById('welcomeUserName');
-        if (welcomeUserName) {
-            welcomeUserName.textContent = currentUser.name || currentUser.displayName || 'ユーザーさん';
-        }
-        
-        // Xからプロフィール情報を取得
-        loadUserProfileFromTwitter();
-    }
 });
 
 /**
@@ -2918,6 +3190,54 @@ async function loadUserProfileFromTwitter() {
 }
 
 /**
+ * 声優用プロフィール情報を読み込む
+ */
+async function loadNarratorProfileInfo() {
+    if (!currentUser || !currentUser.username) return;
+    
+    try {
+        const response = await fetch(`/api/twitter/user-info/${currentUser.username}`);
+        
+        if (!response.ok) {
+            console.error('❌ 声優プロフィール取得エラー:', response.status);
+            return;
+        }
+        
+        const userData = await response.json();
+        console.log('✅ 声優プロフィール取得成功:', userData);
+        
+        // アバター画像を設定
+        const narratorAvatar = document.getElementById('narratorAvatar');
+        if (narratorAvatar) {
+            let avatarUrl = userData.profile_image_url || currentUser.avatar || '';
+            if (avatarUrl.includes('_normal')) {
+                avatarUrl = avatarUrl.replace('_normal', '_200x200');
+            }
+            narratorAvatar.src = avatarUrl;
+        }
+        
+        // プロフィール情報を設定
+        const narratorName = document.getElementById('narratorName');
+        if (narratorName) {
+            narratorName.textContent = userData.name || currentUser.name;
+        }
+        
+        const narratorHandle = document.getElementById('narratorHandle');
+        if (narratorHandle) {
+            narratorHandle.textContent = `@${userData.username || currentUser.username}`;
+        }
+        
+        const narratorBio = document.getElementById('narratorBio');
+        if (narratorBio && userData.description) {
+            narratorBio.textContent = userData.description;
+        }
+        
+    } catch (err) {
+        console.error('❌ 声優プロフィール取得エラー:', err);
+    }
+}
+
+/**
  * 声優ページの感謝のメッセージを読み込む
  */
 async function loadThanksMessagesForVoiceActor() {
@@ -3302,9 +3622,171 @@ function switchRole(role) {
     showToast(message, 'info');
 }
 
+// ===== 上部ナビゲーション切り替え =====
+function showDashboardSection(section) {
+    console.log('🔄 タブ切り替え:', section);
+    
+    // ナビリンクのactive状態を更新
+    document.querySelectorAll('.dashboard-nav .nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('data-section') === section) {
+            link.classList.add('active');
+        }
+    });
+    
+    // 全てのタブコンテンツを強制的に非表示
+    const allTabs = document.querySelectorAll('.tab-content');
+    console.log('📋 全タブ数:', allTabs.length);
+    allTabs.forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+        console.log('❌ 非表示:', tab.id);
+    });
+    
+    // 選択されたセクションを表示
+    switch(section) {
+        case 'dashboard':
+            // dashboard-contentのpadding-topを元に戻す
+            const dashboardContentRestore = document.querySelector('.dashboard-content');
+            if (dashboardContentRestore) {
+                dashboardContentRestore.style.paddingTop = '';
+            }
+            
+            const overviewTab = document.getElementById('overview-tab');
+            if (overviewTab) {
+                overviewTab.style.display = 'block';
+                overviewTab.classList.add('active');
+                console.log('✅ 表示: overview-tab');
+                
+                // ダッシュボードのコンテンツを表示
+                const clientContent = document.getElementById('clientDashboardContent');
+                const narratorContent = document.getElementById('narratorDashboardContent');
+                if (currentRole === 'client' && clientContent) {
+                    clientContent.style.display = 'grid';
+                } else if (currentRole === 'narrator' && narratorContent) {
+                    narratorContent.style.display = 'grid';
+                }
+            }
+            break;
+        case 'history':
+            // dashboard-contentのpadding-topを元に戻す
+            const dashboardContentHistory = document.querySelector('.dashboard-content');
+            if (dashboardContentHistory) {
+                dashboardContentHistory.style.paddingTop = '';
+            }
+            
+            const historyTab = document.getElementById('my-requests-tab');
+            if (historyTab) {
+                historyTab.style.display = 'block';
+                historyTab.classList.add('active');
+                console.log('✅ 表示: my-requests-tab');
+                // 履歴を読み込む
+                if (currentRole === 'client') {
+                    loadMyRequests();
+                } else {
+                    loadOrders();
+                }
+            }
+            break;
+        case 'thanks':
+            // ダッシュボードのコンテンツを非表示
+            const clientContent = document.getElementById('clientDashboardContent');
+            const narratorContent = document.getElementById('narratorDashboardContent');
+            if (clientContent) clientContent.style.display = 'none';
+            if (narratorContent) narratorContent.style.display = 'none';
+            
+            // dashboard-contentのpadding-topを0に
+            const dashboardContent = document.querySelector('.dashboard-content');
+            if (dashboardContent) {
+                dashboardContent.style.paddingTop = '0';
+            }
+            
+            const thanksTab = document.getElementById('thanks-tab');
+            if (thanksTab) {
+                thanksTab.style.display = 'block';
+                thanksTab.classList.add('active');
+                console.log('✅ 表示: thanks-tab');
+                // ロールに応じてデフォルトタブを切り替え
+                if (currentRole === 'narrator') {
+                    switchThanksTab('received'); // 声優：感謝された投稿
+                } else {
+                    switchThanksTab('given'); // 依頼者：感謝した投稿
+                }
+            }
+            break;
+        case 'achievements':
+            // dashboard-contentのpadding-topを元に戻す
+            const dashboardContentAchievements = document.querySelector('.dashboard-content');
+            if (dashboardContentAchievements) {
+                dashboardContentAchievements.style.paddingTop = '';
+            }
+            
+            // 実績タブ（後で実装）
+            showToast('実績機能は準備中です', 'info');
+            break;
+    }
+    
+    return false; // リンクのデフォルト動作を防ぐ
+}
+
+// ===== 感謝タブの切り替え =====
+function switchThanksTab(type) {
+    // サブタブボタンのactive状態を更新
+    document.querySelectorAll('.thanks-sub-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.getAttribute('data-thanks-type') === type) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // コンテンツの表示切り替え
+    document.querySelectorAll('.thanks-sub-content').forEach(content => {
+        content.classList.remove('active');
+        content.style.display = 'none';
+    });
+    
+    // 選択されたコンテンツを表示
+    const targetContent = document.getElementById(`thanks-${type}`);
+    if (targetContent) {
+        targetContent.classList.add('active');
+        targetContent.style.display = 'block';
+    }
+}
+
+// 感謝した投稿の送信
+function submitGivenThanks() {
+    const voiceActor = document.getElementById('thanksVoiceActor').value;
+    const message = document.getElementById('thanksMessageGiven').value.trim();
+    
+    if (!voiceActor) {
+        showToast('声優を選択してください', 'error');
+        return;
+    }
+    
+    if (!message) {
+        showToast('感謝のメッセージを入力してください', 'error');
+        return;
+    }
+    
+    // Twitter投稿用のテキストを作成
+    const twitterText = `${message}\n\n#KimitoLinkVoice ${voiceActor}`;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`;
+    
+    // Twitterで投稿
+    window.open(twitterUrl, '_blank');
+    
+    showToast('感謝のメッセージを投稿しました！', 'success');
+    
+    // フォームをリセット
+    document.getElementById('thanksVoiceActor').value = '';
+    document.getElementById('thanksMessageGiven').value = '';
+}
+
 function updateRoleDisplay() {
-    // ボタンの状態を更新
-    document.querySelectorAll('.role-btn').forEach(btn => {
+    console.log('🔄 updateRoleDisplay() 呼び出し - currentRole:', currentRole);
+    
+    // 役割切り替えボタンの状態を更新
+    document.querySelectorAll('.header-role-btn, .nav-role-btn').forEach(btn => {
         const btnRole = btn.getAttribute('data-role');
         if (btnRole === currentRole) {
             btn.classList.add('active');
@@ -3313,36 +3795,40 @@ function updateRoleDisplay() {
         }
     });
     
-    // タブの表示/非表示を切り替え
-    const clientTabs = document.getElementById('clientTabs');
-    const narratorTabs = document.getElementById('narratorTabs');
+    // ナビゲーションのactive状態をリセット
+    document.querySelectorAll('.dashboard-nav .nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
     
+    // 全てのタブを非表示にして、ダッシュボードタブのみ表示
+    console.log('📋 全タブを非表示にしてダッシュボードのみ表示');
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+    });
+    
+    // ダッシュボードタブを表示
+    const overviewTab = document.getElementById('overview-tab');
+    if (overviewTab) {
+        overviewTab.style.display = 'block';
+        overviewTab.classList.add('active');
+        console.log('✅ overview-tab を表示');
+    }
+    
+    // ダッシュボードの表示を更新
     if (currentRole === 'client') {
-        if (clientTabs) clientTabs.style.display = 'block';
-        if (narratorTabs) narratorTabs.style.display = 'none';
-        
-        // 依頼者用のタブを表示
         showClientDashboard();
     } else {
-        if (clientTabs) clientTabs.style.display = 'none';
-        if (narratorTabs) narratorTabs.style.display = 'block';
-        
-        // 声優用のタブを表示
         showNarratorDashboard();
     }
 }
 
 function showClientDashboard() {
-    // 全てのタブコンテンツを非表示
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // 依頼者用のダッシュボードを表示
-    const overviewTab = document.getElementById('overview-tab');
-    if (overviewTab) {
-        overviewTab.classList.add('active');
-    }
+    // ダッシュボード内のコンテンツを切り替え
+    const clientContent = document.getElementById('clientDashboardContent');
+    const narratorContent = document.getElementById('narratorDashboardContent');
+    if (clientContent) clientContent.style.display = 'grid';
+    if (narratorContent) narratorContent.style.display = 'none';
     
     // タブボタンの状態をリセット
     document.querySelectorAll('#clientTabs .tab-button').forEach(btn => {
@@ -3352,23 +3838,17 @@ function showClientDashboard() {
 }
 
 function showNarratorDashboard() {
-    // 全てのタブコンテンツを非表示
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    
-    // 声優用のダッシュボードを表示
-    const narratorOverviewTab = document.getElementById('narrator-overview-tab');
-    if (narratorOverviewTab) {
-        narratorOverviewTab.classList.add('active');
-        narratorOverviewTab.style.display = 'block';
-    }
+    // ダッシュボード内のコンテンツを切り替え
+    const clientContent = document.getElementById('clientDashboardContent');
+    const narratorContent = document.getElementById('narratorDashboardContent');
+    if (clientContent) clientContent.style.display = 'none';
+    if (narratorContent) narratorContent.style.display = 'grid';
     
     // タブボタンの状態をリセット
     document.querySelectorAll('#narratorTabs .tab-button').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector('#narratorTabs .tab-button[data-tab="narrator-overview"]')?.classList.add('active');
+    document.querySelector('#narratorTabs .tab-button[data-tab="overview"]')?.classList.add('active');
 }
 
 // ===== 依頼フォーム機能 =====

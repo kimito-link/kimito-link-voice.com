@@ -145,7 +145,7 @@ body {
 .logo-area {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
     cursor: pointer;
     transition: transform 0.3s;
     flex-shrink: 0;
@@ -153,6 +153,59 @@ body {
 
 .logo-area:hover {
     transform: scale(1.05);
+}
+
+/* ヘッダー内役割切り替えボタン（非表示） */
+.header-role-switch {
+    display: none;
+}
+
+.header-role-btn {
+    display: none;
+}
+
+/* ナビゲーション内役割切り替えボタン */
+.nav-role-switch {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    margin-right: 15px;
+}
+
+.nav-role-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.nav-role-btn i {
+    font-size: 1rem;
+}
+
+.nav-role-btn:hover {
+    background: rgba(79, 172, 254, 0.1);
+    border-color: rgba(79, 172, 254, 0.4);
+    color: var(--primary-blue);
+}
+
+.nav-role-btn.active {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #1e88e5 100%);
+    border-color: var(--primary-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .header-logo {
@@ -1149,6 +1202,14 @@ body {
     max-width: 800px;
 }
 
+/* アカウント情報モーダル */
+.account-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
 /* WebKit browsers (Chrome, Safari, Edge) でスクロールバーを非表示 */
 .modal-content::-webkit-scrollbar {
     display: none;
@@ -1422,6 +1483,57 @@ body {
 @media (max-width: 768px) {
     .dashboard-nav {
         display: none;
+    }
+    
+    .nav-role-switch {
+        gap: 6px;
+        padding: 4px;
+        margin-right: 8px;
+    }
+    
+    .nav-role-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .nav-role-btn span {
+        display: none;
+    }
+    
+    .nav-role-btn i {
+        font-size: 1.1rem;
+    }
+    
+    .platform-name {
+        display: none;
+    }
+    
+    #thanks-tab {
+        top: -20px;
+    }
+    
+    .thanks-container {
+        padding: 0 15px 15px 15px;
+    }
+    
+    .thanks-sub-tabs {
+        gap: 8px;
+        padding: 6px;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .thanks-sub-tab {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .thanks-sub-tab span {
+        display: none;
+    }
+    
+    .thanks-sub-tab i {
+        font-size: 1.2rem;
     }
 }
 
@@ -4371,8 +4483,8 @@ body {
 
 /* ===== ダッシュボードタブナビゲーション ===== */
 .dashboard-tabs {
-    background: var(--bg-dark);
-    border-bottom: 2px solid var(--card-border);
+    background: transparent;
+    border-bottom: 1px solid rgba(79, 172, 254, 0.2);
     position: sticky;
     top: 70px;
     z-index: 100;
@@ -4380,15 +4492,93 @@ body {
 
 .dashboard-tabs .container {
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 10px;
     padding: 15px 20px;
     overflow-x: auto;
     scrollbar-width: none;
 }
 
+/* 声優モードタブは初期状態で非表示 */
+#narratorTabs {
+    display: none;
+}
+
 .dashboard-tabs .container::-webkit-scrollbar {
     display: none;
 }
+
+/* 感謝タブ自体のpadding削除 */
+#thanks-tab {
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative;
+    top: -40px;
+}
+
+/* 感謝タブ専用コンテナ */
+.thanks-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px 20px 20px; /* 上部のpaddingを0に */
+}
+
+/* 感謝タブのサブタブナビゲーション */
+.thanks-sub-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+}
+
+.thanks-sub-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.thanks-sub-tab:hover {
+    background: rgba(79, 172, 254, 0.1);
+    border-color: rgba(79, 172, 254, 0.4);
+    color: var(--primary-blue);
+}
+
+.thanks-sub-tab.active {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, #1e88e5 100%);
+    border-color: var(--primary-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.thanks-sub-tab i {
+    font-size: 1.1rem;
+}
+
+.thanks-sub-content {
+    display: none;
+}
+
+.thanks-sub-content.active {
+    display: block;
+}
+
+/* 古いレスポンシブコードは削除済み - 下部の新しいレスポンシブコードを使用 */
 
 .tabs-container {
     display: flex;
@@ -5673,6 +5863,90 @@ body {
     box-shadow: 0 6px 20px rgba(79, 172, 254, 0.5);
 }
 
+/* ===== 役割メッセージ ===== */
+.role-message-container {
+    background: rgba(79, 172, 254, 0.05);
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(79, 172, 254, 0.2);
+}
+
+.role-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--primary-blue);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.role-message i {
+    font-size: 1.3rem;
+}
+
+/* ===== 声優用プロフィール ===== */
+.role-profile-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 20px 0;
+    border-bottom: 2px solid rgba(79, 172, 254, 0.3);
+}
+
+.narrator-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(79, 172, 254, 0.2);
+}
+
+.narrator-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-blue);
+}
+
+.narrator-info {
+    flex: 1;
+}
+
+.narrator-info h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.narrator-handle {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+}
+
+.narrator-bio {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.narrator-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: rgba(79, 172, 254, 0.1);
+    border-radius: 30px;
+    color: var(--primary-blue);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.narrator-message i {
+    font-size: 1.1rem;
+}
+
 /* ===== 統計カード ===== */
 .stats-card {
     text-align: center;
@@ -5858,6 +6132,37 @@ body {
         font-size: 0.9rem;
     }
     
+    /* 役割メッセージ */
+    .role-message {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+    
+    .role-message i {
+        font-size: 1.1rem;
+    }
+    
+    /* 声優用プロフィール */
+    .narrator-profile-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .narrator-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .narrator-info h3 {
+        font-size: 1.1rem;
+    }
+    
+    .narrator-message {
+        width: 100%;
+        justify-content: center;
+    }
+    
     /* ダッシュボードタブ */
     .dashboard-tabs {
         overflow-x: auto;
@@ -5871,6 +6176,7 @@ body {
     
     .dashboard-tabs .container {
         display: flex;
+        flex-direction: row;
         flex-wrap: nowrap;
         gap: 5px;
         padding: 10px 15px;

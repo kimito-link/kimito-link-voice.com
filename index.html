@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=76.0">
+    <link rel="stylesheet" href="css/styles.css?v=100.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
     <link rel="manifest" href="manifest.json">
     
@@ -568,8 +568,8 @@
             <div class="footer-content">
                 <div class="footer-logo">
                     <picture>
-                        <source srcset="images/webp/logo_funlink_RGB_color.webp" type="image/webp">
-                        <img src="images/logo/RGB/透過/logo_funlink_RGB_color.png" alt="KimiLink Voice" loading="lazy">
+                        <source srcset="images/webp/logo_funlink_RGB_white.webp" type="image/webp">
+                        <img src="images/logo/RGB/透過/logo_funlink_RGB_white.png" alt="KimiLink Voice" loading="lazy">
                     </picture>
                     <p>君と繋がる、声で届ける</p>
                 </div>
@@ -857,6 +857,92 @@
                 <button class="btn-primary" onclick="logoutAndSwitch()">
                     <i class="fas fa-sign-out-alt"></i> ログアウトして切り替え
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- アカウント情報モーダル -->
+    <div id="accountInfoModal" class="modal">
+        <div class="modal-content modal-content-wide">
+            <button class="modal-close" onclick="hideAccountInfoModal()">×</button>
+            
+            <h2><i class="fas fa-user-circle"></i> アカウント情報</h2>
+            <p class="subtitle">あなたのTwitterアカウント情報</p>
+            
+            <div class="account-info-container">
+                <!-- プロフィールカード（Twitterライク） -->
+                <div class="profile-card-twitter">
+                    <!-- ヘッダー画像 -->
+                    <div class="profile-header-image" id="modalProfileHeaderImage"></div>
+                    
+                    <!-- プロフィール情報 -->
+                    <div class="profile-info-container">
+                        <!-- アバターとボタン -->
+                        <div class="profile-top">
+                            <img src="" alt="Profile" class="profile-avatar-large" id="modalProfileAvatar" loading="lazy">
+                        </div>
+                        
+                        <!-- 名前とユーザー名 -->
+                        <div class="profile-names">
+                            <h2 id="modalProfileName">読み込み中...</h2>
+                            <p class="profile-username" id="modalProfileHandle">@...</p>
+                        </div>
+                        
+                        <!-- プロフィール説明 -->
+                        <div class="profile-description" id="modalProfileBio">
+                            読み込み中...
+                        </div>
+                        
+                        <!-- メタ情報 -->
+                        <div class="profile-meta">
+                            <div class="profile-meta-item" id="modalProfileWebsiteContainer" style="display: none;">
+                                <i class="fas fa-link"></i>
+                                <a href="#" id="modalProfileWebsite" target="_blank"></a>
+                            </div>
+                            <div class="profile-meta-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span id="modalProfileJoinDate">読み込み中...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- フォロー統計 -->
+                        <div class="profile-follow-stats">
+                            <div class="follow-stat-item">
+                                <span class="follow-count" id="modalFollowingCount">--</span>
+                                <span class="follow-label">フォロー中</span>
+                            </div>
+                            <div class="follow-stat-item">
+                                <span class="follow-count" id="modalFollowerCount">--</span>
+                                <span class="follow-label">フォロワー</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- フォロー状態カード -->
+                <div class="card follow-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> フォロー状態</h2>
+                    </div>
+                    <div class="follow-check-content">
+                        <div class="follow-check-item">
+                            <img id="modalCreatorAvatar" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIGF0dHJpYnV0ZVR5cGU9IlhNTCIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDIwMCAyMDAiIHRvPSIzNjAgMjAwIDIwMCIgZHVyPSIxcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48L2RlZnM+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIxODAiIGZpbGw9IiNmNWY1ZjUiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMDAiIHI9IjEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjI0IiBzdHJva2UtZGFzaGFycmF5PSIxNTAgNjAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIGZyb209IjAgMjAwIDIwMCIgdG89IjM2MCAyMDAgMjAwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvY2lyY2xlPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7oqq3jgb/ovrzjgb/kuK3li6QuLi48L3RleHQ+PC9zdmc+" alt="読み込み中" loading="lazy">
+                            <div class="follow-check-info">
+                                <h4 id="modalCreatorName">読み込み中...</h4>
+                                <p id="modalCreatorHandle">@...</p>
+                            </div>
+                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
+                        </div>
+                        <div class="follow-check-item">
+                            <img id="modalIdolAvatar" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIGF0dHJpYnV0ZVR5cGU9IlhNTCIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDIwMCAyMDAiIHRvPSIzNjAgMjAwIDIwMCIgZHVyPSIxcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48L2RlZnM+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIxODAiIGZpbGw9IiNmNWY1ZjUiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMDAiIHI9IjEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjI0IiBzdHJva2UtZGFzaGFycmF5PSIxNTAgNjAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIGZyb209IjAgMjAwIDIwMCIgdG89IjM2MCAyMDAgMjAwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvY2lyY2xlPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7oqq3jgb/ovrzjgb/kuK3li6QuLi48L3RleHQ+PC9zdmc+" alt="読み込み中" loading="lazy">
+                            <div class="follow-check-info">
+                                <h4 id="modalIdolName">読み込み中...</h4>
+                                <p id="modalIdolHandle">@...</p>
+                            </div>
+                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1192,9 +1278,21 @@
                 </div>
                 
                 <nav class="dashboard-nav">
-                    <a href="#" class="nav-link active" onclick="showDashboardSection('main')">ダッシュボード</a>
-                    <a href="#" class="nav-link" onclick="showDashboardSection('reviews')">レビュー</a>
-                    <a href="#" class="nav-link" onclick="showDashboardSection('stats')">実績</a>
+                    <!-- ダッシュボード切り替えボタン -->
+                    <div class="nav-role-switch">
+                        <button class="nav-role-btn active" data-role="client" onclick="switchRole('client')">
+                            <i class="fas fa-heart"></i>
+                            <span>依頼者</span>
+                        </button>
+                        <button class="nav-role-btn" data-role="narrator" onclick="switchRole('narrator')">
+                            <i class="fas fa-microphone"></i>
+                            <span>声優</span>
+                        </button>
+                    </div>
+                    
+                    <a href="javascript:void(0)" class="nav-link" data-section="history" onclick="showDashboardSection('history')">履歴</a>
+                    <a href="javascript:void(0)" class="nav-link" data-section="thanks" onclick="showDashboardSection('thanks')">感謝</a>
+                    <a href="javascript:void(0)" class="nav-link" data-section="achievements" onclick="showDashboardSection('achievements')">実績</a>
                 </nav>
 
                 <div class="user-area">
@@ -1241,6 +1339,10 @@
 
                         <!-- アクション -->
                         <div class="dropdown-actions">
+                            <button class="dropdown-item" onclick="showAccountInfoModal()">
+                                <i class="fas fa-user-circle"></i>
+                                <span>アカウント情報を見る</span>
+                            </button>
                             <button class="dropdown-item" onclick="showSwitchAccountModal()" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); font-weight: 600;">
                                 <i class="fas fa-sync-alt" style="color: #FF9800;"></i>
                                 <span style="color: #E65100;">アカウントを切り替え</span>
@@ -1259,65 +1361,12 @@
             </div>
         </header>
 
-        <!-- 役割切り替え -->
-        <div class="role-switch-container">
-            <div class="container">
-                <div class="role-switch">
-                    <button class="role-btn active" data-role="client" onclick="switchRole('client')">
-                        <i class="fas fa-heart"></i>
-                        <span>依頼者モード</span>
-                    </button>
-                    <button class="role-btn" data-role="narrator" onclick="switchRole('narrator')">
-                        <i class="fas fa-microphone"></i>
-                        <span>声優モード</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- ダッシュボードタブナビゲーション -->
-        <nav class="dashboard-tabs">
-            <div class="container" id="clientTabs">
-                <button class="tab-button active" data-tab="overview">
-                    <i class="fas fa-chart-line"></i> ダッシュボード
-                </button>
-                <button class="tab-button" data-tab="my-requests">
-                    <i class="fas fa-list"></i> 依頼履歴
-                </button>
-                <button class="tab-button" data-tab="collabs">
-                    <i class="fas fa-users"></i> コラボメンバー
-                </button>
-                <button class="tab-button" data-tab="my-thanks">
-                    <i class="fas fa-paper-plane"></i> あなたの感謝
-                </button>
-                <button class="tab-button" data-tab="all-thanks">
-                    <i class="fas fa-heart"></i> みんなの感謝
-                </button>
-            </div>
-            <div class="container" id="narratorTabs" style="display: none;">
-                <button class="tab-button active" data-tab="narrator-overview">
-                    <i class="fas fa-chart-line"></i> ダッシュボード
-                </button>
-                <button class="tab-button" data-tab="orders">
-                    <i class="fas fa-inbox"></i> 受注案件
-                </button>
-                <button class="tab-button" data-tab="narrator-profile">
-                    <i class="fas fa-user-circle"></i> プロフィール設定
-                </button>
-                <button class="tab-button" data-tab="earnings">
-                    <i class="fas fa-yen-sign"></i> 収益管理
-                </button>
-                <button class="tab-button" data-tab="all-thanks">
-                    <i class="fas fa-heart"></i> みんなの感謝
-                </button>
-            </div>
-        </nav>
-
         <!-- ダッシュボードコンテンツ -->
         <main class="dashboard-content">
             <!-- ダッシュボードタブ -->
-            <div class="tab-content active" id="overview-tab">
-            <div class="dashboard-grid">
+            <div class="tab-content" id="overview-tab" style="display: block;">
+            <!-- 依頼者用コンテンツ -->
+            <div class="dashboard-grid" id="clientDashboardContent">
                 <!-- 新着感謝のメッセージ通知カード -->
                 <div class="card notification-card celebration" id="newThanksNotification" style="display: none;">
                     <div class="celebration-effects">
@@ -1337,45 +1386,61 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- ウェルカムカード -->
-                <div class="card welcome-card">
-                    <div class="welcome-content">
-                        <h2>ようこそ、<span id="welcomeUserName">ユーザーさん</span>！</h2>
-                        <p>今日も素敵な音声を届けましょう ✨</p>
-                    </div>
+            </div>
+            </div>
+            
+            <!-- 声優用コンテンツ -->
+            <div class="dashboard-grid" id="narratorDashboardContent" style="display: none;">
+                <!-- 統計カード -->
+                <div class="card stats-card">
+                    <h3><i class="fas fa-inbox"></i> 受注案件</h3>
+                    <p class="stats-number">0件</p>
+                    <p class="stats-label">進行中の案件</p>
                 </div>
 
-                <!-- 音声アップロードカード -->
+                <div class="card stats-card">
+                    <h3><i class="fas fa-check-circle"></i> 完了案件</h3>
+                    <p class="stats-number">0件</p>
+                    <p class="stats-label">累計納品数</p>
+                </div>
+
+                <div class="card stats-card">
+                    <h3><i class="fas fa-yen-sign"></i> 収益</h3>
+                    <p class="stats-number">¥0</p>
+                    <p class="stats-label">今月の収益</p>
+                </div>
+
+                <!-- 音声アップロードカード（声優用） -->
                 <div class="card upload-card">
                     <div class="card-header">
                         <h2><i class="fas fa-microphone"></i> 音声アップロード</h2>
+                        <p class="subtitle">ポートフォリオに追加する音声をアップロード</p>
                     </div>
                     <div class="upload-content">
-                        <div class="upload-area" id="uploadArea">
+                        <div class="upload-area" id="narratorUploadArea">
                             <i class="fas fa-cloud-upload-alt upload-icon"></i>
                             <p class="upload-text">ファイルをドラッグ＆ドロップ</p>
                             <p class="upload-subtext">または</p>
-                            <button type="button" class="btn-upload" onclick="document.getElementById('audioFile').click()">
+                            <button type="button" class="btn-upload" onclick="document.getElementById('narratorAudioFile').click()">
                                 <i class="fas fa-folder-open"></i> ファイルを選択
                             </button>
-                            <input type="file" id="audioFile" accept="audio/*,.m4a" style="display: none;" onchange="handleFileSelect(event)">
+                            <input type="file" id="narratorAudioFile" accept="audio/*,.m4a" style="display: none;" onchange="handleNarratorFileSelect(event)">
                             <p class="upload-note">対応形式: MP3, WAV, OGG, M4A (最大50MB)</p>
                         </div>
                         
-                        <div class="upload-form" id="uploadForm" style="display: none;">
+                        <div class="upload-form" id="narratorUploadForm" style="display: none;">
                             <h3>音声情報</h3>
                             <div class="form-group">
-                                <label for="audioTitle">タイトル <span class="required">*</span></label>
-                                <input type="text" id="audioTitle" placeholder="例: サンプルボイス - 明るいトーン">
+                                <label for="narratorAudioTitle">タイトル <span class="required">*</span></label>
+                                <input type="text" id="narratorAudioTitle" placeholder="例: サンプルボイス - 明るいトーン">
                             </div>
                             <div class="form-group">
-                                <label for="audioDescription">説明</label>
-                                <textarea id="audioDescription" rows="3" placeholder="音声の説明や用途を入力..."></textarea>
+                                <label for="narratorAudioDescription">説明</label>
+                                <textarea id="narratorAudioDescription" rows="3" placeholder="音声の説明や用途を入力..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="audioCategory">カテゴリ <span class="required">*</span></label>
-                                <select id="audioCategory">
+                                <label for="narratorAudioCategory">カテゴリ <span class="required">*</span></label>
+                                <select id="narratorAudioCategory">
                                     <option value="">選択してください</option>
                                     <option value="sample">サンプルボイス</option>
                                     <option value="delivered">納品済み作品</option>
@@ -1385,152 +1450,56 @@
                             </div>
                             <div class="form-group">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" id="audioPublic" checked>
+                                    <input type="checkbox" id="narratorAudioPortfolio" checked>
+                                    <span>ポートフォリオに追加</span>
+                                </label>
+                                <p class="form-hint">チェックを入れると、あなたのプロフィールページに表示されます</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="narratorAudioPublic" checked>
                                     <span>公開する</span>
                                 </label>
                             </div>
                             <div class="form-actions">
-                                <button type="button" class="btn-secondary" onclick="cancelUpload()">キャンセル</button>
-                                <button type="button" class="btn-primary" id="uploadBtn" onclick="submitUpload()">
+                                <button type="button" class="btn-secondary" onclick="cancelNarratorUpload()">キャンセル</button>
+                                <button type="button" class="btn-primary" id="narratorUploadBtn" onclick="submitNarratorUpload()">
                                     <i class="fas fa-upload"></i> アップロード
                                 </button>
                             </div>
                         </div>
                         
                         <!-- アップロード進捗 -->
-                        <div class="upload-progress" id="uploadProgress" style="display: none;">
+                        <div class="upload-progress" id="narratorUploadProgress" style="display: none;">
                             <h3><i class="fas fa-cloud-upload-alt"></i> アップロード中...</h3>
                             <div class="progress-info">
                                 <div class="progress-details">
-                                    <span class="file-name" id="progressFileName"></span>
-                                    <span class="file-size" id="progressFileSize"></span>
+                                    <span class="file-name" id="narratorProgressFileName"></span>
+                                    <span class="file-size" id="narratorProgressFileSize"></span>
                                 </div>
-                                <span class="progress-percentage" id="progressPercentage">0%</span>
+                                <span class="progress-percentage" id="narratorProgressPercentage">0%</span>
                             </div>
                             <div class="progress-bar-container">
-                                <div class="progress-bar" id="progressBar"></div>
+                                <div class="progress-bar" id="narratorProgressBar"></div>
                             </div>
                             <div class="progress-status">
-                                <span id="progressStatus">準備中...</span>
-                                <span id="progressTime">予想時間: --</span>
+                                <span id="narratorProgressStatus">準備中...</span>
+                                <span id="narratorProgressTime">予想時間: --</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- アップロード済み音声リスト -->
+                <!-- アップロード済み音声リスト（声優用） -->
                 <div class="card voice-list-card">
                     <div class="card-header">
                         <h2><i class="fas fa-list"></i> アップロード済み音声</h2>
+                        <p class="subtitle">ポートフォリオ・納品作品の管理</p>
                     </div>
-                    <div class="voice-list" id="voiceList">
+                    <div class="voice-list" id="narratorVoiceList">
                         <div class="empty-state">
                             <i class="fas fa-microphone-slash"></i>
                             <p>まだ音声がアップロードされていません</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- プロフィールカード（Twitterライク） -->
-                <div class="card profile-card-twitter">
-                    <!-- ヘッダー画像 -->
-                    <div class="profile-header-image" id="profileHeaderImage"></div>
-                    
-                    <!-- プロフィール情報 -->
-                    <div class="profile-info-container">
-                        <!-- アバターとボタン -->
-                        <div class="profile-top">
-                            <img src="" alt="Profile" class="profile-avatar-large" id="profileAvatar" loading="lazy">
-                        </div>
-                        
-                        <!-- 名前とユーザー名 -->
-                        <div class="profile-names">
-                            <h2 id="profileName">読み込み中...</h2>
-                            <p class="profile-username" id="profileHandle">@...</p>
-                        </div>
-                        
-                        <!-- プロフィール説明 -->
-                        <div class="profile-description" id="profileBio">
-                            読み込み中...
-                        </div>
-                        
-                        <!-- メタ情報 -->
-                        <div class="profile-meta">
-                            <div class="profile-meta-item" id="profileWebsiteContainer" style="display: none;">
-                                <i class="fas fa-link"></i>
-                                <a href="#" id="profileWebsite" target="_blank"></a>
-                            </div>
-                            <div class="profile-meta-item">
-                                <i class="fas fa-calendar-alt"></i>
-                                <span id="profileJoinDate">読み込み中...</span>
-                            </div>
-                        </div>
-                        
-                        <!-- フォロー統計 -->
-                        <div class="profile-follow-stats">
-                            <div class="follow-stat-item">
-                                <span class="follow-count" id="followingCount">--</span>
-                                <span class="follow-label">フォロー中</span>
-                            </div>
-                            <div class="follow-stat-item">
-                                <span class="follow-count" id="followerCount">--</span>
-                                <span class="follow-label">フォロワー</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 実績カード -->
-                <div class="card stats-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-chart-line"></i> 実績</h2>
-                    </div>
-                    <div class="stats-rows">
-                        <div class="stat-row">
-                            <div class="stat-icon"><i class="fas fa-microphone"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-number" id="voiceCount">43</span>
-                                <span class="stat-text">音声配信数</span>
-                            </div>
-                        </div>
-                        <div class="stat-row">
-                            <div class="stat-icon"><i class="fas fa-star"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-number" id="reviewCount">24</span>
-                                <span class="stat-text">レビュー数</span>
-                            </div>
-                        </div>
-                        <div class="stat-row">
-                            <div class="stat-icon"><i class="fas fa-fire"></i></div>
-                            <div class="stat-info">
-                                <span class="stat-number" id="reachCount">192</span>
-                                <span class="stat-text">リーチ数</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- フォロー状態カード -->
-                <div class="card follow-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-users"></i> フォロー状態</h2>
-                    </div>
-                    <div class="follow-check-content">
-                        <div class="follow-check-item">
-                            <img id="creatorAvatar" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIGF0dHJpYnV0ZVR5cGU9IlhNTCIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDIwMCAyMDAiIHRvPSIzNjAgMjAwIDIwMCIgZHVyPSIxcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48L2RlZnM+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIxODAiIGZpbGw9IiNmNWY1ZjUiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMDAiIHI9IjEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjI0IiBzdHJva2UtZGFzaGFycmF5PSIxNTAgNjAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIGZyb209IjAgMjAwIDIwMCIgdG89IjM2MCAyMDAgMjAwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvY2lyY2xlPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7oqq3jgb/ovrzjgb/kuK3li6QuLi48L3RleHQ+PC9zdmc+" alt="読み込み中" loading="lazy">
-                            <div class="follow-check-info">
-                                <h4>読み込み中...</h4>
-                                <p>@...</p>
-                            </div>
-                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
-                        </div>
-                        <div class="follow-check-item">
-                            <img id="idolAvatar" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48YW5pbWF0ZVRyYW5zZm9ybSBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iIGF0dHJpYnV0ZVR5cGU9IlhNTCIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDIwMCAyMDAiIHRvPSIzNjAgMjAwIDIwMCIgZHVyPSIxcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48L2RlZnM+PGNpcmNsZSBjeD0iMjAwIiBjeT0iMjAwIiByPSIxODAiIGZpbGw9IiNmNWY1ZjUiLz48Y2lyY2xlIGN4PSIyMDAiIGN5PSIyMDAiIHI9IjEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjY2NjY2NjIiBzdHJva2Utd2lkdGg9IjI0IiBzdHJva2UtZGFzaGFycmF5PSIxNTAgNjAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgYXR0cmlidXRlVHlwZT0iWE1MIiB0eXBlPSJyb3RhdGUiIGZyb209IjAgMjAwIDIwMCIgdG89IjM2MCAyMDAgMjAwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIvPjwvY2lyY2xlPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMzAiIGZpbGw9IiM5OTk5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj7oqq3jgb/ovrzjgb/kuK3li6QuLi48L3RleHQ+PC9zdmc+" alt="読み込み中" loading="lazy">
-                            <div class="follow-check-info">
-                                <h4>読み込み中...</h4>
-                                <p>@...</p>
-                            </div>
-                            <span class="badge badge-success"><i class="fas fa-check"></i> フォロー中</span>
                         </div>
                     </div>
                 </div>
@@ -1580,11 +1549,6 @@
             <!-- あなたの感謝のメッセージタブ -->
             <div class="tab-content" id="my-thanks-tab">
                 <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-paper-plane"></i> あなたの感謝のメッセージ</h1>
-                        <p class="page-subtitle">声優さんへの感謝を投稿しよう</p>
-                    </div>
-
                     <!-- 感謝のメッセージ投稿フォーム -->
                     <div class="card thanks-form-card">
                         <div class="card-header">
@@ -1678,14 +1642,124 @@
             </div>
             <!-- あなたの感謝タブ終了 -->
 
-            <!-- みんなの感謝のメッセージタブ -->
-            <div class="tab-content" id="all-thanks-tab">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-heart"></i> みんなの感謝のメッセージ</h1>
-                        <p class="page-subtitle">サービスを利用した方からの温かいメッセージ</p>
+            <!-- 感謝タブ（統合版） -->
+            <div class="tab-content" id="thanks-tab" style="display: none;">
+                <div class="thanks-container">
+                    <!-- サブタブナビゲーション -->
+                    <div class="thanks-sub-tabs">
+                        <button class="thanks-sub-tab active" data-thanks-type="received" onclick="switchThanksTab('received')">
+                            <i class="fas fa-heart"></i>
+                            <span>感謝された投稿</span>
+                        </button>
+                        <button class="thanks-sub-tab" data-thanks-type="given" onclick="switchThanksTab('given')">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>感謝した投稿</span>
+                        </button>
                     </div>
 
+                    <!-- 感謝された投稿コンテンツ -->
+                    <div class="thanks-sub-content active" id="thanks-received">
+                        <div class="thanks-messages-section">
+                            <div class="thanks-messages-list" id="receivedThanksMessages">
+                                <!-- メッセージカード1 -->
+                                <div class="thanks-message-card">
+                                    <div class="message-user-info">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
+                                        <div class="message-user-details">
+                                            <h4>配信者Aさん</h4>
+                                            <p class="message-handle">@streamer_a</p>
+                                            <p class="message-followers"><i class="fas fa-users"></i> 1,234 フォロワー</p>
+                                        </div>
+                                        <span class="message-date">2025年5月10日</span>
+                                    </div>
+                                    <div class="message-content">
+                                        <p>素敵なボイスありがとうございました！<br>台本のよさを3倍にも4倍にもしてくれたね！</p>
+                                    </div>
+                                </div>
+
+                                <!-- メッセージカード2 -->
+                                <div class="thanks-message-card">
+                                    <div class="message-user-info">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
+                                        <div class="message-user-details">
+                                            <h4>VTuber Bさん</h4>
+                                            <p class="message-handle">@vtuber_b</p>
+                                            <p class="message-followers"><i class="fas fa-users"></i> 5,678 フォロワー</p>
+                                        </div>
+                                        <span class="message-date">2025年5月8日</span>
+                                    </div>
+                                    <div class="message-content">
+                                        <p>アイドルはステージを創るクリエイターさんでもあると思うので応援してます。</p>
+                                    </div>
+                                </div>
+
+                                <!-- メッセージカード3 -->
+                                <div class="thanks-message-card">
+                                    <div class="message-user-info">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
+                                        <div class="message-user-details">
+                                            <h4>企業Cさん</h4>
+                                            <p class="message-handle">@company_c</p>
+                                            <p class="message-followers"><i class="fas fa-users"></i> 10,234 フォロワー</p>
+                                        </div>
+                                        <span class="message-date">2025年5月5日</span>
+                                    </div>
+                                    <div class="message-content">
+                                        <p>プロフェッショナルな対応と高品質な音声で、クライアントからも高評価をいただきました。また依頼させていただきます！</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 感謝した投稿コンテンツ -->
+                    <div class="thanks-sub-content" id="thanks-given" style="display: none;">
+                        <!-- 感謝メッセージ投稿フォーム -->
+                        <div class="thanks-form-section">
+                            <h2 class="section-title"><i class="fas fa-heart"></i> 感謝のメッセージを投稿</h2>
+                            <div class="thanks-form-card">
+                                <!-- 声優選択 -->
+                                <div class="form-group">
+                                    <label for="thanksVoiceActor">声優を選択 <span class="required">*</span></label>
+                                    <select id="thanksVoiceActor" onchange="updateThanksPreview()">
+                                        <option value="">選択してください</option>
+                                        <option value="@streamerfunch">君斗りんく@クリエイター応援</option>
+                                        <option value="@idolfunch">君斗りんく@アイドル応援</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- メッセージ入力 -->
+                                <div class="form-group">
+                                    <label for="thanksMessageGiven">感謝のメッセージ <span class="required">*</span></label>
+                                    <textarea id="thanksMessageGiven" rows="6" placeholder="素敵なボイスありがとうございました！&#10;台本のよさを3倍にも4倍にもしてくれたね！" oninput="updateThanksPreview()"></textarea>
+                                    <p class="form-hint">自動的に #KimitoLinkVoice と声優名のメンションが付与されます</p>
+                                </div>
+                                
+                                <button class="btn-submit-thanks" onclick="submitGivenThanks()">
+                                    <i class="fas fa-paper-plane"></i> 投稿する
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 投稿したメッセージ一覧 -->
+                        <div class="thanks-messages-section">
+                            <h2 class="section-title"><i class="fas fa-list"></i> 投稿済みのメッセージ</h2>
+                            <div class="thanks-messages-list" id="givenThanksMessages">
+                                <!-- 自分が投稿したメッセージがここに表示されます -->
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>まだ感謝のメッセージを投稿していません</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 感謝タブ終了 -->
+
+            <!-- みんなの感謝のメッセージタブ（旧版・非表示） -->
+            <div class="tab-content" id="all-thanks-tab" style="display: none;">
+                <div class="container">
                     <!-- メッセージ一覧 -->
                     <div class="thanks-messages-section">
                         <div class="thanks-messages-list" id="allThanksMessages">
@@ -1917,37 +1991,6 @@
             </div>
             <!-- 依頼履歴タブ終了 -->
 
-            <!-- 声優ダッシュボード（声優モード） -->
-            <div class="tab-content" id="narrator-overview-tab" style="display: none;">
-                <div class="container">
-                    <div class="page-header">
-                        <h1><i class="fas fa-chart-line"></i> 声優ダッシュボード</h1>
-                        <p class="page-subtitle">あなたの声優活動の概要</p>
-                    </div>
-
-                    <div class="dashboard-grid">
-                        <!-- 統計カード -->
-                        <div class="card stats-card">
-                            <h3><i class="fas fa-inbox"></i> 受注案件</h3>
-                            <p class="stats-number">0件</p>
-                            <p class="stats-label">進行中の案件</p>
-                        </div>
-
-                        <div class="card stats-card">
-                            <h3><i class="fas fa-check-circle"></i> 完了案件</h3>
-                            <p class="stats-number">0件</p>
-                            <p class="stats-label">累計納品数</p>
-                        </div>
-
-                        <div class="card stats-card">
-                            <h3><i class="fas fa-yen-sign"></i> 収益</h3>
-                            <p class="stats-number">¥0</p>
-                            <p class="stats-label">今月の収益</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- 受注案件タブ（声優モード） -->
             <div class="tab-content" id="orders-tab" style="display: none;">
                 <div class="container">
@@ -2126,6 +2169,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=63.0"></script>
+    <script src="js/script.js?v=81.0"></script>
 </body>
 </html>
