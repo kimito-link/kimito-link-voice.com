@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=51.0">
+    <link rel="stylesheet" href="css/styles.css?v=65.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
     <link rel="manifest" href="manifest.json">
     
@@ -651,18 +651,87 @@
                 </div>
             </div>
 
-            <!-- 別アカウントログインの案内 -->
-            <div class="login-info-box">
-                <div class="info-icon">💡</div>
+            <!-- アカウント認証の説明 -->
+            <div class="login-info-box" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFE8D6 100%); border: 2px solid #FFB84D;">
+                <div class="info-icon" style="font-size: 24px;">⚠️</div>
                 <div class="info-content">
-                    <p class="info-title">別のXアカウントでログインしたい場合</p>
-                    <p class="info-text">現在、KimiLink Voiceはあなたのアカウントにアクセスできるようになっています。アプリへのアクセス許可は<a href="https://x.com/settings/connected_apps" target="_blank" rel="noopener noreferrer">アプリとセッション</a>からいつでも取り消すことができます。</p>
-                    <div class="info-links">
-                        <a href="https://x.com/home" target="_blank" rel="noopener noreferrer" class="link-x">
-                            <i class="fab fa-x-twitter"></i> Xに移動
-                        </a>
+                    <p class="info-title" style="color: #E65100; font-size: 16px; font-weight: 700;">⚡ 重要：認証されるアカウントについて</p>
+                    <p class="info-text" style="font-size: 14px; line-height: 1.7; margin-top: 10px;">
+                        <strong style="color: #D84315;">X.comで現在ログイン中のアカウント</strong>、または<strong style="color: #D84315;">最後に認証したアカウント</strong>で自動的に認証されます。
+                    </p>
+                    <div style="background: white; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #FF9800;">
+                        <p style="margin: 0; font-size: 13px; color: #333; line-height: 1.6;">
+                            <strong style="color: #F57C00;">🔄 違うアカウントで認証したい場合：</strong><br>
+                            1️⃣ まず <a href="https://x.com/logout" style="color: #1DA1F2; text-decoration: underline; font-weight: 600;">X.comからログアウト</a><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;（現在ログイン中のアカウントが表示されます）<br>
+                            2️⃣ ログアウト後、<a href="https://x.com/i/flow/login" style="color: #1DA1F2; text-decoration: underline; font-weight: 600;">こちら</a>から希望するアカウントでログイン<br>
+                            3️⃣ このページに戻って「Xでログイン」をクリック
+                        </p>
+                    </div>
+                    <p class="info-text" style="margin-top: 10px; font-size: 12px; color: #666; font-style: italic;">
+                        ※ これはTwitter OAuth 2.0の仕様です。アプリ側で制御することはできません。
+                    </p>
+                    <div style="margin-top: 12px; padding: 10px; background: #E3F2FD; border-radius: 6px; border-left: 3px solid #2196F3;">
+                        <p style="margin: 0; font-size: 12px; color: #1565C0; line-height: 1.6;">
+                            <strong>🔧 トラブルシューティング：</strong><br>
+                            「このアカウントはすでにログインしています」と表示された場合は、<a href="https://x.com/account/switch" target="_blank" style="color: #1976D2; text-decoration: underline; font-weight: 600;">こちら</a>から全アカウントをログアウトしてください。
+                        </p>
                     </div>
                 </div>
+            </div>
+
+            <!-- 複数アカウント使用時の案内 -->
+            <div style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); padding: 16px; border-radius: 10px; margin: 20px 0; border: 2px solid #42A5F5;">
+                <p style="margin: 0 0 12px 0; font-size: 15px; color: #0D47A1; font-weight: 700;">
+                    <i class="fas fa-info-circle"></i> 複数アカウントを使い分けたい場合
+                </p>
+                <div style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #1976D2;">
+                    <p style="margin: 0 0 16px 0; font-size: 14px; color: #1565C0; font-weight: 600;">
+                        📌 最も簡単な方法（3ステップ）
+                    </p>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <p style="margin: 0 0 8px 0; font-size: 13px; color: #333; font-weight: 600;">
+                            <strong>1.</strong> X.comからログアウト
+                        </p>
+                        <a href="https://x.com/logout" style="background: #1976D2; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-block; font-size: 13px; font-weight: 600;">
+                            <i class="fab fa-x-twitter"></i> X.comからログアウト
+                        </a>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <p style="margin: 0 0 8px 0; font-size: 13px; color: #333; font-weight: 600;">
+                            <strong>2.</strong> 使いたいアカウントでログイン
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: #666;">
+                            X.comで使いたいアカウントでログインします。<br>
+                            <strong style="color: #E65100;">※ ログイン後はX.comのホーム画面に移動します</strong>
+                        </p>
+                    </div>
+
+                    <div style="background: #E8F5E9; padding: 12px; border-radius: 6px; border-left: 3px solid #4CAF50;">
+                        <p style="margin: 0 0 8px 0; font-size: 13px; color: #1B5E20; font-weight: 600;">
+                            <strong>3.</strong> ブラウザの「戻る」ボタンでこのページに戻る
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: #2E7D32;">
+                            または、このタブに切り替えて「Xでログイン」ボタンをクリック
+                        </p>
+                    </div>
+                </div>
+                <details style="margin-top: 12px;">
+                    <summary style="cursor: pointer; color: #1976D2; font-size: 13px; font-weight: 600; padding: 8px 0;">
+                        <i class="fas fa-chevron-down"></i> その他の方法（上級者向け）
+                    </summary>
+                    <div style="background: #F5F5F5; padding: 12px; border-radius: 6px; margin-top: 8px;">
+                        <p style="margin: 0; font-size: 12px; color: #666; line-height: 1.6;">
+                            • <strong>シークレットモード:</strong> Ctrl+Shift+N で別のアカウントを使用<br>
+                            • <strong>ブラウザプロファイル:</strong> Chrome/Edgeの機能で完全に分離
+                        </p>
+                        <button onclick="showMultiAccountGuide()" style="background: #1976D2; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; width: 100%; margin-top: 10px;">
+                            <i class="fas fa-book-open"></i> 詳しく見る
+                        </button>
+                    </div>
+                </details>
             </div>
 
             <button type="button" class="btn-twitter" onclick="loginWithTwitter(event)">
@@ -719,6 +788,17 @@
             <h2><i class="fas fa-sync-alt"></i> アカウント切り替え</h2>
             <p class="subtitle">別のXアカウントに切り替える方法</p>
             
+            <!-- 重要な警告 -->
+            <div style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); padding: 16px; border-radius: 10px; margin: 20px 0; border: 2px solid #FFB74D;">
+                <p style="margin: 0 0 10px 0; font-size: 15px; color: #E65100; font-weight: 700;">
+                    <i class="fas fa-exclamation-triangle" style="color: #FF9800;"></i> 重要な注意事項
+                </p>
+                <p style="margin: 0; font-size: 13px; color: #D84315; line-height: 1.7;">
+                    Twitter OAuth 2.0の仕様により、<strong>最後に認証したアカウント</strong>が優先表示されます。<br>
+                    違うアカウントで認証するには、必ず<strong>X.comからログアウト</strong>してください。
+                </p>
+            </div>
+            
             <div class="current-account-info">
                 <h3>現在ログイン中のアカウント</h3>
                 <div class="account-display">
@@ -751,14 +831,16 @@
                     <div class="step-icon">2</div>
                     <div class="step-text">
                         <strong>X.comからログアウト</strong>
-                        <p>X.comで現在のアカウントからログアウトします</p>
+                        <p>X.comで現在のアカウントからログアウトします<br>
+                        <span style="font-size: 12px; color: #666;">※ ログアウトページには「現在ログイン中のアカウント」が表示されます</span></p>
                     </div>
                 </div>
                 <div class="step-item">
                     <div class="step-icon">3</div>
                     <div class="step-text">
                         <strong>別のアカウントでログイン</strong>
-                        <p>KimiLink Voiceに戻り、別のアカウントでログインします</p>
+                        <p>X.comで別のアカウントでログインします<br>
+                        <a href="https://x.com/i/flow/login" style="color: #1DA1F2; font-size: 13px; text-decoration: underline;">ログイン画面を開く →</a></p>
                     </div>
                 </div>
             </div>
@@ -779,11 +861,17 @@
         <div class="modal-content modal-content-wide">
             <button class="modal-close" onclick="hideMultiAccountGuide()">×</button>
             
-            <h2><i class="fas fa-users"></i> 複数アカウントを同時に利用する</h2>
-            <p class="subtitle">ブラウザの機能を使って、複数のアカウントを同時に使用できます</p>
+            <h2><i class="fas fa-users"></i> 複数アカウントを使い分ける方法</h2>
+            <p class="subtitle">あなたのレベルに合った方法を選んでください。スマホでもPCでも使えます</p>
             
             <div class="guide-tabs">
-                <button class="guide-tab active" onclick="showGuideTab('chrome')">
+                <button class="guide-tab active" onclick="showGuideTab('basic')">
+                    <i class="fas fa-hand-pointer"></i> 基本的な方法
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('incognito')">
+                    <i class="fas fa-user-secret"></i> シークレット
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('chrome')">
                     <i class="fab fa-chrome"></i> Chrome
                 </button>
                 <button class="guide-tab" onclick="showGuideTab('firefox')">
@@ -797,8 +885,142 @@
                 </button>
             </div>
 
+            <!-- 基本的な方法 -->
+            <div class="guide-content" id="guideBasic">
+                <h3><i class="fas fa-check-circle" style="color: #4CAF50;"></i> 基本的な方法（誰でも簡単！）</h3>
+                <div style="background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2196F3;">
+                    <p style="margin: 0; font-size: 14px; color: #0D47A1; line-height: 1.7;">
+                        <strong style="font-size: 16px;">💡 この方法が最も確実：</strong><br>
+                        • 特別な知識は不要<br>
+                        • スマホでもPCでも使える<br>
+                        • たった3ステップで完了
+                    </p>
+                </div>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>X.comからログアウトする</strong>
+                            <p>以下のボタンをクリックして、X.comからログアウトします</p>
+                            <div style="margin-top: 12px;">
+                                <a href="https://x.com/logout" style="background: #1976D2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 14px; font-weight: 600;">
+                                    <i class="fab fa-x-twitter"></i> X.comからログアウト
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>使いたいアカウントでログインする</strong>
+                            <p>ログアウト後、以下のボタンからX.comログイン画面を開き、使いたいアカウントでログインします</p>
+                            <div style="margin-top: 12px;">
+                                <a href="https://x.com/i/flow/login" style="background: #1DA1F2; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-size: 14px; font-weight: 600;">
+                                    <i class="fab fa-x-twitter"></i> X.comログイン画面を開く
+                                </a>
+                            </div>
+                            <div style="background: #FFF9E6; padding: 10px; border-radius: 6px; margin-top: 12px; border-left: 3px solid #FFB84D;">
+                                <p style="margin: 0; font-size: 12px; color: #E65100;">
+                                    <strong>⚠️ 注意：</strong> 「このアカウントはすでにログインしています」と表示された場合は、<a href="https://x.com/account/switch" target="_blank" style="color: #1976D2; text-decoration: underline;">こちら</a>から全アカウントをログアウトしてください
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>KimiLink Voiceに戻ってログイン</strong>
+                            <p>X.comでログインが完了すると、<strong>X.comのホーム画面に移動します。</strong></p>
+                            <div style="background: #E8F5E9; padding: 14px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #4CAF50;">
+                                <p style="margin: 0 0 10px 0; font-size: 13px; color: #1B5E20; font-weight: 600;">
+                                    📌 このページに戻る方法：
+                                </p>
+                                <p style="margin: 0; font-size: 13px; color: #2E7D32; line-height: 1.7;">
+                                    • <strong>ブラウザの「戻る」ボタン</strong>を押す<br>
+                                    • または、<strong>このタブに切り替える</strong><br>
+                                    • そして「Xでログイン」ボタンをクリック
+                                </p>
+                            </div>
+                            <p style="margin-top: 12px; font-size: 13px; color: #2E7D32;">これで希望のアカウントで認証されます！</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li><strong style="color: #4CAF50;">最も確実な方法：</strong> 特別な知識やツールは一切不要です</li>
+                        <li>スマホでもPCでも同じ手順で使えます</li>
+                        <li>頻繁に切り替える場合は、「シークレットモード」や「ブラウザプロファイル」が便利です（次のタブ参照）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- シークレットモード -->
+            <div class="guide-content" id="guideIncognito" style="display: none;">
+                <h3><i class="fas fa-graduation-cap" style="color: #FF9800;"></i> シークレットモード（PCに詳しい方向け）</h3>
+                <div style="background: linear-gradient(135deg, #FFF9E6 0%, #FFE8D6 100%); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF9800;">
+                    <p style="margin: 0; font-size: 14px; color: #E65100; line-height: 1.7;">
+                        <strong style="font-size: 16px;">💡 上級者向けのメリット：</strong><br>
+                        • ログアウト不要で即座に切り替え<br>
+                        • ショートカットキーで素早く操作<br>
+                        • 通常モードとシークレットモードで2つのアカウントを同時使用
+                    </p>
+                </div>
+                <div style="background: #FFF3E0; padding: 12px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #FFB74D;">
+                    <p style="margin: 0; font-size: 13px; color: #E65100; line-height: 1.6;">
+                        <strong>⚠️ 注意：</strong> この方法は「シークレットモード」の概念を理解している方向けです。初めての方は「基本的な方法」タブをご覧ください。
+                    </p>
+                </div>
+                <div class="guide-steps">
+                    <div class="guide-step">
+                        <div class="guide-step-number">1</div>
+                        <div class="guide-step-text">
+                            <strong>通常モードで1つ目のアカウントにログイン</strong>
+                            <p>いつも通りKimiLink Voiceにアクセスして、1つ目のアカウントでログイン</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">2</div>
+                        <div class="guide-step-text">
+                            <strong>シークレットモードを開く</strong>
+                            <div style="background: #F5F5F5; padding: 12px; border-radius: 6px; margin-top: 8px;">
+                                <p style="margin: 0; font-size: 13px; color: #333;">
+                                    <strong>ショートカットキー：</strong><br>
+                                    • <strong>Chrome / Edge:</strong> Ctrl + Shift + N<br>
+                                    • <strong>Firefox:</strong> Ctrl + Shift + P<br>
+                                    • <strong>Safari:</strong> Cmd + Shift + N
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">3</div>
+                        <div class="guide-step-text">
+                            <strong>シークレットモードで2つ目のアカウントにログイン</strong>
+                            <p>シークレットウィンドウで KimiLink Voice にアクセスし、2つ目のアカウントでログイン</p>
+                        </div>
+                    </div>
+                    <div class="guide-step">
+                        <div class="guide-step-number">4</div>
+                        <div class="guide-step-text">
+                            <strong>完了！両方のアカウントを同時に使用</strong>
+                            <p>通常ウィンドウとシークレットウィンドウを切り替えるだけで、即座にアカウントを切り替えられます</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="guide-tips">
+                    <h4><i class="fas fa-lightbulb"></i> ヒント</h4>
+                    <ul>
+                        <li><strong style="color: #4CAF50;">最大のメリット：</strong> ログアウト不要！ウィンドウを切り替えるだけ</li>
+                        <li>シークレットモードを閉じると、そのセッションは終了します</li>
+                        <li>3つ以上のアカウントを使う場合は、ブラウザプロファイル機能を利用してください</li>
+                        <li>シークレットモードのショートカットキーを覚えておくと便利です</li>
+                    </ul>
+                </div>
+            </div>
+
             <!-- Chrome -->
-            <div class="guide-content" id="guideChrome">
+            <div class="guide-content" id="guideChrome" style="display: none;">
                 <h3>Chrome プロフィール機能</h3>
                 <div class="guide-steps">
                     <div class="guide-step">
@@ -1003,11 +1225,20 @@
 
                         <div class="dropdown-divider"></div>
 
+                        <!-- 警告メッセージ -->
+                        <div style="padding: 12px; background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); border-radius: 8px; margin: 0 8px 8px 8px; border: 1px solid #FFB74D;">
+                            <p style="margin: 0; font-size: 11px; color: #E65100; line-height: 1.5;">
+                                <i class="fas fa-info-circle" style="color: #FF9800;"></i>
+                                <strong>アカウント切り替えについて：</strong><br>
+                                X.comでログアウト→再ログインが必要です
+                            </p>
+                        </div>
+
                         <!-- アクション -->
                         <div class="dropdown-actions">
-                            <button class="dropdown-item" onclick="showSwitchAccountModal()">
-                                <i class="fas fa-sync-alt"></i>
-                                <span>アカウントを切り替え</span>
+                            <button class="dropdown-item" onclick="showSwitchAccountModal()" style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); font-weight: 600;">
+                                <i class="fas fa-sync-alt" style="color: #FF9800;"></i>
+                                <span style="color: #E65100;">アカウントを切り替え</span>
                             </button>
                             <button class="dropdown-item" onclick="showMultiAccountGuide()">
                                 <i class="fas fa-users"></i>
@@ -1665,6 +1896,6 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=36.0"></script>
+    <script src="js/script.js?v=48.0"></script>
 </body>
 </html>

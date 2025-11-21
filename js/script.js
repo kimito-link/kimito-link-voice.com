@@ -1415,13 +1415,13 @@ async function loadRequiredAccountsAvatars() {
             console.log('🔍 creatorAvatar要素:', creatorAvatar);
             
             if (creatorAvatar && userData.profile_image_url) {
-                // 高解像度版を試す（存在しない場合はフォールバック）
-                const imageUrl = userData.profile_image_url.replace('_normal', '_400x400');
+                // 高解像度画像を使用（_200x200 = 200x200）でピンボケ防止
+                const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
                 console.log('✅ クリエイター画像を更新:', imageUrl);
                 
                 // 画像の読み込みエラーハンドリング
                 creatorAvatar.onerror = function() {
-                    console.warn('⚠️ 400x400が存在しないため、元のURLを使用');
+                    console.warn('⚠️ _200x200が存在しないため、元のURLを使用');
                     this.onerror = null; // 無限ループ防止
                     this.src = userData.profile_image_url;
                 };
@@ -1463,13 +1463,13 @@ async function loadRequiredAccountsAvatars() {
             console.log('🔍 idolAvatar要素:', idolAvatar);
             
             if (idolAvatar && userData.profile_image_url) {
-                // 高解像度版を試す（存在しない場合はフォールバック）
-                const imageUrl = userData.profile_image_url.replace('_normal', '_400x400');
+                // 高解像度画像を使用（_200x200 = 200x200）でピンボケ防止
+                const imageUrl = userData.profile_image_url.replace('_normal', '_200x200');
                 console.log('✅ アイドル画像を更新:', imageUrl);
                 
                 // 画像の読み込みエラーハンドリング
                 idolAvatar.onerror = function() {
-                    console.warn('⚠️ 400x400が存在しないため、元のURLを使用');
+                    console.warn('⚠️ _200x200が存在しないため、元のURLを使用');
                     this.onerror = null; // 無限ループ防止
                     this.src = userData.profile_image_url;
                 };
@@ -2854,10 +2854,10 @@ async function loadUserProfileFromTwitter() {
         // アバター画像を設定（高解像度版）
         const profileAvatar = document.getElementById('profileAvatar');
         if (profileAvatar) {
-            // _normal を _400x400 に置き換えて高解像度画像を取得
+            // _normal を _200x200 に置き換えて高解像度画像を取得（60px表示なのでフォロー状態と同じ）
             let avatarUrl = userData.profile_image_url || currentUser.avatar || '';
             if (avatarUrl.includes('_normal')) {
-                avatarUrl = avatarUrl.replace('_normal', '_400x400');
+                avatarUrl = avatarUrl.replace('_normal', '_200x200');
             }
             profileAvatar.src = avatarUrl;
             console.log('📸 アバター画像URL:', avatarUrl);

@@ -668,19 +668,76 @@
 
         <!-- 別のアカウントでログインする場合の案内 -->
         <div class="account-switch-notice" id="switchAccountGuide" style="display: none;">
-            <p>
-                <i class="fas fa-info-circle"></i>
-                <strong>別のアカウントでログインしたい場合</strong>
+            <p style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 22px; color: #FF9800;"></i>
+                <strong style="font-size: 17px; color: #E65100;">認証アカウントを切り替える方法</strong>
             </p>
-            <p style="font-size: 14px; color: #666; margin: 10px 0;">
-                現在X.comにログイン中の場合、自動的にそのアカウントで認証されます。<br>
-                別のアカウントでログインするには、先にX.comからログアウトしてください。
-            </p>
-            <a href="https://x.com/logout" class="btn-logout-x">
-                <i class="fab fa-x-twitter"></i>
-                X.comからログアウトする
-            </a>
+            <div style="background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%); padding: 18px; border-radius: 10px; margin: 16px 0; border: 2px solid #FFB74D;">
+                <p style="font-size: 14px; color: #D84315; margin: 0 0 14px 0; font-weight: 600;">
+                    ⚠️ 重要：表示されたアカウントと異なるアカウントで認証したい場合
+                </p>
+                <div style="background: white; padding: 16px; border-radius: 8px; margin: 12px 0; text-align: left; border-left: 4px solid #FF9800;">
+                    <p style="font-size: 13px; color: #333; margin: 0 0 12px 0; line-height: 1.8;">
+                        <strong style="color: #F57C00; font-size: 14px;">📝 3ステップで切り替え：</strong>
+                    </p>
+                    <div style="margin-bottom: 20px;">
+                        <p style="font-size: 14px; color: #333; margin: 0 0 12px 0; font-weight: 600;">
+                            <strong>1️⃣</strong> X.comからログアウトする
+                        </p>
+                        <p style="font-size: 12px; color: #666; margin: 0 0 10px 0; padding-left: 20px;">
+                            ※ X.comで現在ログイン中のアカウントが表示されます
+                        </p>
+                        <a href="https://x.com/logout" class="btn-logout-x" style="font-size: 15px; padding: 14px 28px; display: inline-block;">
+                            <i class="fab fa-x-twitter"></i>
+                            X.comからログアウトする
+                        </a>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <p style="font-size: 14px; color: #333; margin: 0 0 12px 0; font-weight: 600;">
+                            <strong>2️⃣</strong> ログインしたいアカウントでログイン
+                        </p>
+                        <p style="font-size: 12px; color: #666; margin: 0 0 10px 0; padding-left: 20px;">
+                            ※ X.comでログインします。<strong style="color: #E65100;">ログイン後は自動的にX.comのホーム画面に移動します。</strong>
+                        </p>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); padding: 16px; border-radius: 8px; margin-bottom: 20px; border: 2px solid #66BB6A;">
+                        <p style="font-size: 14px; color: #1B5E20; margin: 0 0 12px 0; font-weight: 700;">
+                            <strong>3️⃣</strong> このページに戻ってログイン
+                        </p>
+                        <p style="font-size: 13px; color: #2E7D32; margin: 0 0 12px 0; line-height: 1.7;">
+                            X.comでログインが完了したら、<strong>ブラウザの「戻る」ボタン</strong>または<strong>このタブに切り替えて</strong>、下のボタンをクリックしてください。
+                        </p>
+                        <button onclick="window.location.href='/'" style="background: #4CAF50; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;">
+                            <i class="fas fa-arrow-left"></i>
+                            KimiLink Voiceに戻ってログイン
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div style="font-size: 12px; color: #666; margin-top: 14px; padding: 12px; background: #F5F5F5; border-radius: 6px; border-left: 3px solid #4A90E2;">
+                <p style="margin: 0 0 8px 0;"><strong>💡 ヒント：</strong></p>
+                <p style="margin: 0 0 8px 0;">• ログアウトページでは<strong>現在ログイン中のアカウント</strong>が表示されます</p>
+                <p style="margin: 0 0 8px 0;">• 「このアカウントはすでにログインしています」と表示された場合は、<a href="https://x.com/account/switch" target="_blank" style="color: #1DA1F2; text-decoration: underline;">こちら</a>から全アカウントをログアウト</p>
+                <p style="margin: 0;">• ログアウト後、希望するアカウントでログインしてください</p>
+            </div>
         </div>
+
+        <!-- 参考：上級者向けの方法 -->
+        <details style="margin: 24px 0;">
+            <summary style="cursor: pointer; color: #1976D2; font-size: 15px; font-weight: 600; padding: 12px; background: #E3F2FD; border-radius: 8px; border: 1px solid #90CAF9;">
+                <i class="fas fa-graduation-cap"></i> 参考：ログアウト不要の方法（上級者向け）
+            </summary>
+            <div style="background: #F5F5F5; padding: 16px; border-radius: 8px; margin-top: 12px;">
+                <p style="margin: 0 0 12px 0; font-size: 14px; color: #1565C0; font-weight: 600;">
+                    💡 PCに詳しい方向け：シークレットモード
+                </p>
+                <p style="margin: 0; font-size: 13px; color: #424242; line-height: 1.7;">
+                    <strong>Ctrl + Shift + N</strong> (Chrome/Edge) または <strong>Ctrl + Shift + P</strong> (Firefox) でシークレットウィンドウを開き、別のアカウントでログインすると、ログアウト不要で切り替えられます。
+                </p>
+            </div>
+        </details>
 
         <div class="cancelled-links">
             <a href="https://x.com/" target="_blank">

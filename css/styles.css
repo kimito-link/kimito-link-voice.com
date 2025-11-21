@@ -1272,10 +1272,6 @@ body {
     border-radius: 50%;
     border: 2px solid var(--primary-blue);
     object-fit: cover;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    backface-visibility: hidden;
-    transform: translateZ(0);
 }
 
 .account-info {
@@ -2460,11 +2456,11 @@ body {
 
 /* 大きなアバター */
 .profile-avatar-large {
-    width: 140px;
-    height: 140px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    border: 5px solid var(--card-bg);
-    margin-top: -70px;
+    border: 3px solid var(--card-bg);
+    margin-top: -30px;
     object-fit: cover;
     background: var(--card-bg);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -2728,6 +2724,7 @@ body {
     border: 3px solid var(--primary-blue);
     box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
     object-fit: cover;
+    object-position: center;
 }
 
 .follow-check-info {
@@ -4198,10 +4195,10 @@ body {
     }
     
     .profile-avatar-large {
-        width: 100px;
-        height: 100px;
-        margin-top: -50px;
-        border-width: 4px;
+        width: 60px;
+        height: 60px;
+        margin-top: -30px;
+        border-width: 3px;
     }
     
     .profile-names h2 {
