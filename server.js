@@ -385,55 +385,61 @@ app.post('/auth/logout', (req, res) => {
 app.get('/api/user/profile/:username', async (req, res) => {
     try {
         const { username } = req.params;
+        const forceFresh = req.query.force === 'true'; // クエリパラメータでキャッシュスキップ
         const bearerToken = process.env.TWITTER_BEARER_TOKEN;
+        const cacheKey = `profile_${username}`; // スコープを広げるため最初に定義
 
         if (!bearerToken) {
             console.error('❌ Bearer Token が設定されていません');
             return res.status(500).json({ error: 'Twitter Bearer Token が設定されていません' });
         }
 
-        // サーバー側メモリキャッシュをチェック（7日間有効・最速）
-        const cacheKey = `profile_${username}`;
-        const cached = accountProfileCache.get(cacheKey);
-        if (cached && Date.now() - cached.timestamp < ACCOUNT_CACHE_DURATION) {
-            if (isDevelopment) console.log(`💾 メモリキャッシュからプロフィール取得: ${username} (残り: ${Math.floor((ACCOUNT_CACHE_DURATION - (Date.now() - cached.timestamp)) / 1000 / 60 / 60)}時間)`);
-            return res.json(cached.data);
-        }
-
-        // Supabaseからチェック（永続的・サーバー再起動後も有効）
-        try {
-            const { data: dbProfile, error: dbError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('twitter_username', username)
-                .single();
-            
-            if (dbProfile && !dbError) {
-                // Supabaseから取得できた場合
-                const profileData = {
-                    id: dbProfile.twitter_id,
-                    username: dbProfile.twitter_username,
-                    name: dbProfile.display_name,
-                    profile_image_url: dbProfile.avatar_url,
-                    description: dbProfile.bio || '', // プロフィール文章を追加
-                    public_metrics: {
-                        followers_count: dbProfile.followers || 0,
-                        following_count: dbProfile.following || 0
-                    }
-                };
-                
-                // メモリキャッシュにも保存
-                accountProfileCache.set(cacheKey, {
-                    timestamp: Date.now(),
-                    data: profileData
-                });
-                
-                if (isDevelopment) console.log(`💾 Supabaseからプロフィール取得: ${username}`);
-                return res.json(profileData);
+        // forceFreshが指定されていない場合のみキャッシュをチェック
+        if (!forceFresh) {
+            // サーバー側メモリキャッシュをチェック（7日間有効・最速）
+            const cached = accountProfileCache.get(cacheKey);
+            if (cached && Date.now() - cached.timestamp < ACCOUNT_CACHE_DURATION) {
+                if (isDevelopment) console.log(`💾 メモリキャッシュからプロフィール取得: ${username} (残り: ${Math.floor((ACCOUNT_CACHE_DURATION - (Date.now() - cached.timestamp)) / 1000 / 60 / 60)}時間)`);
+                return res.json(cached.data);
             }
-        } catch (dbError) {
-            // データベースエラーの場合はログ出力して続行
-            if (isDevelopment) console.warn('⚠️ Supabase取得エラー:', dbError);
+
+            // Supabaseからチェック（永続的・サーバー再起動後も有効）
+            try {
+                const { data: dbProfile, error: dbError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('twitter_username', username)
+                    .single();
+                
+                if (dbProfile && !dbError) {
+                    // Supabaseから取得できた場合
+                    const profileData = {
+                        id: dbProfile.twitter_id,
+                        username: dbProfile.twitter_username,
+                        name: dbProfile.display_name,
+                        profile_image_url: dbProfile.avatar_url,
+                        description: dbProfile.bio || '', // プロフィール文章を追加
+                        public_metrics: {
+                            followers_count: dbProfile.followers || 0,
+                            following_count: dbProfile.following || 0
+                        }
+                    };
+                    
+                    // メモリキャッシュにも保存
+                    accountProfileCache.set(cacheKey, {
+                        timestamp: Date.now(),
+                        data: profileData
+                    });
+                    
+                    if (isDevelopment) console.log(`💾 Supabaseからプロフィール取得: ${username}`);
+                    return res.json(profileData);
+                }
+            } catch (dbError) {
+                // データベースエラーの場合はログ出力して続行
+                if (isDevelopment) console.warn('⚠️ Supabase取得エラー:', dbError);
+            }
+        } else {
+            if (isDevelopment) console.log('🔄 キャッシュをスキップして最新データを取得:', username);
         }
 
         if (isDevelopment) console.log('📡 Twitter APIからプロフィール取得:', username);
@@ -495,6 +501,25 @@ app.get('/api/user/profile/:username', async (req, res) => {
         res.status(error.response?.status || 500).json({
             error: error.response?.data || { message: error.message }
         });
+    }
+});
+
+// キャッシュクリアエンドポイント（開発用）
+app.post('/api/cache/clear', (req, res) => {
+    const { username } = req.body;
+    
+    if (username) {
+        // 特定のユーザーのキャッシュをクリア
+        const cacheKey = `profile_${username}`;
+        accountProfileCache.delete(cacheKey);
+        console.log(`🗑️ キャッシュをクリア: ${username}`);
+        res.json({ success: true, message: `${username} のキャッシュをクリアしました` });
+    } else {
+        // 全キャッシュをクリア
+        accountProfileCache.clear();
+        followStatusCache.clear();
+        console.log('🗑️ 全キャッシュをクリア');
+        res.json({ success: true, message: '全キャッシュをクリアしました' });
     }
 });
 

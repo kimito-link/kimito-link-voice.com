@@ -1,6 +1,6 @@
 # 🔧 自動修正提案レポート
 
-生成日時: 2025/11/22 6:32:28
+生成日時: 2025/11/22 7:02:10
 
 ---
 
@@ -159,7 +159,7 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
     "success": true
   },
   {
-    "url": "http://localhost:3000/api/user/profile/c0tanpoTesh1ta",
+    "url": "http://localhost:3000/api/user/profile/c0tanpoTesh1ta?force=true",
     "status": 200,
     "method": "GET",
     "success": true

@@ -3385,14 +3385,18 @@ async function loadVoiceActorCard() {
 
 /**
  * コラボメンバーカードの情報を取得して表示
+ * @param {boolean} forceFresh - trueの場合、キャッシュをクリアして最新データを取得
  */
-async function loadCollabMemberCard() {
+async function loadCollabMemberCard(forceFresh = false) {
     const username = 'c0tanpoTesh1ta'; // コタのAI紀行 @c0tanpoTesh1ta（正しいスペル）
     console.log('🤝 コラボメンバー情報取得中...', username);
     
     try {
-        const apiUrl = `/api/user/profile/${username}`;
-        console.log('📡 API呼び出し:', apiUrl);
+        // APIのURLを構築（forceFreshの場合はクエリパラメータを追加）
+        const apiUrl = forceFresh 
+            ? `/api/user/profile/${username}?force=true` 
+            : `/api/user/profile/${username}`;
+        console.log('📡 API呼び出し:', apiUrl, forceFresh ? '(最新データ取得)' : '(キャッシュ優先)');
         const response = await fetch(apiUrl);
         console.log('📡 API応答ステータス:', response.status);
         
@@ -3627,7 +3631,7 @@ window.addEventListener('DOMContentLoaded', function() {
     loadNarratorCard2();      // TOPページ声優カード2 (@idolfunch)
     // 声優カード3はダミーデータのまま
     loadVoiceActorCard();     // 声優プロフィールタブ
-    loadCollabMemberCard();   // コラボメンバー (@c0tanpoTesh1ta)
+    loadCollabMemberCard(true);   // コラボメンバー (@c0tanpoTesh1ta) - 常に最新データを取得
     
     // 依頼フォームの初期化
     initializeRequestForm();
