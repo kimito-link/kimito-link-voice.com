@@ -15,6 +15,7 @@
     "lighthouse": "node lighthouse-auto.js",
     "lighthouse:history": "node lighthouse-history-viewer.js",
     "lighthouse:auto": "node lighthouse-auto-commit.js",
+    "debug": "node auto-debug.js",
     "birthday": "node birthday-shizuku/birthday-automation.js"
   },
   "keywords": [
