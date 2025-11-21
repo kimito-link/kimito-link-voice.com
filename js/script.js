@@ -6,7 +6,7 @@ const DEVELOPMENT_MODE = true; // 一時的にtrue: キャッシュをクリア�
 const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 // 認証をスキップ（開発中のみ）
-const SKIP_AUTHENTICATION = true; // 本番環境では必ずfalse - 開発中は認証をスキップ
+const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse - 認証を必須にする
 
 // ===== Supabase初期化 =====
 const SUPABASE_URL = 'https://ljidnprwxniixrigktss.supabase.co';
@@ -2164,6 +2164,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (welcomeUserName) {
             welcomeUserName.textContent = currentUser.name || currentUser.displayName || 'ユーザーさん';
         }
+        
+        // Xからプロフィール情報を取得
+        loadUserProfileFromTwitter();
     }
 });
 
@@ -2725,6 +2728,186 @@ function createDashboardMessageCard(message, isMyMessage = false) {
     `;
     
     return card;
+}
+
+/**
+ * 感謝のメッセージを編集
+ */
+async function editThanksMessage(messageId) {
+    if (!supabaseClient) {
+        showToast('エラー', 'データベース接続エラー', 'error');
+        return;
+    }
+    
+    try {
+        // メッセージを取得
+        const { data, error } = await supabaseClient
+            .from('thanks_messages')
+            .select('*')
+            .eq('id', messageId)
+            .single();
+        
+        if (error) {
+            console.error('❌ メッセージ取得エラー:', error);
+            showToast('エラー', 'メッセージの取得に失敗しました', 'error');
+            return;
+        }
+        
+        // 編集フォームに内容を設定
+        const messageInput = document.getElementById('thanksMessage');
+        if (messageInput) {
+            messageInput.value = data.message;
+            
+            // あなたの感謝タブに移動
+            const tabButton = document.querySelector('[data-tab="my-thanks"]');
+            if (tabButton) {
+                tabButton.click();
+            }
+            
+            // スクロールしてフォームを表示
+            messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            messageInput.focus();
+            
+            showToast('編集モード', 'メッセージを編集してください', 'info');
+            
+            // 編集中のIDを保存
+            window.editingMessageId = messageId;
+        }
+        
+    } catch (err) {
+        console.error('❌ エラー:', err);
+        showToast('エラー', '予期しないエラーが発生しました', 'error');
+    }
+}
+
+/**
+ * 感謝のメッセージを削除
+ */
+async function deleteThanksMessage(messageId) {
+    if (!supabaseClient) {
+        showToast('エラー', 'データベース接続エラー', 'error');
+        return;
+    }
+    
+    // 確認ダイアログ
+    if (!confirm('このメッセージを削除してもよろしいですか？\n削除すると元に戻せません。')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabaseClient
+            .from('thanks_messages')
+            .delete()
+            .eq('id', messageId);
+        
+        if (error) {
+            console.error('❌ 削除エラー:', error);
+            showToast('エラー', 'メッセージの削除に失敗しました', 'error');
+            return;
+        }
+        
+        showToast('削除完了', 'メッセージを削除しました', 'success');
+        
+        // 一覧を再読み込み
+        loadThanksMessagesForDashboard();
+        loadThanksMessagesForTopPage();
+        loadThanksMessagesForVoiceActor();
+        
+        console.log('✅ メッセージを削除しました:', messageId);
+        
+    } catch (err) {
+        console.error('❌ エラー:', err);
+        showToast('エラー', '予期しないエラーが発生しました', 'error');
+    }
+}
+
+/**
+ * ダッシュボードのプロフィール情報をXから取得して表示
+ */
+async function loadUserProfileFromTwitter() {
+    if (!currentUser || !currentUser.username) return;
+    
+    try {
+        const response = await fetch(`/api/twitter/user-info/${currentUser.username}`);
+        
+        if (!response.ok) {
+            console.error('❌ プロフィール取得エラー:', response.status);
+            return;
+        }
+        
+        const userData = await response.json();
+        console.log('✅ プロフィール取得成功:', userData);
+        
+        // ヘッダー画像を設定
+        const headerImage = document.getElementById('profileHeaderImage');
+        if (headerImage) {
+            if (userData.profile_banner_url) {
+                headerImage.style.backgroundImage = `url(${userData.profile_banner_url})`;
+                headerImage.style.backgroundSize = 'cover';
+                headerImage.style.backgroundPosition = 'center';
+                console.log('🖼️ ヘッダー画像URL:', userData.profile_banner_url);
+            } else {
+                console.log('⚠️ ヘッダー画像が設定されていません');
+            }
+        }
+        
+        // アバター画像を設定（高解像度版）
+        const profileAvatar = document.getElementById('profileAvatar');
+        if (profileAvatar) {
+            // _normal を _400x400 に置き換えて高解像度画像を取得
+            let avatarUrl = userData.profile_image_url || currentUser.avatar || '';
+            if (avatarUrl.includes('_normal')) {
+                avatarUrl = avatarUrl.replace('_normal', '_400x400');
+            }
+            profileAvatar.src = avatarUrl;
+            console.log('📸 アバター画像URL:', avatarUrl);
+        }
+        
+        // プロフィール情報を設定
+        const profileName = document.getElementById('profileName');
+        if (profileName) {
+            profileName.textContent = userData.name || currentUser.name;
+        }
+        
+        const profileHandle = document.getElementById('profileHandle');
+        if (profileHandle) {
+            profileHandle.textContent = `@${userData.username || currentUser.username}`;
+        }
+        
+        const profileBio = document.getElementById('profileBio');
+        if (profileBio && userData.description) {
+            profileBio.textContent = userData.description;
+        }
+        
+        const profileWebsiteContainer = document.getElementById('profileWebsiteContainer');
+        const profileWebsite = document.getElementById('profileWebsite');
+        if (profileWebsite && userData.url) {
+            profileWebsite.textContent = userData.url;
+            profileWebsite.href = userData.url;
+            if (profileWebsiteContainer) {
+                profileWebsiteContainer.style.display = 'flex';
+            }
+        }
+        
+        const followingCount = document.getElementById('followingCount');
+        if (followingCount && userData.public_metrics) {
+            followingCount.textContent = userData.public_metrics.following_count.toLocaleString();
+        }
+        
+        const followerCount = document.getElementById('followerCount');
+        if (followerCount && userData.public_metrics) {
+            followerCount.textContent = userData.public_metrics.followers_count.toLocaleString();
+        }
+        
+        const profileJoinDate = document.getElementById('profileJoinDate');
+        if (profileJoinDate && userData.created_at) {
+            const joinDate = new Date(userData.created_at);
+            profileJoinDate.textContent = `${joinDate.getFullYear()}年${joinDate.getMonth() + 1}月から利用しています`;
+        }
+        
+    } catch (err) {
+        console.error('❌ プロフィール取得エラー:', err);
+    }
 }
 
 /**

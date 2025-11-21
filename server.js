@@ -501,6 +501,50 @@ app.get('/api/user/me', (req, res) => {
     res.json(req.session.user);
 });
 
+// Twitter APIからユーザー詳細情報を取得（ヘッダー画像含む）
+app.get('/api/twitter/user-info/:username', async (req, res) => {
+    try {
+        if (!req.session.user || !req.session.accessToken) {
+            return res.status(401).json({ error: '認証が必要です' });
+        }
+
+        const { username } = req.params;
+        const accessToken = req.session.accessToken;
+
+        if (isDevelopment) console.log('📡 Twitter APIからユーザー詳細情報取得:', username);
+
+        // Twitter API v2でユーザー情報を取得
+        const response = await axios.get(`https://api.twitter.com/2/users/by/username/${username}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            },
+            params: {
+                'user.fields': 'profile_image_url,description,public_metrics,created_at,url,profile_banner_url'
+            }
+        });
+
+        if (isDevelopment) {
+            console.log('✅ ユーザー詳細情報取得成功:', username);
+            console.log('📊 取得したデータ:', JSON.stringify(response.data.data, null, 2));
+        }
+
+        const userData = response.data.data;
+        res.json(userData);
+
+    } catch (error) {
+        if (isDevelopment) {
+            console.error('❌ ユーザー詳細情報取得エラー:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+        }
+        res.status(error.response?.status || 500).json({
+            error: error.response?.data || { message: error.message }
+        });
+    }
+});
+
 // フォロー状態確認
 app.get('/api/user/follow-status', async (req, res) => {
     try {
