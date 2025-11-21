@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="images/webp/yukkuri-link-nikoniko-kuchiake.webp" as="image" type="image/webp">
     <link rel="preload" href="css/styles.css?v=106.0" as="style">
+    <link rel="preload" href="images/webp/yukkuri-link-nikoniko-kuchiake.webp" as="image" type="image/webp" imagesrcset="images/webp/yukkuri-link-nikoniko-kuchiake.webp" imagesizes="150px">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -70,10 +70,14 @@
         <section class="hero-section" id="home">
             <div class="hero-content">
                 <div class="hero-character">
-                    <picture>
-                        <source srcset="images/webp/yukkuri-link-nikoniko-kuchiake.webp" type="image/webp">
-                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="キャラクター" class="character-img" width="400" height="400" loading="eager" fetchpriority="high">
-                    </picture>
+                    <img 
+                        src="images/webp/yukkuri-link-nikoniko-kuchiake.webp" 
+                        alt="キャラクター" 
+                        class="character-img" 
+                        width="150" 
+                        height="150" 
+                        loading="eager" 
+                        fetchpriority="high">
                 </div>
                 <h1 class="hero-title">
                     推しに想いを届ける<br>
@@ -1998,14 +2002,16 @@
                                         <div class="message-bubble">
                                             <p>プロフェッショナルな対応と高品質な音声で、クライアントからも高評価をいただきました。また依頼させていただきます！</p>
                                         </div>
-                                        <div class="message-reactions">
-                                            <span class="reaction-icon">💖</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                        <div class="hero-character">
+                    <img 
+                        src="images/webp/yukkuri-link-nikoniko-kuchiake.webp" 
+                        alt="キャラクター" 
+                        class="character-img" 
+                        width="150" 
+                        height="150" 
+                        loading="eager" 
+                        fetchpriority="high">
+                </div>
 
                     <!-- 感謝した投稿コンテンツ -->
                     <div class="thanks-sub-content" id="thanks-given" style="display: none;">
