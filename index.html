@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=102.0">
+    <link rel="stylesheet" href="css/styles.css?v=106.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0">
+    <link rel="stylesheet" href="css/loading-animation.css?v=1.0">
+    <link rel="stylesheet" href="css/faq.css?v=1.0">
     <link rel="manifest" href="manifest.json">
     
     <!-- Cache Control -->
@@ -61,20 +63,29 @@
                     </picture>
                 </div>
                 <h1 class="hero-title">
-                    君と声でつながる<br>
-                    <span class="highlight">新しいクリエイター応援のカタチ</span>
+                    推しに想いを届ける<br>
+                    <span class="highlight">ゆっくり音声プラットフォーム</span>
                 </h1>
                 <p class="hero-subtitle">
-                    プロ・アマチュア問わず、声優・ナレーターと依頼者を<br>
-                    適正価格でマッチング。応援ボイスで推し活もサポート。
+                    1文字¥1から始める、あなただけの特別なボイス。<br>
+                    プロもアマも、みんなで作る新しい声の世界。
                 </p>
-                <div class="hero-buttons">
-                    <button class="btn-primary-large" onclick="showLoginModal()">
-                        <i class="fas fa-microphone"></i> 声優として登録
-                    </button>
-                    <button class="btn-secondary-large" onclick="showLoginModal()">
-                        <i class="fas fa-heart"></i> ボイスを依頼する
-                    </button>
+                <div class="hero-cta-box">
+                    <div class="cta-highlight">
+                        <i class="fas fa-star"></i>
+                        今なら初回依頼500円から！
+                    </div>
+                    <div class="hero-buttons">
+                        <button class="btn-primary-large" onclick="showLoginModal()">
+                            <i class="fas fa-heart"></i> 推しに想いを届ける
+                        </button>
+                        <button class="btn-secondary-large" onclick="showLoginModal()">
+                            <i class="fas fa-microphone"></i> 声優として活動する
+                        </button>
+                    </div>
+                    <p class="cta-note">
+                        <i class="fas fa-check-circle"></i> 無料登録・月額料金なし
+                    </p>
                 </div>
                 <div class="hero-description">
                     <h2 class="description-title">あなたの声が、誰かの心を動かす</h2>
@@ -193,6 +204,7 @@
                         <h3 class="narrator-name" id="narrator1Name">君斗りんく</h3>
                         <p class="narrator-handle" id="narrator1Handle">@streamerfunch</p>
                         <p class="narrator-followers" id="narrator1Followers"><i class="fas fa-users"></i> 読み込み中...</p>
+                        <p class="narrator-bio" id="narrator1Bio">プロフィール読み込み中...</p>
                         <div class="narrator-tags">
                             <span class="tag">少女ボイス</span>
                             <span class="tag">萌え系</span>
@@ -219,6 +231,7 @@
                         <h3 class="narrator-name" id="narrator2Name">君斗りんく</h3>
                         <p class="narrator-handle" id="narrator2Handle">@idolfunch</p>
                         <p class="narrator-followers" id="narrator2Followers"><i class="fas fa-users"></i> 読み込み中...</p>
+                        <p class="narrator-bio" id="narrator2Bio">プロフィール読み込み中...</p>
                         <div class="narrator-tags">
                             <span class="tag">青年ボイス</span>
                             <span class="tag">ナレーション</span>
@@ -559,6 +572,180 @@
                         <div class="result-price">¥500</div>
                         <p class="result-note">文字数や内容は概算</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ（よくある質問）-->
+        <section class="faq-section" id="faq">
+            <div class="container">
+                <div class="section-header">
+                    <picture>
+                        <source srcset="images/webp/yukkuri-link-nikoniko-kuchiake.webp" type="image/webp">
+                        <img src="images/yukkuri/yukkuri-link-nikoniko-kuchiake.png" alt="" class="section-icon" loading="lazy">
+                    </picture>
+                    <h2>よくある質問</h2>
+                    <p class="section-subtitle">KimiLink Voiceについて、よくある質問をまとめました</p>
+                </div>
+
+                <div class="faq-container">
+                    <!-- Q1 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">料金はどのくらいかかりますか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                声優・ナレーターによって料金は異なりますが、<strong>1文字¥1から</strong>ご依頼いただけます。
+                                最低料金は¥500からとなっており、初心者の方でも気軽にご利用いただけます。
+                            </p>
+                            <ul>
+                                <li>エントリー：¥1/文字〜（最低 ¥500）</li>
+                                <li>スタンダード：¥3/文字〜（最低 ¥1,000）</li>
+                                <li>プロフェッショナル：¥5/文字〜（最低 ¥3,000）</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Q2 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">納期はどのくらいですか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                声優・ナレーターによって納期は異なりますが、通常<strong>3〜7日程度</strong>でお届けします。
+                                急ぎの場合は、個別にご相談ください。お急ぎ対応が可能な場合もございます。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q3 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">修正は可能ですか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                はい、<strong>1回まで無料で修正</strong>いただけます。
+                                2回目以降の修正については、声優・ナレーターと個別にご相談ください。
+                                ただし、台本の大幅な変更は追加料金が発生する場合がございます。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q4 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">商用利用は可能ですか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                声優・ナレーターによって異なります。依頼時に<strong>商用利用の有無</strong>をお伝えください。
+                                商用利用の場合は、別途料金が発生する場合がございます。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q5 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">どのような形式でファイルが納品されますか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                基本的に<strong>MP3形式</strong>で納品されます。
+                                WAVやその他の形式をご希望の場合は、依頼時にその旨をお伝えください。
+                                追加料金なしで対応できる場合もございます。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q6 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">声優として登録するには？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                <strong>無料</strong>でご登録いただけます！以下の手順で登録してください：
+                            </p>
+                            <ol>
+                                <li>トップページの「声優として登録」ボタンをクリック</li>
+                                <li>Twitterアカウントでログイン</li>
+                                <li>必須アカウントをフォロー</li>
+                                <li>プロフィール情報を入力</li>
+                                <li>サンプルボイスをアップロード</li>
+                            </ol>
+                            <p>
+                                審査なしで、すぐに活動を開始できます！
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q7 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">支払い方法は？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                現在、以下の支払い方法に対応しています：
+                            </p>
+                            <ul>
+                                <li><i class="fas fa-credit-card"></i> クレジットカード（Visa、Mastercard、JCB、American Express）</li>
+                                <li><i class="fas fa-money-check"></i> 銀行振込</li>
+                                <li><i class="fas fa-wallet"></i> PayPal</li>
+                            </ul>
+                            <p>
+                                決済は<strong>納品後の後払い</strong>となります。安心してご利用ください。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Q8 -->
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFAQ(this)">
+                            <span class="faq-icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span class="faq-text">月額料金はかかりますか？</span>
+                        </button>
+                        <div class="faq-answer">
+                            <p>
+                                <strong>いいえ、月額料金は一切かかりません！</strong>
+                                登録料・年会費も無料です。かかるのは依頼時の料金のみとなります。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-cta">
+                    <p>その他のご質問がございましたら、お気軽にお問い合わせください。</p>
+                    <button class="btn-primary" onclick="showLoginModal()">
+                        <i class="fas fa-envelope"></i> お問い合わせ
+                    </button>
                 </div>
             </div>
         </section>
@@ -2396,6 +2583,7 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/galaxy-effects.js?v=2.0"></script>
-    <script src="js/script.js?v=90.0"></script>
+    <script src="js/loading.js?v=1.0"></script>
+    <script src="js/script.js?v=93.0"></script>
 </body>
 </html>

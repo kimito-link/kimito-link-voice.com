@@ -631,6 +631,9 @@ async function submitUpload() {
     formData.append('is_public', isPublic);
     
     try {
+        // ゆっくりローディング表示
+        showProgressLoading('音声ファイルをアップロード中...', 0);
+        
         // フォームを非表示にして進捗表示を表示
         document.getElementById('uploadForm').style.display = 'none';
         const progressDiv = document.getElementById('uploadProgress');
@@ -658,20 +661,25 @@ async function submitUpload() {
             if (e.lengthComputable) {
                 const percentComplete = Math.round((e.loaded / e.total) * 100);
                 
+                // ゆっくりローディングのプログレスを更新
+                let statusMessage = 'アップロード中...';
+                if (percentComplete < 30) {
+                    statusMessage = 'アップロード開始...';
+                } else if (percentComplete < 70) {
+                    statusMessage = 'アップロード中...';
+                } else if (percentComplete < 95) {
+                    statusMessage = '処理中...';
+                } else {
+                    statusMessage = '完了間近...';
+                }
+                showProgressLoading(statusMessage, percentComplete);
+                
                 // 進捗バーを更新
                 document.getElementById('progressBar').style.width = percentComplete + '%';
                 document.getElementById('progressPercentage').textContent = percentComplete + '%';
                 
                 // ステータスメッセージを更新
-                if (percentComplete < 30) {
-                    document.getElementById('progressStatus').textContent = 'アップロード開始...';
-                } else if (percentComplete < 70) {
-                    document.getElementById('progressStatus').textContent = 'アップロード中...';
-                } else if (percentComplete < 95) {
-                    document.getElementById('progressStatus').textContent = '処理中...';
-                } else {
-                    document.getElementById('progressStatus').textContent = '完了間近...';
-                }
+                document.getElementById('progressStatus').textContent = statusMessage;
                 
                 // 予想残り時間を計算
                 const elapsedTime = (Date.now() - startTime) / 1000; // 秒
@@ -699,12 +707,14 @@ async function submitUpload() {
                 document.getElementById('progressStatus').textContent = '完了！';
                 document.getElementById('progressTime').textContent = '';
                 
+                // ゆっくり成功メッセージ表示
+                showSuccess('音声ファイルがアップロードされました！✨', 2000);
+                
                 setTimeout(() => {
-                    alert('音声ファイルがアップロードされました！');
                     progressDiv.style.display = 'none';
                     cancelUpload();
                     loadVoiceList();
-                }, 500);
+                }, 2000);
             } else {
                 throw new Error('アップロードに失敗しました');
             }
@@ -719,6 +729,7 @@ async function submitUpload() {
         
     } catch (error) {
         console.error('❌ アップロードエラー:', error);
+        hideLoading();
         document.getElementById('uploadProgress').style.display = 'none';
         document.getElementById('uploadForm').style.display = 'block';
         alert('アップロードに失敗しました。もう一度お試しください。');
@@ -809,6 +820,9 @@ async function submitNarratorUpload() {
     formData.append('is_public', isPublic);
     
     try {
+        // ゆっくりローディング表示
+        showProgressLoading('音声ファイルをアップロード中...', 0);
+        
         // フォームを非表示にして進捗表示を表示
         document.getElementById('narratorUploadForm').style.display = 'none';
         const progressDiv = document.getElementById('narratorUploadProgress');
@@ -3515,6 +3529,12 @@ async function loadNarratorCard1() {
             followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
         }
         
+        // プロフィール文を更新
+        const bioEl = document.getElementById('narrator1Bio');
+        if (bioEl && userData.description) {
+            bioEl.textContent = userData.description;
+        }
+        
         console.log('✅ 声優カード1更新完了');
         
     } catch (error) {
@@ -3568,6 +3588,12 @@ async function loadNarratorCard2() {
         if (followersEl && userData.public_metrics?.followers_count) {
             const count = userData.public_metrics.followers_count.toLocaleString();
             followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        }
+        
+        // プロフィール文を更新
+        const bioEl = document.getElementById('narrator2Bio');
+        if (bioEl && userData.description) {
+            bioEl.textContent = userData.description;
         }
         
         console.log('✅ 声優カード2更新完了');
@@ -4696,5 +4722,36 @@ window.showPlatform = async function() {
         await loadMonthlyStats();
     }
 };
+
+/**
+ * FAQアコーディオンのトグル機能
+ * @param {HTMLElement} button - クリックされた質問ボタン
+ */
+function toggleFAQ(button) {
+    const faqItem = button.closest('.faq-item');
+    const isActive = faqItem.classList.contains('active');
+    
+    // 他の開いているFAQを閉じる
+    document.querySelectorAll('.faq-item.active').forEach(item => {
+        if (item !== faqItem) {
+            item.classList.remove('active');
+        }
+    });
+    
+    // クリックされたFAQをトグル
+    faqItem.classList.toggle('active');
+    
+    // アイコンの変更
+    const icon = button.querySelector('.faq-icon i');
+    if (!isActive) {
+        // 開く場合、スムーズにスクロール
+        setTimeout(() => {
+            faqItem.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
+        }, 100);
+    }
+}
 
 console.log('✅ ダッシュボード機能が読み込まれました');

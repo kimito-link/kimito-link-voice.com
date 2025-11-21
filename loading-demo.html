@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ローディングアニメーション デモ | KimiLink Voice</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/loading-animation.css?v=1.0">
+    
+    <style>
+        :root {
+            --primary-blue: #4A90E2;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .demo-section {
+            margin-bottom: 40px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .demo-section:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--primary-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-secondary {
+            background: #E0E0E0;
+            color: var(--text-primary);
+        }
+
+        .demo-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+
+        .demo-card-content {
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        code {
+            background: #2C3E50;
+            color: #FFE66D;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .info-box {
+            background: #E3F2FD;
+            border-left: 4px solid var(--primary-blue);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .demo-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .demo-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🎨 ローディングアニメーション デモ</h1>
+
+        <!-- 基本的なローディング -->
+        <div class="demo-section">
+            <h2>1. 基本的なローディング</h2>
+            <div class="demo-buttons">
+                <button class="btn" onclick="testBasicLoading()">
+                    <i class="fas fa-circle-notch"></i>
+                    基本ローディング
+                </button>
+                <button class="btn" onclick="testCustomMessage()">
+                    <i class="fas fa-comment"></i>
+                    カスタムメッセージ
+                </button>
+                <button class="btn btn-secondary" onclick="hideLoading()">
+                    <i class="fas fa-times"></i>
+                    閉じる
+                </button>
+            </div>
+            <div class="info-box">
+                <code>showLoading('メッセージ', '吹き出しテキスト')</code>
+            </div>
+        </div>
+
+        <!-- プログレスバー -->
+        <div class="demo-section">
+            <h2>2. プログレスバー付きローディング</h2>
+            <div class="demo-buttons">
+                <button class="btn" onclick="testProgressLoading()">
+                    <i class="fas fa-tasks"></i>
+                    プログレス表示
+                </button>
+                <button class="btn" onclick="testUploadSimulation()">
+                    <i class="fas fa-upload"></i>
+                    アップロードシミュレーション
+                </button>
+            </div>
+            <div class="info-box">
+                <code>showProgressLoading('アップロード中...', 50)</code>
+            </div>
+        </div>
+
+        <!-- 成功メッセージ -->
+        <div class="demo-section">
+            <h2>3. 成功メッセージ</h2>
+            <div class="demo-buttons">
+                <button class="btn" onclick="testSuccess()">
+                    <i class="fas fa-check-circle"></i>
+                    成功メッセージ
+                </button>
+                <button class="btn" onclick="testCustomSuccess()">
+                    <i class="fas fa-star"></i>
+                    カスタム成功メッセージ
+                </button>
+            </div>
+            <div class="info-box">
+                <code>showSuccess('完了しました！', 2000)</code>
+            </div>
+        </div>
+
+        <!-- インラインローディング -->
+        <div class="demo-section">
+            <h2>4. インラインローディング</h2>
+            <div class="demo-buttons">
+                <button class="btn" onclick="testInlineLoading()">
+                    <i class="fas fa-sync"></i>
+                    インラインローディング
+                </button>
+            </div>
+            <div class="demo-card">
+                <div class="demo-card-content" id="inlineDemo">
+                    カード内のコンテンツ
+                </div>
+            </div>
+            <div class="info-box">
+                <code>showInlineLoading(element, 'テキスト')</code>
+            </div>
+        </div>
+
+        <!-- 戻るボタン -->
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="btn">
+                <i class="fas fa-home"></i>
+                ホームに戻る
+            </a>
+        </div>
+    </div>
+
+    <script src="js/loading.js?v=1.0"></script>
+    <script>
+        // 1. 基本的なローディング
+        function testBasicLoading() {
+            showLoading();
+            setTimeout(() => hideLoading(), 3000);
+        }
+
+        function testCustomMessage() {
+            showLoading(
+                'データを取得中です...', 
+                'ゆっくり待っててね！'
+            );
+            setTimeout(() => hideLoading(), 3000);
+        }
+
+        // 2. プログレスバー
+        function testProgressLoading() {
+            let progress = 0;
+            showProgressLoading('処理中...', progress);
+
+            const interval = setInterval(() => {
+                progress += 10;
+                showProgressLoading('処理中...', progress);
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showSuccess('処理が完了しました！');
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function testUploadSimulation() {
+            let progress = 0;
+            showProgressLoading('ファイルをアップロード中...', progress);
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+
+                showProgressLoading('ファイルをアップロード中...', progress);
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        showSuccess('アップロード完了！', 2000);
+                    }, 500);
+                }
+            }, 400);
+        }
+
+        // 3. 成功メッセージ
+        function testSuccess() {
+            showSuccess('完了しました！');
+        }
+
+        function testCustomSuccess() {
+            showSuccess('依頼を送信しました！✨', 3000);
+        }
+
+        // 4. インラインローディング
+        function testInlineLoading() {
+            const element = document.getElementById('inlineDemo');
+            showInlineLoading(element, 'データ取得中...');
+
+            setTimeout(() => {
+                hideInlineLoading(element);
+            }, 3000);
+        }
+
+        // ページロード時のメッセージ
+        console.log('%cローディングアニメーション デモ', 'color: #4A90E2; font-size: 1.5rem; font-weight: bold;');
+        console.log('各ボタンをクリックしてアニメーションを確認してください！');
+    </script>
+</body>
+</html>

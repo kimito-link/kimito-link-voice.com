@@ -311,6 +311,67 @@ body {
     margin-bottom: 40px;
 }
 
+.hero-cta-box {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+    padding: 30px;
+    border-radius: 20px;
+    margin: 30px auto;
+    max-width: 600px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(74, 144, 226, 0.2);
+}
+
+.cta-highlight {
+    background: linear-gradient(135deg, #FFE66D, #FFA500);
+    color: #2C3E50;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(255, 230, 109, 0.5);
+    animation: ctaPulse 2s ease-in-out infinite;
+}
+
+@keyframes ctaPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.cta-highlight i {
+    animation: ctaSpin 3s linear infinite;
+}
+
+@keyframes ctaSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.cta-note {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.cta-note i {
+    color: #4CAF50;
+}
+
 .hero-buttons {
     display: flex;
     gap: 20px;
@@ -664,6 +725,21 @@ body {
 .narrator-followers i {
     color: var(--primary-blue);
     font-size: 1.2rem;
+}
+
+.narrator-bio {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 8px 0;
+    padding: 0 10px;
+    text-align: center;
+    max-height: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .narrator-tags {
@@ -3232,6 +3308,24 @@ body {
     .voice-grid {
         grid-template-columns: 1fr;
     }
+    
+    /* プロフィール文のモバイル対応 */
+    .narrator-bio {
+        font-size: 0.85rem;
+        padding: 0 5px;
+        margin: 6px 0;
+    }
+    
+    /* ヒーローセクションCTAボックスのモバイル対応 */
+    .hero-cta-box {
+        padding: 20px;
+        margin: 20px auto;
+    }
+    
+    .cta-highlight {
+        font-size: 0.95rem;
+        padding: 10px 20px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -3491,6 +3585,29 @@ body {
     
     .footer-social {
         justify-content: flex-start;
+    }
+    
+    /* プロフィール文の小型スマホ対応 */
+    .narrator-bio {
+        font-size: 0.8rem;
+        padding: 0 3px;
+        margin: 5px 0;
+        -webkit-line-clamp: 2;
+    }
+    
+    /* CTAボックスの小型スマホ対応 */
+    .hero-cta-box {
+        padding: 15px;
+        margin: 15px auto;
+    }
+    
+    .cta-highlight {
+        font-size: 0.85rem;
+        padding: 8px 15px;
+    }
+    
+    .cta-note {
+        font-size: 0.85rem;
     }
 }
 
