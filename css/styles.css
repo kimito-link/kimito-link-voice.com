@@ -1508,10 +1508,6 @@ body {
         display: none;
     }
     
-    #thanks-tab {
-        top: -20px;
-    }
-    
     .thanks-container {
         padding: 0 15px 15px 15px;
     }
@@ -4513,8 +4509,6 @@ body {
 #thanks-tab {
     padding: 0 !important;
     margin: 0 !important;
-    position: relative;
-    top: -40px;
 }
 
 /* 感謝タブ専用コンテナ */
@@ -6236,5 +6230,1388 @@ body {
     .tab-button {
         padding: 8px 12px;
         font-size: 0.8rem;
+    }
+}
+
+/* ===== ダッシュボードカード（ゆっくりデザイン） ===== */
+
+/* ウェルカムカード（ゆっくり版） */
+.welcome-card-yukkuri {
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.15) 0%, rgba(173, 216, 230, 0.15) 100%);
+    border: 3px solid rgba(255, 192, 203, 0.4);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(255, 182, 193, 0.3);
+    overflow: hidden;
+}
+
+.yukkuri-welcome-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+
+.yukkuri-character-left,
+.yukkuri-character-right {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    position: relative;
+}
+
+.yukkuri-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.yukkuri-avatar.bounce {
+    animation: bounce 2s ease-in-out infinite;
+}
+
+.yukkuri-avatar.bounce-delay {
+    animation: bounce 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.welcome-content-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 吹き出しスタイル */
+.speech-bubble {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    animation: bubblePop 0.5s ease-out;
+}
+
+@keyframes bubblePop {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.speech-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 30px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid white;
+}
+
+.bubble-primary {
+    background: linear-gradient(135deg, #E0F7FF 0%, #FFF4F4 100%);
+    border: 3px solid #4FACFE;
+}
+
+.bubble-primary::before {
+    border-bottom-color: #4FACFE;
+}
+
+.bubble-success {
+    background: linear-gradient(135deg, #E8F8F5 0%, #FFF9E6 100%);
+    border: 3px solid #38ef7d;
+}
+
+.bubble-success::before {
+    border-bottom-color: #38ef7d;
+}
+
+.bubble-content {
+    text-align: center;
+}
+
+.welcome-title-yukkuri {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.name-highlight {
+    color: #FF69B4;
+    font-weight: 800;
+    text-shadow: 2px 2px 0px rgba(255, 105, 180, 0.2);
+}
+
+.welcome-subtitle-yukkuri {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* クイックアクション（ゆっくり版） */
+.quick-actions-yukkuri {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-yukkuri {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-yukkuri::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn-yukkuri:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-yukkuri .btn-icon {
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-yukkuri .btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-yukkuri.btn-create {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FFA06B 100%);
+    color: white;
+}
+
+.btn-yukkuri.btn-create:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(255, 107, 157, 0.5);
+}
+
+.btn-yukkuri.btn-search {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.btn-yukkuri.btn-search:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(79, 172, 254, 0.5);
+}
+
+/* 小さいゆっくりボタン（カードフッター用） */
+.btn-yukkuri-small {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.btn-yukkuri-small::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn-yukkuri-small:hover::before {
+    width: 200px;
+    height: 200px;
+}
+
+.btn-yukkuri-small .btn-icon {
+    font-size: 1.3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-yukkuri-small .btn-text {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-yukkuri-small.btn-view {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.btn-yukkuri-small.btn-view:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(102, 126, 234, 0.5);
+}
+
+/* 今日のタスクセクション（ゆっくり版） */
+.today-tasks-section-yukkuri {
+    margin-top: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    border: 2px dashed rgba(255, 192, 203, 0.5);
+}
+
+.tasks-header-yukkuri {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.task-helper-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    animation: wiggle 1.5s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-5deg);
+    }
+    75% {
+        transform: rotate(5deg);
+    }
+}
+
+.tasks-header-yukkuri h3 {
+    font-size: 1.3rem;
+    color: #333;
+    font-weight: 700;
+}
+
+.empty-state-yukkuri {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 250, 205, 0.8) 100%);
+    border-radius: 15px;
+}
+
+.empty-state-yukkuri i {
+    font-size: 3rem;
+    color: #38ef7d;
+    margin-bottom: 15px;
+}
+
+.empty-state-yukkuri p {
+    font-size: 1.1rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* カードヘッダー（ゆっくり版） */
+.card-header-yukkuri {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.header-helper-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    animation: wiggle 1.5s ease-in-out infinite;
+}
+
+/* 今月の実績カード（ゆっくり版） */
+.stats-summary-card-yukkuri {
+    background: linear-gradient(135deg, rgba(255, 250, 205, 0.3) 0%, rgba(224, 247, 255, 0.3) 100%);
+    border: 3px solid rgba(255, 215, 0, 0.4);
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.stats-grid-yukkuri {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* カード（ゆっくり版） */
+.card-yukkuri {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 250, 240, 0.05) 100%);
+    border: 3px solid rgba(255, 192, 203, 0.3);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(255, 182, 193, 0.2);
+    transition: all 0.3s ease;
+}
+
+.card-yukkuri:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(255, 182, 193, 0.4);
+    border-color: rgba(255, 192, 203, 0.6);
+}
+
+/* カードヘッダー（キャラクター付き） */
+.card-header-with-character {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.card-mascot {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    animation: wiggle 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.header-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-content h3 {
+    font-size: 1.3rem;
+    color: #333;
+    font-weight: 700;
+}
+
+/* カードフッター（ゆっくり版） */
+.card-footer-yukkuri {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px dashed rgba(255, 192, 203, 0.3);
+    text-align: center;
+}
+
+.card-footer-yukkuri a {
+    color: #FF69B4;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.card-footer-yukkuri a:hover {
+    color: #FF1493;
+    transform: translateX(5px);
+}
+
+/* 今日のタスクセクション（声優用） */
+.today-tasks-section {
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(79, 172, 254, 0.2);
+}
+
+.today-tasks-section h3 {
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+
+.task-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.2rem;
+}
+
+.task-icon.high {
+    background: rgba(255, 59, 92, 0.2);
+    color: #FF3B5C;
+}
+
+.task-icon.medium {
+    background: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
+}
+
+.task-icon.low {
+    background: rgba(79, 172, 254, 0.2);
+    color: var(--primary);
+}
+
+.task-details h4 {
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.task-details p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* 今月の実績サマリー（声優用） */
+.stats-summary-card {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(0, 217, 255, 0.05) 100%);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(79, 172, 254, 0.2);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.8rem;
+}
+
+.stat-icon.revenue {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.stat-icon.completed {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.stat-icon.new {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+.stat-details {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ポートフォリオクイックアクセス */
+.portfolio-stats {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    justify-content: space-around;
+}
+
+.portfolio-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    flex: 1;
+}
+
+.portfolio-stat i {
+    font-size: 2rem;
+    color: var(--primary);
+}
+
+.portfolio-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.portfolio-stat-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.portfolio-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-portfolio-action {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-portfolio-action.btn-primary {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.btn-portfolio-action.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+}
+
+.btn-portfolio-action.btn-secondary {
+    background: rgba(79, 172, 254, 0.1);
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-portfolio-action.btn-secondary:hover {
+    background: rgba(79, 172, 254, 0.2);
+    transform: translateY(-2px);
+}
+
+/* バッジスタイル */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-info {
+    background: rgba(79, 172, 254, 0.2);
+    color: var(--primary);
+}
+
+.badge-warning {
+    background: rgba(255, 193, 7, 0.2);
+    color: #FFC107;
+}
+
+.badge-pink {
+    background: rgba(255, 59, 92, 0.2);
+    color: #FF3B5C;
+}
+
+/* ===== ポートフォリオ追加モーダル ===== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+    border-radius: 20px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    border: 2px solid rgba(79, 172, 254, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.portfolio-modal {
+    padding: 40px 30px;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 59, 92, 0.2);
+    color: #FF3B5C;
+    transform: rotate(90deg);
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-radius: 50%;
+    font-size: 3rem;
+    color: white;
+    animation: successPulse 2s infinite;
+}
+
+@keyframes successPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(17, 153, 142, 0.7);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(17, 153, 142, 0);
+    }
+}
+
+.modal-header h2 {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.modal-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.modal-body {
+    margin-bottom: 30px;
+}
+
+.portfolio-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.portfolio-option {
+    cursor: pointer;
+}
+
+.portfolio-option input[type="radio"] {
+    display: none;
+}
+
+.option-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.portfolio-option input[type="radio"]:checked + .option-card {
+    background: rgba(79, 172, 254, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(79, 172, 254, 0.2);
+}
+
+.option-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(79, 172, 254, 0.5);
+}
+
+.option-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.option-icon.public {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.option-icon.private {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+.option-icon.none {
+    background: rgba(128, 128, 128, 0.3);
+    color: #888;
+}
+
+.option-details {
+    flex: 1;
+}
+
+.option-details h3 {
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-recommend {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.option-details p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.option-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.option-benefits li {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.option-benefits li i {
+    color: #38ef7d;
+    font-size: 0.9rem;
+}
+
+.modal-note {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: rgba(79, 172, 254, 0.1);
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.modal-note i {
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.modal-note span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.modal-footer button {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modal-footer .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-footer .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+    color: white;
+}
+
+.modal-footer .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4);
+}
+
+/* レスポンシブ対応（ゆっくりデザイン） */
+@media (max-width: 768px) {
+    /* ゆっくりウェルカムカード */
+    .welcome-card-yukkuri {
+        padding: 20px;
+    }
+    
+    .yukkuri-welcome-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .yukkuri-character-left,
+    .yukkuri-character-right {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .welcome-content-center {
+        width: 100%;
+    }
+    
+    .speech-bubble {
+        padding: 20px;
+    }
+    
+    .welcome-title-yukkuri {
+        font-size: 1.4rem;
+    }
+    
+    .welcome-subtitle-yukkuri {
+        font-size: 0.95rem;
+    }
+    
+    .quick-actions-yukkuri {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-yukkuri {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+    
+    /* タスクセクション */
+    .today-tasks-section-yukkuri {
+        padding: 15px;
+    }
+    
+    .task-helper-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .tasks-header-yukkuri h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* ヘッダーヘルパーアイコン */
+    .header-helper-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* 統計グリッド */
+    .stats-grid,
+    .stats-grid-yukkuri {
+        grid-template-columns: 1fr;
+    }
+    
+    .portfolio-stats {
+        flex-direction: column;
+    }
+    
+    .portfolio-actions {
+        flex-direction: column;
+    }
+    
+    .btn-portfolio-action {
+        width: 100%;
+    }
+    
+    .portfolio-modal {
+        padding: 30px 20px;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+    }
+    
+    .modal-footer button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    /* さらに小さいスマホ用 */
+    .yukkuri-character-left,
+    .yukkuri-character-right {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .speech-bubble {
+        padding: 15px;
+    }
+    
+    .welcome-title-yukkuri {
+        font-size: 1.2rem;
+    }
+    
+    .welcome-subtitle-yukkuri {
+        font-size: 0.9rem;
+    }
+    
+    .btn-yukkuri {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+    
+    .btn-yukkuri .btn-icon {
+        font-size: 1.2rem;
+    }
+}
+
+/* ===== 感謝タブ（ゆっくりデザイン） ===== */
+
+/* 感謝タブコンテナ */
+.thanks-container-yukkuri {
+    padding: 30px;
+}
+
+/* ウェルカムヘッダー */
+.thanks-welcome-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 30px;
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.2) 0%, rgba(255, 218, 224, 0.2) 100%);
+    border-radius: 20px;
+    border: 3px solid rgba(255, 105, 180, 0.3);
+}
+
+.thanks-mascot-left,
+.thanks-mascot-right {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.bubble-thanks {
+    background: linear-gradient(135deg, #FFE4E1 0%, #FFF0F5 100%);
+    border: 3px solid #FF69B4;
+}
+
+.bubble-thanks::before {
+    border-bottom-color: #FF69B4;
+}
+
+.bubble-thanks h2 {
+    font-size: 1.8rem;
+    color: #FF1493;
+    margin-bottom: 10px;
+}
+
+.bubble-thanks p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* サブタブナビゲーション（ゆっくり版） */
+.thanks-sub-tabs-yukkuri {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    justify-content: center;
+}
+
+.thanks-sub-tab-yukkuri {
+    flex: 1;
+    max-width: 300px;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 250, 250, 0.8) 100%);
+    border: 3px solid rgba(255, 192, 203, 0.3);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.thanks-sub-tab-yukkuri:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+    border-color: rgba(255, 105, 180, 0.6);
+}
+
+.thanks-sub-tab-yukkuri.active {
+    background: linear-gradient(135deg, #FF69B4 0%, #FFB6C1 100%);
+    border-color: #FF1493;
+    color: white;
+    box-shadow: 0 8px 20px rgba(255, 105, 180, 0.5);
+}
+
+.thanks-sub-tab-yukkuri .tab-icon {
+    font-size: 1.5rem;
+}
+
+.thanks-sub-tab-yukkuri .tab-text {
+    font-weight: 700;
+}
+
+/* メッセージカード（ゆっくり版） */
+.thanks-messages-list-yukkuri {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.thanks-message-card-yukkuri {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 250, 250, 0.9) 100%);
+    border: 3px solid rgba(255, 192, 203, 0.4);
+    border-radius: 20px;
+    padding: 25px;
+    padding-left: 90px;
+    box-shadow: 0 4px 16px rgba(255, 182, 193, 0.3);
+    transition: all 0.3s ease;
+}
+
+.thanks-message-card-yukkuri:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(255, 182, 193, 0.5);
+    border-color: rgba(255, 105, 180, 0.6);
+}
+
+/* カードデコレーター */
+.card-decorator {
+    position: absolute;
+    left: 15px;
+    top: 20px;
+}
+
+.message-decorator-icon {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    animation: wiggle 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* ユーザー情報（ゆっくり版） */
+.message-user-info-yukkuri {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.message-avatar-yukkuri {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #FF69B4;
+    object-fit: cover;
+}
+
+.message-user-details-yukkuri {
+    flex: 1;
+}
+
+.message-user-details-yukkuri .user-name {
+    font-size: 1.2rem;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.message-user-details-yukkuri .message-handle {
+    color: #666;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+}
+
+.message-user-details-yukkuri .message-followers {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.message-date-yukkuri {
+    color: #999;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* メッセージコンテンツ（ゆっくり版） */
+.message-content-yukkuri {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message-bubble {
+    background: white;
+    border: 2px solid rgba(255, 192, 203, 0.3);
+    border-radius: 15px;
+    padding: 20px;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #333;
+}
+
+.message-reactions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.reaction-icon {
+    font-size: 1.5rem;
+    animation: heartBeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartBeat {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25%, 75% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+}
+
+/* 空の状態（ゆっくり版） */
+.empty-state-yukkuri-thanks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 30px;
+    background: linear-gradient(135deg, rgba(255, 250, 250, 0.5) 0%, rgba(255, 240, 245, 0.5) 100%);
+    border-radius: 20px;
+    border: 3px dashed rgba(255, 192, 203, 0.4);
+}
+
+.empty-mascot {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+.empty-message {
+    text-align: center;
+}
+
+.empty-title {
+    font-size: 1.3rem;
+    color: #666;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.empty-subtitle {
+    font-size: 1.05rem;
+    color: #999;
+}
+
+/* レスポンシブ対応（感謝タブ） */
+@media (max-width: 768px) {
+    .thanks-container-yukkuri {
+        padding: 20px;
+    }
+    
+    .thanks-welcome-header {
+        flex-direction: column;
+        padding: 20px;
+    }
+    
+    .thanks-mascot-left,
+    .thanks-mascot-right {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .thanks-sub-tabs-yukkuri {
+        flex-direction: column;
+    }
+    
+    .thanks-sub-tab-yukkuri {
+        max-width: 100%;
+    }
+    
+    .thanks-message-card-yukkuri {
+        padding: 20px;
+        padding-top: 80px;
+        padding-left: 20px;
+    }
+    
+    .card-decorator {
+        left: 50%;
+        top: 10px;
+        transform: translateX(-50%);
+    }
+    
+    .message-decorator-icon {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .message-user-info-yukkuri {
+        flex-wrap: wrap;
+    }
+    
+    .message-date-yukkuri {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .thanks-mascot-left,
+    .thanks-mascot-right {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .bubble-thanks h2 {
+        font-size: 1.4rem;
+    }
+    
+    .bubble-thanks p {
+        font-size: 0.95rem;
+    }
+    
+    .empty-mascot {
+        width: 100px;
+        height: 100px;
     }
 }

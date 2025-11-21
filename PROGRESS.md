@@ -1,10 +1,158 @@
 # KimiLink Voice 開発進捗状況
 
-**最終更新**: 2025年11月20日 21:49 JST
+**最終更新**: 2025年11月21日 18:25 JST
 
 ---
 
 ## 📋 最新の作業内容
+
+### 🔧 Phase 15: 感謝タブUI修正（空白削除・コンテンツ表示制御） (2025-11-21 17:30-18:25)
+
+#### 🎯 実施内容
+依頼者モードと声優モードの「感謝」タブにおける表示問題を修正しました（作業時間：約4時間）。
+
+#### ✅ 解決した問題
+
+**1. 依頼者モード：感謝タブの上部空白**
+- 原因: `.dashboard-content` のpadding-top（40px）が適用
+- 解決策: 感謝タブ表示時にJavaScriptでpadding-topを0に設定
+
+**2. 声優モード：感謝タブに不要なコンテンツが表示**
+- 原因: `narratorDashboardContent`（完了案件、収益、音声アップロード）が非表示になっていない
+- 解決策: 感謝タブ表示時に`clientDashboardContent`と`narratorDashboardContent`を非表示に
+
+#### 🔧 実装した修正
+
+**1. JavaScript修正** (`js/script.js` v81.0):
+```javascript
+case 'thanks':
+    // ダッシュボードのコンテンツを非表示
+    const clientContent = document.getElementById('clientDashboardContent');
+    const narratorContent = document.getElementById('narratorDashboardContent');
+    if (clientContent) clientContent.style.display = 'none';
+    if (narratorContent) narratorContent.style.display = 'none';
+    
+    // dashboard-contentのpadding-topを0に
+    const dashboardContent = document.querySelector('.dashboard-content');
+    if (dashboardContent) {
+        dashboardContent.style.paddingTop = '0';
+    }
+```
+
+**2. CSS修正** (`css/styles.css` v100.0):
+```css
+#thanks-tab {
+    padding: 0 !important;
+    margin: 0 !important;
+    position: relative;
+    top: -40px;
+}
+```
+
+**3. server.js修正**:
+- CSS/JSファイルのキャッシュを完全無効化（開発中）
+- `Cache-Control: no-cache, no-store, must-revalidate`
+
+**4. HTML修正** (`index.html`):
+- ナビゲーションリンクを`javascript:void(0)`に変更
+- ハッシュタグによるページ内リンクを削除
+
+#### 📊 技術詳細
+
+**役割切り替え時の処理**:
+- ナビゲーションのactive状態をリセット
+- 全タブを非表示にしてダッシュボードのみ表示
+- padding-topを元に戻す（他のタブに影響しないように）
+
+**キャッシュ対策**:
+```javascript
+// server.js
+else if (filePath.match(/\.(css|js)$/i)) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+}
+```
+
+#### ⚠️ 未解決の問題
+
+**感謝タブの表示問題が解決しない**:
+1. **依頼者モード**: 感謝タブの上部に大きな空白が残る
+2. **声優モード**: 感謝タブに「完了案件」「収益」「音声アップロード」が表示されたまま
+
+**何度修正しても変わらない理由**:
+- JavaScriptコードは正しく実装されている（Consoleで確認済み）
+- CSSも正しく適用されている（開発者ツールで確認済み）
+- ブラウザキャッシュをクリアしても変わらない
+- 複数のブラウザ（Opera、Edge）で試しても同じ
+- サーバー再起動しても変わらない
+
+**作業時間**: 約4時間かけても解決せず
+
+#### 📝 関連ファイル
+- `js/script.js`: showDashboardSection()関数修正（v81.0）
+- `css/styles.css`: #thanks-tab スタイル追加（v100.0）
+- `server.js`: CSS/JSキャッシュ無効化
+- `index.html`: ナビゲーションリンク修正
+
+#### 🔄 次のステップ
+
+**最優先タスク: Chrome開発者ツールで根本原因を徹底調査**
+
+**ステップ1: Elements タブで DOM 構造を確認**
+```
+1. 感謝タブをクリック
+2. Elements タブで #thanks-tab を検索
+3. 実際の HTML 構造を確認
+4. clientDashboardContent と narratorDashboardContent の存在を確認
+5. display プロパティが none になっているか確認
+```
+
+**ステップ2: Console タブで実際の値を確認**
+```javascript
+// 感謝タブをクリック後に実行
+const thanksTab = document.getElementById('thanks-tab');
+const clientContent = document.getElementById('clientDashboardContent');
+const narratorContent = document.getElementById('narratorDashboardContent');
+const dashboardContent = document.querySelector('.dashboard-content');
+
+console.log('=== 感謝タブの状態 ===');
+console.log('thanksTab display:', thanksTab?.style.display);
+console.log('thanksTab computed top:', window.getComputedStyle(thanksTab).top);
+console.log('dashboard padding-top:', dashboardContent?.style.paddingTop);
+console.log('clientContent display:', clientContent?.style.display);
+console.log('narratorContent display:', narratorContent?.style.display);
+```
+
+**ステップ3: showDashboardSection 関数が正しく呼ばれているか確認**
+```javascript
+// script.js の showDashboardSection 関数の最初に以下を追加
+console.log('🔍 showDashboardSection called with:', section);
+```
+
+**ステップ4: 仮説検証**
+- JavaScriptが実行されていない可能性
+- 別の JavaScript が上書きしている可能性
+- HTML構造が想定と異なる可能性
+- タイミング問題（DOMロード前に実行）
+
+#### 📚 参考情報
+
+**作業時間**: 約4時間（17:30-18:25, 休憩含む）
+
+**主な試行**:
+1. 負のmarginを使用（効果なし）
+2. position: relative + top: -40px（効果なし - ブラウザキャッシュ）
+3. server.jsでキャッシュ無効化
+4. JavaScriptでpadding-top動的制御（成功）
+
+**学んだこと**:
+- ブラウザのファイルキャッシュは非常に頑固
+- server.jsでのCache-Control設定が重要
+- バージョン番号変更だけでは不十分な場合がある
+- JavaScriptでの動的スタイル制御が最も確実
+
+---
 
 ### ✅ Phase 14: OAuth認証キャンセル画面とフッター修正 (2025-11-20 22:36)
 

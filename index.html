@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=100.0">
-    <link rel="stylesheet" href="css/modal-responsive-fix.css?v=2.0">
+    <link rel="stylesheet" href="css/styles.css?v=102.0">
+    <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0">
     <link rel="manifest" href="manifest.json">
     
     <!-- Cache Control -->
@@ -1367,142 +1367,250 @@
             <div class="tab-content" id="overview-tab" style="display: block;">
             <!-- 依頼者用コンテンツ -->
             <div class="dashboard-grid" id="clientDashboardContent">
-                <!-- 新着感謝のメッセージ通知カード -->
-                <div class="card notification-card celebration" id="newThanksNotification" style="display: none;">
-                    <div class="celebration-effects">
-                        <span class="sparkle sparkle-1">✨</span>
-                        <span class="sparkle sparkle-2">⭐</span>
-                        <span class="sparkle sparkle-3">💫</span>
-                        <span class="sparkle sparkle-4">🌟</span>
+                <!-- 1. ウェルカムカード + クイックアクション -->
+                <div class="card welcome-card-yukkuri full-width">
+                    <div class="yukkuri-welcome-container">
+                        <div class="yukkuri-character-left">
+                            <img src="images/yukkuri-charactore-english/link/link-normal.png" alt="りんくちゃん" class="yukkuri-avatar bounce">
+                        </div>
+                        <div class="welcome-content-center">
+                            <div class="speech-bubble bubble-primary">
+                                <div class="bubble-content">
+                                    <h2 class="welcome-title-yukkuri">ようこそ、<span id="clientWelcomeName" class="name-highlight">〇〇</span>さん！</h2>
+                                    <p class="welcome-subtitle-yukkuri">✨ 素敵なボイスで、あなたの企画を実現しましょう ✨</p>
+                                </div>
+                            </div>
+                            <div class="quick-actions-yukkuri">
+                                <button class="btn-yukkuri btn-create" onclick="showRequestCreationModal()">
+                                    <span class="btn-icon">📝</span>
+                                    <span class="btn-text">依頼を作成する</span>
+                                </button>
+                                <button class="btn-yukkuri btn-search" onclick="showDashboardSection('collabs')">
+                                    <span class="btn-icon">🔍</span>
+                                    <span class="btn-text">声優を探す</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="yukkuri-character-right">
+                            <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-smile-mouth-open.png" alt="こんたくん" class="yukkuri-avatar bounce-delay">
+                        </div>
                     </div>
-                    <div class="notification-icon">
-                        <i class="fas fa-heart pulse-heart"></i>
+                </div>
+
+                <!-- 2. 進行中の依頼 -->
+                <div class="card card-yukkuri ongoing-requests-card">
+                    <div class="card-header-with-character">
+                        <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-half-eyes-mouth-closed.png" alt="こんたくん" class="card-mascot">
+                        <div class="header-content">
+                            <h3><i class="fas fa-tasks"></i> 進行中の依頼</h3>
+                            <span class="badge badge-info" id="ongoingRequestsCount">0</span>
+                        </div>
                     </div>
-                    <div class="notification-content">
-                        <h2 class="celebration-title">🎉 感謝のメッセージが届いています！</h2>
-                        <p class="notification-message">あなたのボイスに <span class="highlight-count" id="newThanksCount">0</span> 件の新しい感謝のメッセージが届きました</p>
-                        <button class="btn-view-messages" onclick="viewNewThanksMessages()">
-                            <i class="fas fa-envelope-open"></i> メッセージを見る
+                    <div class="card-content" id="ongoingRequestsList">
+                        <div class="empty-state-yukkuri">
+                            <i class="fas fa-inbox"></i>
+                            <p>進行中の依頼はありません</p>
+                            <button class="btn-yukkuri btn-create" onclick="showRequestCreationModal()">
+                                <span class="btn-icon">📝</span>
+                                <span class="btn-text">最初の依頼を作成</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-footer-yukkuri">
+                        <button class="btn-yukkuri-small btn-view" onclick="showDashboardSection('history'); return false;">
+                            <span class="btn-icon">📋</span>
+                            <span class="btn-text">全ての依頼を見る</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. 新着通知（条件付き表示） -->
+                <div class="card notifications-card" id="clientNotificationsCard" style="display: none;">
+                    <div class="card-header">
+                        <h3><i class="fas fa-bell"></i> 新着通知</h3>
+                        <span class="badge badge-warning" id="notificationsCount">0</span>
+                    </div>
+                    <div class="card-content" id="notificationsList">
+                        <!-- 通知アイテムが動的に追加される -->
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" onclick="showAllNotifications(); return false;">通知を全て見る →</a>
+                    </div>
+                </div>
+
+                <!-- 4. 最近依頼した声優 -->
+                <div class="card recent-narrators-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> 最近依頼した声優</h3>
+                    </div>
+                    <div class="card-content" id="recentNarratorsList">
+                        <div class="empty-state">
+                            <i class="fas fa-user-slash"></i>
+                            <p>まだ依頼履歴がありません</p>
+                        </div>
+                    </div>
+                    <div class="card-footer-yukkuri">
+                        <button class="btn-yukkuri-small btn-view" onclick="showDashboardSection('history'); return false;">
+                            <span class="btn-icon">📜</span>
+                            <span class="btn-text">履歴を見る</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. おすすめ声優 -->
+                <div class="card recommended-narrators-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> おすすめの声優</h3>
+                    </div>
+                    <div class="card-content" id="recommendedNarratorsList">
+                        <div class="narrator-mini-cards" id="recommendedNarratorsGrid">
+                            <!-- おすすめ声優カードが動的に追加される -->
+                        </div>
+                    </div>
+                    <div class="card-footer-yukkuri">
+                        <button class="btn-yukkuri-small btn-view" onclick="showDashboardSection('collabs'); return false;">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">もっと見る</span>
                         </button>
                     </div>
                 </div>
             </div>
-            </div>
             
             <!-- 声優用コンテンツ -->
             <div class="dashboard-grid" id="narratorDashboardContent" style="display: none;">
-                <!-- 統計カード -->
-                <div class="card stats-card">
-                    <h3><i class="fas fa-inbox"></i> 受注案件</h3>
-                    <p class="stats-number">0件</p>
-                    <p class="stats-label">進行中の案件</p>
-                </div>
-
-                <div class="card stats-card">
-                    <h3><i class="fas fa-check-circle"></i> 完了案件</h3>
-                    <p class="stats-number">0件</p>
-                    <p class="stats-label">累計納品数</p>
-                </div>
-
-                <div class="card stats-card">
-                    <h3><i class="fas fa-yen-sign"></i> 収益</h3>
-                    <p class="stats-number">¥0</p>
-                    <p class="stats-label">今月の収益</p>
-                </div>
-
-                <!-- 音声アップロードカード（声優用） -->
-                <div class="card upload-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-microphone"></i> 音声アップロード</h2>
-                        <p class="subtitle">ポートフォリオに追加する音声をアップロード</p>
-                    </div>
-                    <div class="upload-content">
-                        <div class="upload-area" id="narratorUploadArea">
-                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-                            <p class="upload-text">ファイルをドラッグ＆ドロップ</p>
-                            <p class="upload-subtext">または</p>
-                            <button type="button" class="btn-upload" onclick="document.getElementById('narratorAudioFile').click()">
-                                <i class="fas fa-folder-open"></i> ファイルを選択
-                            </button>
-                            <input type="file" id="narratorAudioFile" accept="audio/*,.m4a" style="display: none;" onchange="handleNarratorFileSelect(event)">
-                            <p class="upload-note">対応形式: MP3, WAV, OGG, M4A (最大50MB)</p>
+                <!-- 1. ウェルカム + 今日のタスク -->
+                <div class="card welcome-card-yukkuri full-width">
+                    <div class="yukkuri-welcome-container">
+                        <div class="yukkuri-character-left">
+                            <img src="images/yukkuri-charactore-english/tanunee/tanuki-yukkuri-smile-mouth-open.png" alt="たぬにーくん" class="yukkuri-avatar bounce">
                         </div>
-                        
-                        <div class="upload-form" id="narratorUploadForm" style="display: none;">
-                            <h3>音声情報</h3>
-                            <div class="form-group">
-                                <label for="narratorAudioTitle">タイトル <span class="required">*</span></label>
-                                <input type="text" id="narratorAudioTitle" placeholder="例: サンプルボイス - 明るいトーン">
-                            </div>
-                            <div class="form-group">
-                                <label for="narratorAudioDescription">説明</label>
-                                <textarea id="narratorAudioDescription" rows="3" placeholder="音声の説明や用途を入力..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="narratorAudioCategory">カテゴリ <span class="required">*</span></label>
-                                <select id="narratorAudioCategory">
-                                    <option value="">選択してください</option>
-                                    <option value="sample">サンプルボイス</option>
-                                    <option value="delivered">納品済み作品</option>
-                                    <option value="profile">プロフィールボイス</option>
-                                    <option value="other">その他</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="narratorAudioPortfolio" checked>
-                                    <span>ポートフォリオに追加</span>
-                                </label>
-                                <p class="form-hint">チェックを入れると、あなたのプロフィールページに表示されます</p>
-                            </div>
-                            <div class="form-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="narratorAudioPublic" checked>
-                                    <span>公開する</span>
-                                </label>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" class="btn-secondary" onclick="cancelNarratorUpload()">キャンセル</button>
-                                <button type="button" class="btn-primary" id="narratorUploadBtn" onclick="submitNarratorUpload()">
-                                    <i class="fas fa-upload"></i> アップロード
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- アップロード進捗 -->
-                        <div class="upload-progress" id="narratorUploadProgress" style="display: none;">
-                            <h3><i class="fas fa-cloud-upload-alt"></i> アップロード中...</h3>
-                            <div class="progress-info">
-                                <div class="progress-details">
-                                    <span class="file-name" id="narratorProgressFileName"></span>
-                                    <span class="file-size" id="narratorProgressFileSize"></span>
+                        <div class="welcome-content-center">
+                            <div class="speech-bubble bubble-success">
+                                <div class="bubble-content">
+                                    <h2 class="welcome-title-yukkuri">おはようございます、<span id="narratorWelcomeName" class="name-highlight">〇〇</span>さん！</h2>
+                                    <p class="welcome-subtitle-yukkuri">🎤 今日も素敵なボイスをお届けしましょう 🎤</p>
                                 </div>
-                                <span class="progress-percentage" id="narratorProgressPercentage">0%</span>
                             </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" id="narratorProgressBar"></div>
+                            <div class="today-tasks-section-yukkuri" id="todayTasksSection">
+                                <div class="tasks-header-yukkuri">
+                                    <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-normal.png" alt="こんたくん" class="task-helper-icon">
+                                    <h3>📋 今日のタスク</h3>
+                                </div>
+                                <div class="tasks-list" id="todayTasksList">
+                                    <div class="empty-state-yukkuri">
+                                        <i class="fas fa-check-circle"></i>
+                                        <p>今日のタスクはありません！ゆっくりしていってね！</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="progress-status">
-                                <span id="narratorProgressStatus">準備中...</span>
-                                <span id="narratorProgressTime">予想時間: --</span>
-                            </div>
+                        </div>
+                        <div class="yukkuri-character-right">
+                            <img src="images/yukkuri-charactore-english/link/link-normal.png" alt="りんくちゃん" class="yukkuri-avatar bounce-delay">
                         </div>
                     </div>
                 </div>
 
-                <!-- アップロード済み音声リスト（声優用） -->
-                <div class="card voice-list-card">
-                    <div class="card-header">
-                        <h2><i class="fas fa-list"></i> アップロード済み音声</h2>
-                        <p class="subtitle">ポートフォリオ・納品作品の管理</p>
+                <!-- 2. 今月の実績サマリー -->
+                <div class="card stats-summary-card-yukkuri full-width">
+                    <div class="card-header-yukkuri">
+                        <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-smile-mouth-closed.png" alt="こんたくん" class="header-helper-icon">
+                        <h3><i class="fas fa-chart-line"></i> 今月の実績</h3>
                     </div>
-                    <div class="voice-list" id="narratorVoiceList">
-                        <div class="empty-state">
-                            <i class="fas fa-microphone-slash"></i>
-                            <p>まだ音声がアップロードされていません</p>
+                    <div class="stats-grid-yukkuri">
+                        <div class="stat-item">
+                            <div class="stat-icon revenue">
+                                <i class="fas fa-yen-sign"></i>
+                            </div>
+                            <div class="stat-details">
+                                <p class="stat-number" id="monthlyRevenue">¥0</p>
+                                <p class="stat-label">収益</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon completed">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-details">
+                                <p class="stat-number" id="completedOrders">0件</p>
+                                <p class="stat-label">完了案件</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon new">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="stat-details">
+                                <p class="stat-number" id="newRequests">0件</p>
+                                <p class="stat-label">新着依頼</p>
+                            </div>
                         </div>
                     </div>
+                    <div class="card-footer">
+                        <a href="#" onclick="showDashboardSection('history'); return false;">詳細を見る →</a>
+                    </div>
                 </div>
+
+                <!-- 3. 新着依頼 -->
+                <div class="card new-requests-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-inbox"></i> 新着依頼</h3>
+                        <span class="badge badge-warning" id="newRequestsBadge">0</span>
+                    </div>
+                    <div class="card-content" id="newRequestsList">
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>新着依頼はありません</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" onclick="showDashboardSection('history'); return false;">全ての依頼を見る →</a>
+                    </div>
+                </div>
+
+                <!-- 4. 進行中の案件 -->
+                <div class="card ongoing-orders-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-hourglass-half"></i> 進行中の案件</h3>
+                        <span class="badge badge-info" id="ongoingOrdersCount">0</span>
+                    </div>
+                    <div class="card-content" id="ongoingOrdersList">
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-check"></i>
+                            <p>進行中の案件はありません</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="#" onclick="showDashboardSection('history'); return false;">全ての案件を見る →</a>
+                    </div>
+                </div>
+
+                <!-- 5. ポートフォリオクイックアクセス -->
+                <div class="card portfolio-quick-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-microphone-alt"></i> ポートフォリオ</h3>
+                    </div>
+                    <div class="portfolio-stats">
+                        <div class="portfolio-stat">
+                            <i class="fas fa-music"></i>
+                            <span class="portfolio-stat-number" id="portfolioSamplesCount">0</span>
+                            <span class="portfolio-stat-label">サンプル音声</span>
+                        </div>
+                        <div class="portfolio-stat">
+                            <i class="fas fa-play-circle"></i>
+                            <span class="portfolio-stat-number" id="portfolioPlaysCount">0</span>
+                            <span class="portfolio-stat-label">累計再生数</span>
+                        </div>
+                    </div>
+                    <div class="card-content portfolio-actions">
+                        <button class="btn-portfolio-action btn-primary" onclick="showUploadModal()">
+                            <i class="fas fa-upload"></i> サンプルを追加
+                        </button>
+                        <button class="btn-portfolio-action btn-secondary" onclick="managePortfolio()">
+                            <i class="fas fa-cog"></i> 管理する
+                        </button>
+                    </div>
+                </div>
+
             </div>
             </div>
             <!-- ダッシュボードタブ終了 -->
@@ -1642,70 +1750,104 @@
             </div>
             <!-- あなたの感謝タブ終了 -->
 
-            <!-- 感謝タブ（統合版） -->
+            <!-- 感謝タブ（統合版・ゆっくりデザイン） -->
             <div class="tab-content" id="thanks-tab" style="display: none;">
-                <div class="thanks-container">
-                    <!-- サブタブナビゲーション -->
-                    <div class="thanks-sub-tabs">
-                        <button class="thanks-sub-tab active" data-thanks-type="received" onclick="switchThanksTab('received')">
-                            <i class="fas fa-heart"></i>
-                            <span>感謝された投稿</span>
+                <div class="thanks-container-yukkuri">
+                    <!-- ウェルカムヘッダー -->
+                    <div class="thanks-welcome-header">
+                        <img src="images/yukkuri-charactore-english/link/link-normal.png" alt="りんくちゃん" class="thanks-mascot-left bounce">
+                        <div class="speech-bubble bubble-thanks">
+                            <h2>💖 感謝のメッセージ 💖</h2>
+                            <p>みんなからの温かいメッセージをチェックしよう！</p>
+                        </div>
+                        <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-smile-mouth-closed.png" alt="こんたくん" class="thanks-mascot-right bounce-delay">
+                    </div>
+                    
+                    <!-- サブタブナビゲーション（ゆっくり版） -->
+                    <div class="thanks-sub-tabs-yukkuri">
+                        <button class="thanks-sub-tab-yukkuri active" data-thanks-type="received" onclick="switchThanksTab('received')">
+                            <span class="tab-icon">💝</span>
+                            <span class="tab-text">感謝された投稿</span>
                         </button>
-                        <button class="thanks-sub-tab" data-thanks-type="given" onclick="switchThanksTab('given')">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>感謝した投稿</span>
+                        <button class="thanks-sub-tab-yukkuri" data-thanks-type="given" onclick="switchThanksTab('given')">
+                            <span class="tab-icon">✉️</span>
+                            <span class="tab-text">感謝した投稿</span>
                         </button>
                     </div>
 
                     <!-- 感謝された投稿コンテンツ -->
                     <div class="thanks-sub-content active" id="thanks-received">
                         <div class="thanks-messages-section">
-                            <div class="thanks-messages-list" id="receivedThanksMessages">
-                                <!-- メッセージカード1 -->
-                                <div class="thanks-message-card">
-                                    <div class="message-user-info">
-                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
-                                        <div class="message-user-details">
-                                            <h4>配信者Aさん</h4>
+                            <div class="thanks-messages-list-yukkuri" id="receivedThanksMessages">
+                                <!-- メッセージカード1（ゆっくり版） -->
+                                <div class="thanks-message-card-yukkuri">
+                                    <div class="card-decorator">
+                                        <img src="images/yukkuri-charactore-english/konta/kitsune-yukkuri-blink-mouth-closed.png" alt="こんたくん" class="message-decorator-icon">
+                                    </div>
+                                    <div class="message-user-info-yukkuri">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar-yukkuri">
+                                        <div class="message-user-details-yukkuri">
+                                            <h4 class="user-name">配信者Aさん</h4>
                                             <p class="message-handle">@streamer_a</p>
                                             <p class="message-followers"><i class="fas fa-users"></i> 1,234 フォロワー</p>
                                         </div>
-                                        <span class="message-date">2025年5月10日</span>
+                                        <span class="message-date-yukkuri">📅 2025年5月10日</span>
                                     </div>
-                                    <div class="message-content">
-                                        <p>素敵なボイスありがとうございました！<br>台本のよさを3倍にも4倍にもしてくれたね！</p>
+                                    <div class="message-content-yukkuri">
+                                        <div class="message-bubble">
+                                            <p>素敵なボイスありがとうございました！<br>台本のよさを3倍にも4倍にもしてくれたね！</p>
+                                        </div>
+                                        <div class="message-reactions">
+                                            <span class="reaction-icon">💖</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- メッセージカード2 -->
-                                <div class="thanks-message-card">
-                                    <div class="message-user-info">
-                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
-                                        <div class="message-user-details">
-                                            <h4>VTuber Bさん</h4>
+                                <!-- メッセージカード2（ゆっくり版） -->
+                                <div class="thanks-message-card-yukkuri">
+                                    <div class="card-decorator">
+                                        <img src="images/yukkuri-charactore-english/tanunee/tanuki-yukkuri-smile-mouth-closed.png" alt="たぬにーくん" class="message-decorator-icon">
+                                    </div>
+                                    <div class="message-user-info-yukkuri">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar-yukkuri">
+                                        <div class="message-user-details-yukkuri">
+                                            <h4 class="user-name">VTuber Bさん</h4>
                                             <p class="message-handle">@vtuber_b</p>
                                             <p class="message-followers"><i class="fas fa-users"></i> 5,678 フォロワー</p>
                                         </div>
-                                        <span class="message-date">2025年5月8日</span>
+                                        <span class="message-date-yukkuri">📅 2025年5月8日</span>
                                     </div>
-                                    <div class="message-content">
-                                        <p>アイドルはステージを創るクリエイターさんでもあると思うので応援してます。</p>
+                                    <div class="message-content-yukkuri">
+                                        <div class="message-bubble">
+                                            <p>アイドルはステージを創るクリエイターさんでもあると思うので応援してます。</p>
+                                        </div>
+                                        <div class="message-reactions">
+                                            <span class="reaction-icon">💖</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- メッセージカード3 -->
-                                <div class="thanks-message-card">
-                                    <div class="message-user-info">
-                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar">
-                                        <div class="message-user-details">
-                                            <h4>企業Cさん</h4>
+                                <!-- メッセージカード3（ゆっくり版） -->
+                                <div class="thanks-message-card-yukkuri">
+                                    <div class="card-decorator">
+                                        <img src="images/yukkuri-charactore-english/link/link-normal.png" alt="りんくちゃん" class="message-decorator-icon">
+                                    </div>
+                                    <div class="message-user-info-yukkuri">
+                                        <img src="https://via.placeholder.com/60" alt="ユーザー" class="message-avatar-yukkuri">
+                                        <div class="message-user-details-yukkuri">
+                                            <h4 class="user-name">企業Cさん</h4>
                                             <p class="message-handle">@company_c</p>
                                             <p class="message-followers"><i class="fas fa-users"></i> 10,234 フォロワー</p>
                                         </div>
-                                        <span class="message-date">2025年5月5日</span>
+                                        <span class="message-date-yukkuri">📅 2025年5月5日</span>
                                     </div>
-                                    <div class="message-content">
-                                        <p>プロフェッショナルな対応と高品質な音声で、クライアントからも高評価をいただきました。また依頼させていただきます！</p>
+                                    <div class="message-content-yukkuri">
+                                        <div class="message-bubble">
+                                            <p>プロフェッショナルな対応と高品質な音声で、クライアントからも高評価をいただきました。また依頼させていただきます！</p>
+                                        </div>
+                                        <div class="message-reactions">
+                                            <span class="reaction-icon">💖</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1746,9 +1888,12 @@
                             <h2 class="section-title"><i class="fas fa-list"></i> 投稿済みのメッセージ</h2>
                             <div class="thanks-messages-list" id="givenThanksMessages">
                                 <!-- 自分が投稿したメッセージがここに表示されます -->
-                                <div class="empty-state">
-                                    <i class="fas fa-inbox"></i>
-                                    <p>まだ感謝のメッセージを投稿していません</p>
+                                <div class="empty-state-yukkuri-thanks">
+                                    <img src="images/yukkuri-charactore-english/tanunee/tanuki-yukkuri-half-eyes-mouth-closed.png" alt="たぬにーくん" class="empty-mascot">
+                                    <div class="empty-message">
+                                        <p class="empty-title">まだ感謝のメッセージを投稿していません</p>
+                                        <p class="empty-subtitle">上のフォームから感謝の気持ちを伝えよう！</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2166,9 +2311,91 @@
         </div>
     </div>
 
+    <!-- 納品完了時のポートフォリオ追加モーダル -->
+    <div class="modal-overlay" id="portfolioAddModal" style="display: none;">
+        <div class="modal-content portfolio-modal">
+            <button class="modal-close" onclick="closePortfolioModal()">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <div class="modal-header">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2>✅ 納品が完了しました！</h2>
+                <p class="modal-subtitle">お疲れ様でした。この音声をポートフォリオに追加しますか？</p>
+            </div>
+
+            <div class="modal-body">
+                <div class="portfolio-options">
+                    <label class="portfolio-option recommended">
+                        <input type="radio" name="portfolioChoice" value="public" checked>
+                        <div class="option-card">
+                            <div class="option-icon public">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="option-details">
+                                <h3>公開ポートフォリオに追加 <span class="badge-recommend">おすすめ</span></h3>
+                                <p>プロフィールページに表示され、他のユーザーが視聴できます</p>
+                                <ul class="option-benefits">
+                                    <li><i class="fas fa-check"></i> 実績をアピールできる</li>
+                                    <li><i class="fas fa-check"></i> 新規受注の増加につながる</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="portfolio-option">
+                        <input type="radio" name="portfolioChoice" value="private">
+                        <div class="option-card">
+                            <div class="option-icon private">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="option-details">
+                                <h3>非公開ポートフォリオに追加</h3>
+                                <p>自分だけが見れます。後から公開に変更も可能です</p>
+                                <ul class="option-benefits">
+                                    <li><i class="fas fa-check"></i> 自分の記録用として保存</li>
+                                    <li><i class="fas fa-check"></i> 将来公開することもできる</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="portfolio-option">
+                        <input type="radio" name="portfolioChoice" value="none">
+                        <div class="option-card">
+                            <div class="option-icon none">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="option-details">
+                                <h3>追加しない</h3>
+                                <p>ポートフォリオには追加せず、納品のみ完了します</p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="modal-note">
+                    <i class="fas fa-info-circle"></i>
+                    <span>※ 後から「ポートフォリオ管理」で公開・非公開を変更できます</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closePortfolioModal()">
+                    <i class="fas fa-times"></i> 後で決める
+                </button>
+                <button class="btn-primary" onclick="submitPortfolioChoice()">
+                    <i class="fas fa-check"></i> 決定
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/galaxy-effects.js"></script>
-    <script src="js/script.js?v=81.0"></script>
+    <script src="js/galaxy-effects.js?v=2.0"></script>
+    <script src="js/script.js?v=87.0"></script>
 </body>
 </html>

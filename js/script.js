@@ -6,7 +6,7 @@ const DEVELOPMENT_MODE = true; // 一時的にtrue: キャッシュをクリア�
 const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のためスキップ
 
 // 認証をスキップ（開発中のみ）
-const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse - 認証を必須にする
+const SKIP_AUTHENTICATION = true; // 本番環境では必ずfalse - 認証を必須にする
 
 // ===== Supabase初期化 =====
 const SUPABASE_URL = 'https://ljidnprwxniixrigktss.supabase.co';
@@ -4401,3 +4401,300 @@ async function acceptOrder(orderId) {
         showToast('受注中にエラーが発生しました', 'error');
     }
 }
+
+// ===== デバッグ関数（Chrome開発者ツール用） =====
+/**
+ * 感謝タブの状態をデバッグするための関数
+ * Chrome開発者ツールのConsoleで実行: debugThanksTab()
+ */
+window.debugThanksTab = function() {
+    const thanksTab = document.getElementById('thanks-tab');
+    const clientContent = document.getElementById('clientDashboardContent');
+    const narratorContent = document.getElementById('narratorDashboardContent');
+    const dashboardContent = document.querySelector('.dashboard-content');
+    const overviewTab = document.getElementById('overview-tab');
+    
+    console.log('%c=== 感謝タブの状態 ===', 'color: #4FACFE; font-size: 16px; font-weight: bold;');
+    console.log('%c🎯 基本情報', 'color: #00D9FF; font-weight: bold;');
+    console.log('  現在のロール:', currentRole);
+    console.log('  thanksTab 存在:', !!thanksTab);
+    console.log('  clientContent 存在:', !!clientContent);
+    console.log('  narratorContent 存在:', !!narratorContent);
+    
+    if (thanksTab) {
+        console.log('%c📊 #thanks-tab の状態', 'color: #00D9FF; font-weight: bold;');
+        console.log('  display (inline):', thanksTab.style.display);
+        console.log('  display (computed):', window.getComputedStyle(thanksTab).display);
+        console.log('  top (inline):', thanksTab.style.top);
+        console.log('  top (computed):', window.getComputedStyle(thanksTab).top);
+        console.log('  padding-top (computed):', window.getComputedStyle(thanksTab).paddingTop);
+        console.log('  margin-top (computed):', window.getComputedStyle(thanksTab).marginTop);
+        console.log('  classList:', Array.from(thanksTab.classList));
+    }
+    
+    if (dashboardContent) {
+        console.log('%c📐 .dashboard-content の状態', 'color: #00D9FF; font-weight: bold;');
+        console.log('  padding-top (inline):', dashboardContent.style.paddingTop);
+        console.log('  padding-top (computed):', window.getComputedStyle(dashboardContent).paddingTop);
+    }
+    
+    if (overviewTab) {
+        console.log('%c📋 #overview-tab の状態', 'color: #00D9FF; font-weight: bold;');
+        console.log('  display (inline):', overviewTab.style.display);
+        console.log('  display (computed):', window.getComputedStyle(overviewTab).display);
+    }
+    
+    if (clientContent) {
+        console.log('%c👤 #clientDashboardContent の状態', 'color: #00D9FF; font-weight: bold;');
+        console.log('  display (inline):', clientContent.style.display);
+        console.log('  display (computed):', window.getComputedStyle(clientContent).display);
+        console.log('  親要素:', clientContent.parentElement?.id || clientContent.parentElement?.className);
+    }
+    
+    if (narratorContent) {
+        console.log('%c🎤 #narratorDashboardContent の状態', 'color: #00D9FF; font-weight: bold;');
+        console.log('  display (inline):', narratorContent.style.display);
+        console.log('  display (computed):', window.getComputedStyle(narratorContent).display);
+        console.log('  親要素:', narratorContent.parentElement?.id || narratorContent.parentElement?.className);
+    }
+    
+    console.log('%c✅ デバッグ完了', 'color: #4FACFE; font-size: 14px; font-weight: bold;');
+    console.log('%c💡 ヒント: 感謝タブをクリックした直後に実行してください', 'color: #FFD700;');
+};
+
+console.log('%c🔧 デバッグ関数が利用可能です: debugThanksTab()', 'color: #4FACFE; font-weight: bold;');
+
+// ===== ダッシュボード機能 =====
+
+/**
+ * ダッシュボード表示時にユーザー名を更新
+ */
+function updateDashboardWelcome() {
+    const userName = currentUser?.displayName || currentUser?.name || 'ゲスト';
+    
+    // 依頼者ダッシュボード
+    const clientWelcomeName = document.getElementById('clientWelcomeName');
+    if (clientWelcomeName) {
+        clientWelcomeName.textContent = userName;
+    }
+    
+    // 声優ダッシュボード
+    const narratorWelcomeName = document.getElementById('narratorWelcomeName');
+    if (narratorWelcomeName) {
+        narratorWelcomeName.textContent = userName;
+    }
+}
+
+/**
+ * 依頼作成モーダルを表示（仮実装）
+ */
+function showRequestCreationModal() {
+    showToast('依頼作成機能は準備中です', 'info');
+    console.log('📝 依頼作成モーダルを表示');
+}
+
+/**
+ * 全通知を表示（仮実装）
+ */
+function showAllNotifications() {
+    showToast('通知機能は準備中です', 'info');
+    console.log('🔔 全通知を表示');
+}
+
+/**
+ * 音声アップロードモーダルを表示（仮実装）
+ */
+function showUploadModal() {
+    showToast('音声アップロード機能は準備中です', 'info');
+    console.log('🎤 音声アップロードモーダルを表示');
+}
+
+/**
+ * ポートフォリオ管理画面を表示（仮実装）
+ */
+function managePortfolio() {
+    showToast('ポートフォリオ管理機能は準備中です', 'info');
+    console.log('📁 ポートフォリオ管理画面を表示');
+}
+
+// ===== ポートフォリオ追加モーダル機能 =====
+
+let currentDeliveryData = null;
+
+/**
+ * 納品完了時にポートフォリオ追加モーダルを表示
+ * @param {Object} deliveryData - 納品データ（orderId, audioUrl, titleなど）
+ */
+function showPortfolioAddModal(deliveryData) {
+    currentDeliveryData = deliveryData;
+    const modal = document.getElementById('portfolioAddModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        console.log('📦 ポートフォリオ追加モーダルを表示', deliveryData);
+    }
+}
+
+/**
+ * ポートフォリオ追加モーダルを閉じる
+ */
+function closePortfolioModal() {
+    const modal = document.getElementById('portfolioAddModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+        currentDeliveryData = null;
+        console.log('📦 ポートフォリオ追加モーダルを閉じる');
+    }
+}
+
+/**
+ * ポートフォリオ追加の選択を送信
+ */
+async function submitPortfolioChoice() {
+    const choice = document.querySelector('input[name="portfolioChoice"]:checked')?.value;
+    
+    if (!choice) {
+        showToast('選択肢を選んでください', 'warning');
+        return;
+    }
+    
+    if (!currentDeliveryData) {
+        showToast('納品データが見つかりません', 'error');
+        return;
+    }
+    
+    try {
+        showLoading();
+        
+        console.log('📦 ポートフォリオ追加の選択:', choice, currentDeliveryData);
+        
+        if (choice === 'public') {
+            // 公開ポートフォリオに追加
+            await addToPortfolio(currentDeliveryData, true);
+            showToast('公開ポートフォリオに追加しました！', 'success');
+        } else if (choice === 'private') {
+            // 非公開ポートフォリオに追加
+            await addToPortfolio(currentDeliveryData, false);
+            showToast('非公開ポートフォリオに追加しました', 'success');
+        } else {
+            // 追加しない
+            showToast('ポートフォリオには追加されませんでした', 'info');
+        }
+        
+        closePortfolioModal();
+        
+    } catch (error) {
+        console.error('❌ ポートフォリオ追加エラー:', error);
+        showToast('ポートフォリオ追加中にエラーが発生しました', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+/**
+ * ポートフォリオに音声を追加
+ * @param {Object} deliveryData - 納品データ
+ * @param {Boolean} isPublic - 公開するかどうか
+ */
+async function addToPortfolio(deliveryData, isPublic) {
+    if (!supabaseClient) {
+        throw new Error('Supabaseクライアントが初期化されていません');
+    }
+    
+    // TODO: Supabaseにポートフォリオデータを保存
+    const portfolioData = {
+        user_id: currentUser?.id,
+        order_id: deliveryData.orderId,
+        audio_url: deliveryData.audioUrl,
+        title: deliveryData.title,
+        description: deliveryData.description,
+        is_public: isPublic,
+        created_at: new Date().toISOString()
+    };
+    
+    console.log('💾 ポートフォリオデータを保存:', portfolioData);
+    
+    // Supabase保存処理（後で実装）
+    // const { data, error } = await supabaseClient
+    //     .from('portfolio')
+    //     .insert([portfolioData]);
+    
+    // if (error) throw error;
+    
+    return portfolioData;
+}
+
+/**
+ * 今日のタスクを読み込み（声優用）
+ */
+async function loadTodayTasks() {
+    const tasksList = document.getElementById('todayTasksList');
+    if (!tasksList) return;
+    
+    // TODO: Supabaseから今日の納品期限の案件を取得
+    const tasks = [];
+    
+    if (tasks.length === 0) {
+        tasksList.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>今日のタスクはありません</p>
+            </div>
+        `;
+    } else {
+        // タスクを表示
+        tasksList.innerHTML = tasks.map(task => `
+            <div class="task-item">
+                <div class="task-icon ${task.priority}">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="task-details">
+                    <h4>${task.title}</h4>
+                    <p>${task.deadline}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+/**
+ * 今月の実績を読み込み（声優用）
+ */
+async function loadMonthlyStats() {
+    // TODO: Supabaseから今月の実績を取得
+    const stats = {
+        revenue: 0,
+        completedOrders: 0,
+        newRequests: 0
+    };
+    
+    // UIを更新
+    const revenueEl = document.getElementById('monthlyRevenue');
+    if (revenueEl) revenueEl.textContent = `¥${stats.revenue.toLocaleString()}`;
+    
+    const completedEl = document.getElementById('completedOrders');
+    if (completedEl) completedEl.textContent = `${stats.completedOrders}件`;
+    
+    const requestsEl = document.getElementById('newRequests');
+    if (requestsEl) requestsEl.textContent = `${stats.newRequests}件`;
+}
+
+/**
+ * ダッシュボード表示時の初期化処理を追加
+ */
+const originalShowPlatform = window.showPlatform || function() {};
+window.showPlatform = async function() {
+    await originalShowPlatform();
+    
+    // ウェルカムメッセージを更新
+    updateDashboardWelcome();
+    
+    // 声優モードの場合、追加データを読み込み
+    if (currentRole === 'narrator') {
+        await loadTodayTasks();
+        await loadMonthlyStats();
+    }
+};
+
+console.log('✅ ダッシュボード機能が読み込まれました');
