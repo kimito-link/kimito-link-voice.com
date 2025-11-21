@@ -17,6 +17,10 @@
     "lighthouse:auto": "node lighthouse-auto-commit.js",
     "debug": "node auto-debug.js",
     "fix": "node debug-and-fix.js",
+    "demo": "node auto-demo-recorder.js",
+    "demo:story": "node auto-demo-story.js",
+    "demo:dashboard": "node auto-demo-dashboard.js",
+    "demo:manual": "node auto-demo-manual.js",
     "birthday": "node birthday-shizuku/birthday-automation.js"
   },
   "keywords": [

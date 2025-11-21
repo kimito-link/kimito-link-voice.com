@@ -1,1 +1,1 @@
-chore: ignore commit_message.txt working file
+docs: update progress with promotion content

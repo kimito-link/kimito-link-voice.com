@@ -654,19 +654,21 @@ body {
 }
 
 .narrator-card {
-    background: var(--card-bg);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--card-border);
+    border: 2px solid #4FC3F7;
     border-radius: 20px;
     padding: 25px;
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
+    box-shadow: 0 4px 15px rgba(79, 195, 247, 0.15);
 }
 
 .narrator-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    box-shadow: 0 10px 30px rgba(79, 195, 247, 0.4);
+    border-color: #26C6DA;
 }
 
 .narrator-badge {
@@ -680,18 +682,21 @@ body {
 }
 
 .badge-entry {
-    background: var(--success-green);
+    background: linear-gradient(135deg, #4CAF50, #45a049);
     color: white;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 
 .badge-standard {
-    background: var(--primary-orange);
+    background: linear-gradient(135deg, #FF9800, #F57C00);
     color: white;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 
 .badge-professional {
-    background: var(--primary-blue);
+    background: linear-gradient(135deg, #2196F3, #1976D2);
     color: white;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 }
 
 .narrator-avatar {
@@ -699,40 +704,113 @@ body {
     height: 100px;
     border-radius: 50%;
     margin: 20px auto;
-    border: 3px solid var(--primary-blue);
+    border: 3px solid #4FC3F7;
+    box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
 }
 
 .narrator-name {
     font-size: 1.3rem;
-    color: var(--text-primary);
+    color: #1a1a1a;
     margin-bottom: 6px;
+    font-weight: 700;
 }
 
 .narrator-handle {
-    color: var(--primary-blue);
+    color: #4FC3F7;
     font-size: 0.95rem;
     margin-bottom: 6px;
+    font-weight: 600;
 }
 
 .narrator-followers {
-    color: #4FC3F7; /* 明るい水色 */
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(255, 138, 101, 0.1));
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 2px solid var(--primary-blue);
-    display: inline-block;
+    color: var(--primary-blue);
+    font-size: 1rem;
+    margin: 12px 0;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
 }
 
 .narrator-followers i {
-    color: #4FC3F7; /* 明るい水色 */
-    font-size: 1.2rem;
+    color: var(--primary-blue);
+    font-size: 1.4rem;
+}
+
+.narrator-followers .follower-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.narrator-followers .follower-count {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--primary-blue);
+    margin-left: 5px;
+}
+
+/* 声優カード - フォローセクション */
+.narrator-follow-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.narrator-follow-section .narrator-followers {
+    flex: 1;
+    margin: 0;
+}
+
+/* 声優カード専用フォローボタン（ブルー/グリーン系） */
+.btn-follow-narrator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #4FC3F7, #26C6DA);
+    color: white;
+    text-decoration: none;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(79, 195, 247, 0.3);
+    white-space: nowrap;
+}
+
+.btn-follow-narrator:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 195, 247, 0.5);
+    background: linear-gradient(135deg, #26C6DA, #00ACC1);
+}
+
+.btn-follow-narrator i {
+    font-size: 1rem;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .narrator-follow-section {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .narrator-follow-section .narrator-followers {
+        width: 100%;
+    }
+    
+    .btn-follow-narrator {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .narrator-bio {
-    color: var(--text-secondary);
+    color: #555555;
     font-size: 0.9rem;
     line-height: 1.5;
     margin: 8px 0;
@@ -743,6 +821,7 @@ body {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
 }
 
@@ -755,23 +834,25 @@ body {
 }
 
 .tag {
-    background: rgba(0, 66, 123, 0.2);
-    color: var(--text-secondary);
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1a1a1a;
     padding: 4px 12px;
     border-radius: 12px;
     font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #4FC3F7;
 }
 
 .narrator-price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: #4FC3F7;
     margin: 15px 0 5px;
 }
 
 .narrator-meta {
     font-size: 0.9rem;
-    color: var(--text-secondary);
+    color: #666666;
     margin-bottom: 15px;
 }
 
@@ -1029,21 +1110,90 @@ body {
     margin-bottom: 12px;
 }
 
+.follower-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
 .collaborator-followers {
     color: var(--primary-blue);
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 15px;
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(255, 138, 101, 0.15));
-    padding: 10px 16px;
-    border-radius: 10px;
-    border: 2px solid var(--primary-blue);
-    display: inline-block;
+    font-size: 1rem;
+    margin: 0;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 200px;
 }
 
 .collaborator-followers i {
     color: var(--primary-blue);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+}
+
+.follower-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.follower-count {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--primary-blue);
+    margin-left: 5px;
+}
+
+.btn-follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #1DA1F2, #0d8bd9);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(29, 161, 242, 0.3);
+}
+
+.btn-follow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 161, 242, 0.5);
+    background: linear-gradient(135deg, #0d8bd9, #0a7bc4);
+}
+
+.btn-follow i {
+    font-size: 1.2rem;
+}
+
+/* フォロワーセクション - レスポンシブ */
+@media (max-width: 768px) {
+    .follower-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .collaborator-followers {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .follower-count {
+        font-size: 1.5rem;
+    }
+    
+    .btn-follow {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .collaborator-features {

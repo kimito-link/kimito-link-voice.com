@@ -1,10 +1,10 @@
 # 🔧 自動修正提案レポート
 
-生成日時: 2025/11/22 7:02:10
+生成日時: 2025/11/22 8:06:18
 
 ---
 
-## ⚠️ 9件の項目があります
+## ⚠️ 10件の項目があります
 
 ### 1. 認証エラー
 
@@ -24,34 +24,7 @@ TWITTER_BEARER_TOKEN=あなたのBearer Token
 
 ---
 
-### 2. API 404エラー: http://localhost:3000/api/logs
-
-**問題:**
-APIエンドポイントが見つかりません
-
-**解決策:**
-1. ユーザー名のスペルを確認
-2. APIエンドポイントのURLを確認
-3. サーバー側のルーティングを確認
-
-**修正コード:**
-```javascript
-// 修正例（js/script.js）
-async function loadCollabMemberCard() {
-    const username = 'c0tanpoTesh1ta'; // 正しいスペルを確認
-    console.log('🤝 コラボメンバー情報取得中...', username);
-    
-    const apiUrl = `/api/user/profile/${username}`;
-    console.log('📡 API呼び出し:', apiUrl);
-    
-    const response = await fetch(apiUrl);
-    // ...
-}
-```
-
----
-
-### 3. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+### 2. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 **問題:**
 Failed to load resource: net::ERR_NAME_NOT_RESOLVED
@@ -65,7 +38,7 @@ Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 ---
 
-### 4. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+### 3. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 **問題:**
 Failed to load resource: net::ERR_NAME_NOT_RESOLVED
@@ -79,7 +52,7 @@ Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 ---
 
-### 5. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
+### 4. コンソールエラー: Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 **問題:**
 Failed to load resource: net::ERR_NAME_NOT_RESOLVED
@@ -93,7 +66,7 @@ Failed to load resource: net::ERR_NAME_NOT_RESOLVED
 
 ---
 
-### 6. コンソールエラー: Failed to load resource: the server responded with a status of 401 (Unauthorized)
+### 5. コンソールエラー: Failed to load resource: the server responded with a status of 401 (Unauthorized)
 
 **問題:**
 Failed to load resource: the server responded with a status of 401 (Unauthorized)
@@ -107,7 +80,7 @@ Failed to load resource: the server responded with a status of 401 (Unauthorized
 
 ---
 
-### 7. コンソールエラー: Failed to load resource: the server responded with a status of 404 (Not Found)
+### 6. コンソールエラー: Failed to load resource: the server responded with a status of 404 (Not Found)
 
 **問題:**
 Failed to load resource: the server responded with a status of 404 (Not Found)
@@ -121,21 +94,49 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
 
 ---
 
-### 8. コンソールエラー: Failed to load resource: the server responded with a status of 404 (Not Found)
+### 7. コンソールエラー: Failed to load resource: the server responded with a status of 429 (Too Many Requests)
 
 **問題:**
-Failed to load resource: the server responded with a status of 404 (Not Found)
+Failed to load resource: the server responded with a status of 429 (Too Many Requests)
 
 **解決策:**
 1. エラーメッセージを確認
 2. 該当行を修正
 3. 変数のスコープを確認
 
-**場所:** http://localhost:3000/api/logs:undefined
+**場所:** http://localhost:3000/api/user/profile/c0tanpoTesh1ta?force=true:undefined
 
 ---
 
-### 9. 📊 APIコール詳細
+### 8. コンソールエラー: ❌ コラボメンバー情報取得エラー: 429
+
+**問題:**
+❌ コラボメンバー情報取得エラー: 429
+
+**解決策:**
+1. エラーメッセージを確認
+2. 該当行を修正
+3. 変数のスコープを確認
+
+**場所:** http://localhost:3000/js/error-logger.js?v=1.0:28
+
+---
+
+### 9. コンソールエラー: ❌ エラー詳細: {"error":{"title":"Too Many Requests","detail":"Too Many Requests","type":"about:blank","status":429}}
+
+**問題:**
+❌ エラー詳細: {"error":{"title":"Too Many Requests","detail":"Too Many Requests","type":"about:blank","status":429}}
+
+**解決策:**
+1. エラーメッセージを確認
+2. 該当行を修正
+3. 変数のスコープを確認
+
+**場所:** http://localhost:3000/js/error-logger.js?v=1.0:28
+
+---
+
+### 10. 📊 APIコール詳細
 
 **詳細:**
 ```json
@@ -147,19 +148,13 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
     "success": true
   },
   {
-    "url": "http://localhost:3000/api/user/profile/streamerfunch",
-    "status": 200,
-    "method": "GET",
-    "success": true
-  },
-  {
     "url": "http://localhost:3000/api/user/profile/idolfunch",
     "status": 200,
     "method": "GET",
     "success": true
   },
   {
-    "url": "http://localhost:3000/api/user/profile/c0tanpoTesh1ta?force=true",
+    "url": "http://localhost:3000/api/user/profile/streamerfunch",
     "status": 200,
     "method": "GET",
     "success": true
@@ -171,10 +166,16 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
     "success": false
   },
   {
-    "url": "http://localhost:3000/api/logs",
-    "status": 404,
-    "method": "POST",
+    "url": "http://localhost:3000/api/user/profile/c0tanpoTesh1ta?force=true",
+    "status": 429,
+    "method": "GET",
     "success": false
+  },
+  {
+    "url": "http://localhost:3000/api/logs",
+    "status": 200,
+    "method": "POST",
+    "success": true
   }
 ]
 ```

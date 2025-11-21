@@ -1282,7 +1282,7 @@ function sleep(ms) {
 }
 
 // ===== キャッシュ管理 =====
-const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7日間（ミリ秒） - スケーラビリティのため延長
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24時間（ミリ秒） - 毎日最新データに更新
 
 // キャッシュからアカウント情報を取得
 function getCachedAccountData(username, allowExpired = false) {
@@ -3470,11 +3470,19 @@ async function loadCollabMemberCard(forceFresh = false) {
         if (followersEl) {
             if (userData.public_metrics?.followers_count !== undefined) {
                 const count = userData.public_metrics.followers_count.toLocaleString();
-                followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">${count}</span>
+                `;
                 console.log('✅ フォロワー数を設定:', count);
             } else {
                 // フォロワー数が取得できない場合はデフォルトを表示
-                followersEl.innerHTML = '<i class="fas fa-users"></i> フォロワー情報取得中...';
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">取得中...</span>
+                `;
                 console.warn('⚠️ フォロワー数が取得できませんでした');
                 console.warn('⚠️ public_metrics全体:', userData.public_metrics);
             }
@@ -3489,7 +3497,11 @@ async function loadCollabMemberCard(forceFresh = false) {
         // エラー時もUIを更新
         const followersEl = document.getElementById('collabFollowers');
         if (followersEl) {
-            followersEl.innerHTML = '<i class="fas fa-users"></i> 取得に失敗しました';
+            followersEl.innerHTML = `
+                <i class="fas fa-users"></i> 
+                <span class="follower-label">フォロワー</span>
+                <span class="follower-count">取得失敗</span>
+            `;
         }
     }
 }
@@ -3545,9 +3557,21 @@ async function loadNarratorCard1() {
         
         // フォロワー数を更新
         const followersEl = document.getElementById('narrator1Followers');
-        if (followersEl && userData.public_metrics?.followers_count) {
-            const count = userData.public_metrics.followers_count.toLocaleString();
-            followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        if (followersEl) {
+            if (userData.public_metrics?.followers_count !== undefined) {
+                const count = userData.public_metrics.followers_count.toLocaleString();
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">${count}</span>
+                `;
+            } else {
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">取得中...</span>
+                `;
+            }
         }
         
         // プロフィール文を更新
@@ -3606,9 +3630,21 @@ async function loadNarratorCard2() {
         
         // フォロワー数を更新
         const followersEl = document.getElementById('narrator2Followers');
-        if (followersEl && userData.public_metrics?.followers_count) {
-            const count = userData.public_metrics.followers_count.toLocaleString();
-            followersEl.innerHTML = `<i class="fas fa-users"></i> ${count} フォロワー`;
+        if (followersEl) {
+            if (userData.public_metrics?.followers_count !== undefined) {
+                const count = userData.public_metrics.followers_count.toLocaleString();
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">${count}</span>
+                `;
+            } else {
+                followersEl.innerHTML = `
+                    <i class="fas fa-users"></i> 
+                    <span class="follower-label">フォロワー</span>
+                    <span class="follower-count">取得中...</span>
+                `;
+            }
         }
         
         // プロフィール文を更新
@@ -3626,12 +3662,15 @@ async function loadNarratorCard2() {
 
 // ページ読み込み時に自動的に取得
 window.addEventListener('DOMContentLoaded', function() {
+    // 古いキャッシュを自動削除
+    cleanExpiredCache();
+    
     // 全てのカードを読み込み
     loadNarratorCard1();      // TOPページ声優カード1 (@streamerfunch)
     loadNarratorCard2();      // TOPページ声優カード2 (@idolfunch)
     // 声優カード3はダミーデータのまま
     loadVoiceActorCard();     // 声優プロフィールタブ
-    loadCollabMemberCard(true);   // コラボメンバー (@c0tanpoTesh1ta) - 常に最新データを取得
+    loadCollabMemberCard(false);  // コラボメンバー (@c0tanpoTesh1ta) - キャッシュ優先
     
     // 依頼フォームの初期化
     initializeRequestForm();
@@ -3639,6 +3678,43 @@ window.addEventListener('DOMContentLoaded', function() {
     // 役割切り替えの初期化
     initializeRoleSwitch();
 });
+
+// 古いキャッシュを自動削除する関数
+function cleanExpiredCache() {
+    try {
+        const keys = Object.keys(localStorage);
+        let deletedCount = 0;
+        
+        keys.forEach(key => {
+            if (key.startsWith('account_')) {
+                try {
+                    const cached = localStorage.getItem(key);
+                    if (cached) {
+                        const data = JSON.parse(cached);
+                        // 24時間以上古いキャッシュを削除
+                        if (Date.now() - data.timestamp > CACHE_DURATION) {
+                            localStorage.removeItem(key);
+                            deletedCount++;
+                            console.log(`🗑️ 古いキャッシュを削除: ${key}`);
+                        }
+                    }
+                } catch (e) {
+                    // パースエラーの場合も削除
+                    localStorage.removeItem(key);
+                    deletedCount++;
+                }
+            }
+        });
+        
+        if (deletedCount > 0) {
+            console.log(`✅ ${deletedCount}件の古いキャッシュを削除しました`);
+        } else {
+            console.log('✅ キャッシュは最新です');
+        }
+    } catch (error) {
+        console.warn('⚠️ キャッシュクリーンアップエラー:', error);
+    }
+}
 
 // ===== 役割切り替え機能 =====
 

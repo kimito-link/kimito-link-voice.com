@@ -25,9 +25,9 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 // フォロー状態のキャッシュ（5分間有効）
 const followStatusCache = new Map();
 
-// アカウント情報のサーバー側キャッシュ（7日間有効）
+// アカウント情報のサーバー側キャッシュ（24時間有効）
 const accountProfileCache = new Map();
-const ACCOUNT_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7日間
+const ACCOUNT_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24時間（1日1回更新）
 
 // セッション設定（メモリストア使用 - 開発用）
 app.use(session({
