@@ -1,0 +1,468 @@
+/* ===== プロフィールページ専用スタイル ===== */
+
+.profile-main {
+    min-height: 100vh;
+    padding: 80px 0 50px;
+    position: relative;
+    z-index: 1;
+}
+
+/* プロフィールヘッダー */
+.profile-header {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.profile-cover {
+    height: 200px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cover-logo {
+    width: 200px;
+    height: auto;
+    opacity: 0.9;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.profile-info {
+    padding: 0 30px 30px;
+    position: relative;
+}
+
+.profile-avatar-wrapper {
+    position: relative;
+    margin-top: -60px;
+    margin-bottom: 20px;
+    width: 120px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.rank-badge {
+    position: absolute;
+    bottom: 5px;
+    right: -10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.badge-entry {
+    background: linear-gradient(135deg, #4FC3F7 0%, #26C6DA 100%);
+}
+
+.badge-standard {
+    background: linear-gradient(135deg, #AB47BC 0%, #8E24AA 100%);
+}
+
+.badge-professional {
+    background: linear-gradient(135deg, #FFA726 0%, #FB8C00 100%);
+}
+
+.profile-details {
+    margin-top: 20px;
+}
+
+.profile-name {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+.profile-handle {
+    display: inline-block;
+    padding: 4px 12px;
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    color: #01579B;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1.5px solid #4FC3F7;
+    margin-bottom: 20px;
+}
+
+/* プロフィール統計 */
+.profile-stats {
+    display: flex;
+    gap: 30px;
+    margin: 25px 0;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-width: 80px;
+}
+
+.stat-item i {
+    color: #4FC3F7;
+    font-size: 1.5rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* プロフィールアクション */
+.profile-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-request-large,
+.btn-follow-large {
+    padding: 14px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-request-large {
+    background: linear-gradient(135deg, #4FC3F7 0%, #26C6DA 100%);
+    color: #fff;
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-request-large:hover {
+    background: linear-gradient(135deg, #26C6DA 0%, #00ACC1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 195, 247, 0.4);
+}
+
+.btn-follow-large {
+    background: #1DA1F2;
+    color: #fff;
+    justify-content: center;
+}
+
+.btn-follow-large:hover {
+    background: #1991DA;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(29, 161, 242, 0.4);
+}
+
+/* プロフィールコンテンツ */
+.profile-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+}
+
+.profile-section {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: #4FC3F7;
+}
+
+.profile-bio {
+    color: #333;
+    font-size: 1rem;
+    line-height: 1.8;
+    white-space: pre-wrap;
+}
+
+/* 料金カード */
+.pricing-card {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.pricing-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(79, 195, 247, 0.3);
+}
+
+.pricing-item:last-of-type {
+    border-bottom: none;
+}
+
+.pricing-label {
+    font-size: 1rem;
+    color: #01579B;
+    font-weight: 600;
+}
+
+.pricing-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #01579B;
+}
+
+.pricing-note {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #01579B;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* タグリスト */
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag-list .tag {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    color: #01579B;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1.5px solid #4FC3F7;
+}
+
+/* サンプルボイス */
+.sample-voice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.sample-voice-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #e3f2fd;
+}
+
+.sample-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: #01579B;
+    font-weight: 600;
+}
+
+.sample-info i {
+    color: #4FC3F7;
+}
+
+.sample-audio {
+    width: 100%;
+}
+
+/* 実績 */
+.achievement-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.achievement-item i {
+    color: #4FC3F7;
+    font-size: 1.2rem;
+}
+
+/* 対応時間 */
+.response-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.info-label {
+    color: #666;
+    font-weight: 600;
+}
+
+.info-value {
+    color: #01579B;
+    font-weight: 700;
+}
+
+/* 感謝のメッセージ */
+.thanks-preview {
+    text-align: center;
+}
+
+.thanks-note {
+    color: #999;
+    margin-bottom: 15px;
+}
+
+.btn-view-thanks {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4FC3F7 0%, #26C6DA 100%);
+    color: #fff;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-view-thanks:hover {
+    background: linear-gradient(135deg, #26C6DA 0%, #00ACC1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(79, 195, 247, 0.4);
+}
+
+/* レスポンシブ：タブレット */
+@media (max-width: 1024px) {
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-stats {
+        gap: 20px;
+    }
+    
+    .profile-actions {
+        flex-direction: column;
+    }
+}
+
+/* レスポンシブ：スマホ */
+@media (max-width: 768px) {
+    .profile-main {
+        padding: 60px 0 30px;
+    }
+    
+    .profile-header {
+        border-radius: 15px;
+    }
+    
+    .profile-cover {
+        height: 150px;
+    }
+    
+    .cover-logo {
+        width: 150px;
+    }
+    
+    .profile-info {
+        padding: 0 20px 20px;
+    }
+    
+    .profile-avatar-wrapper {
+        margin-top: -40px;
+        width: 100px;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-name {
+        font-size: 1.5rem;
+    }
+    
+    .profile-stats {
+        gap: 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .profile-section {
+        padding: 20px;
+    }
+    
+    .btn-request-large,
+    .btn-follow-large {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}

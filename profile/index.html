@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - KimiLink Voice</title>
+    <meta name="description" content="{{description}}">
+    
+    <!-- DNS Prefetch & Preconnect -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+    <!-- 宇宙背景エフェクト -->
+    <div id="star-field"></div>
+    <div class="galaxy-fog"></div>
+    <div class="aurora"></div>
+
+    <!-- ヘッダー -->
+    <header class="public-header">
+        <div class="header-container">
+            <div class="logo-area" onclick="location.href='/'">
+                <img src="/images/logo/RGB/透過/logo_funlink_RGB_ginga_color.png" alt="KimiLink Voice" class="header-logo">
+                <span class="logo-text">KimiLink Voice</span>
+            </div>
+            
+            <nav class="header-nav">
+                <a href="/">ホーム</a>
+                <a href="/narrators/">声優一覧</a>
+                <a href="/thanks/">感謝のメッセージ</a>
+            </nav>
+
+            <button type="button" class="btn-login" onclick="location.href='/dashboard/'">
+                <i class="fas fa-tachometer-alt"></i> ダッシュボード
+            </button>
+        </div>
+    </header>
+
+    <!-- プロフィールコンテンツ -->
+    <main class="profile-main">
+        <div class="container">
+            <!-- プロフィールヘッダー -->
+            <div class="profile-header">
+                <div class="profile-cover" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <img src="/images/logo/RGB/透過/logo_funlink_RGB_ginga_color.png" alt="KimiLink Voice" class="cover-logo">
+                </div>
+                
+                <div class="profile-info">
+                    <div class="profile-avatar-wrapper">
+                        <img src="{{profile_image_url}}" alt="{{name}}" class="profile-avatar" width="120" height="120" loading="eager" decoding="sync">
+                        <div class="rank-badge badge-{{rank}}">{{rankLabel}}</div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <h1 class="profile-name">{{name}}</h1>
+                        <p class="profile-handle">@{{username}}</p>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                <span class="stat-number">{{followers_count}}</span>
+                                <span class="stat-label">フォロワー</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span class="stat-number">{{achievement_count}}</span>
+                                <span class="stat-label">実績</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-heart"></i>
+                                <span class="stat-number">{{engagement_count}}</span>
+                                <span class="stat-label">エンゲージメント</span>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="btn-request-large" onclick="openRequestModal()">
+                                <i class="fas fa-paper-plane"></i> 依頼する
+                            </button>
+                            <a href="https://twitter.com/{{username}}" class="btn-follow-large">
+                                <i class="fab fa-twitter"></i> フォロー
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- プロフィール本文 -->
+            <div class="profile-content">
+                <!-- 左カラム -->
+                <div class="profile-left">
+                    <!-- 自己紹介 -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-user-circle"></i> 自己紹介
+                        </h2>
+                        <p class="profile-bio">{{description}}</p>
+                    </section>
+
+                    <!-- 料金表 -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-tag"></i> 料金
+                        </h2>
+                        <div class="pricing-card">
+                            <div class="pricing-item">
+                                <span class="pricing-label">基本料金</span>
+                                <span class="pricing-value">¥{{price_per_char}}/文字</span>
+                            </div>
+                            <div class="pricing-item">
+                                <span class="pricing-label">最低料金</span>
+                                <span class="pricing-value">¥{{min_price}}</span>
+                            </div>
+                            <div class="pricing-note">
+                                <i class="fas fa-info-circle"></i>
+                                文字数に応じて自動計算されます
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 得意ジャンル -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-tags"></i> 得意ジャンル
+                        </h2>
+                        <div class="tag-list">
+                            {{tags}}
+                        </div>
+                    </section>
+
+                    <!-- サンプルボイス -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-headphones"></i> サンプルボイス
+                        </h2>
+                        <div class="sample-voice-list">
+                            <div class="sample-voice-item">
+                                <div class="sample-info">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>自己紹介</span>
+                                </div>
+                                <audio controls class="sample-audio">
+                                    <source src="/uploads/samples/{{username}}/intro.mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                            <div class="sample-voice-item">
+                                <div class="sample-info">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>ポートフォリオ1</span>
+                                </div>
+                                <audio controls class="sample-audio">
+                                    <source src="/uploads/samples/{{username}}/portfolio1.mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                            <div class="sample-voice-item">
+                                <div class="sample-info">
+                                    <i class="fas fa-microphone"></i>
+                                    <span>ポートフォリオ2</span>
+                                </div>
+                                <audio controls class="sample-audio">
+                                    <source src="/uploads/samples/{{username}}/portfolio2.mp3" type="audio/mpeg">
+                                </audio>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 右カラム -->
+                <div class="profile-right">
+                    <!-- 実績 -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-trophy"></i> 実績
+                        </h2>
+                        <div class="achievement-stats">
+                            <div class="achievement-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>完了案件: <strong>{{achievement_count}}件</strong></span>
+                            </div>
+                            <div class="achievement-item">
+                                <i class="fas fa-redo"></i>
+                                <span>リピート率: <strong>85%</strong></span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 対応時間 -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock"></i> 対応時間
+                        </h2>
+                        <div class="response-info">
+                            <div class="info-item">
+                                <span class="info-label">平均返信時間</span>
+                                <span class="info-value">2時間以内</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">平均納期</span>
+                                <span class="info-value">3日</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 感謝のメッセージ -->
+                    <section class="profile-section">
+                        <h2 class="section-title">
+                            <i class="fas fa-heart"></i> 感謝のメッセージ
+                        </h2>
+                        <div class="thanks-preview">
+                            <p class="thanks-note">まだメッセージがありません</p>
+                            <a href="/{{username}}/thanks/" class="btn-view-thanks">
+                                すべて見る <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター -->
+    <footer class="public-footer">
+        <div class="footer-container">
+            <p>&copy; 2024 KimiLink Voice. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- スクリプト -->
+    <script src="/js/script.js"></script>
+</body>
+</html>

@@ -86,6 +86,136 @@ const upload = multer({
 app.use(compression()); // Gzip圧縮を有効化
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ===== 動的ルーティング（静的ファイルより前に配置） =====
+
+// 声優プロフィールの仮データ（後でデータベースから取得）
+const narratorProfiles = {
+    'streamerfunch': {
+        name: '君斗りんく@クリエイター応援',
+        rank: 'entry',
+        rankLabel: 'エントリー',
+        price_per_char: 1,
+        min_price: 500,
+        achievement_count: 23,
+        engagement_count: 1250, // いいね + RT + リプライ + 引用RT の合計
+        tags: '<span class="tag">少女ボイス</span><span class="tag">萌え系</span><span class="tag">YouTube</span>',
+        description: 'はろー！君斗りんくなのだ🎶配信者•クリエイターの収益アップを目的に、ボクの作ったYouTube動画やコンテンツを応援しているのだ！',
+        avatar_url: '' // Twitter APIから取得
+    },
+    'idolfunch': {
+        name: '君斗りんく@アイドル応援',
+        rank: 'standard',
+        rankLabel: 'スタンダード',
+        price_per_char: 3,
+        min_price: 1000,
+        achievement_count: 45,
+        engagement_count: 3840, // いいね + RT + リプライ + 引用RT の合計
+        tags: '<span class="tag">青年ボイス</span><span class="tag">ナレーション</span><span class="tag">配信</span>',
+        description: 'アイドルを応援する君斗りんくです！一緒にアイドル文化を盛り上げていきましょう！',
+        avatar_url: '' // Twitter APIから取得
+    },
+    'c0tanpoTesh1ta': {
+        name: 'コタのAI紀行',
+        rank: 'professional',
+        rankLabel: 'プロ',
+        price_per_char: 6,
+        min_price: 3000,
+        achievement_count: 89,
+        engagement_count: 12345, // いいね + RT + リプライ + 引用RT の合計
+        tags: '<span class="tag">動画編集</span><span class="tag">AI活用</span><span class="tag">SNS拡散</span>',
+        description: '猫でも分かるAI！黒猫が発作的創造『変ジーナ』睡眠第一・ご飯自由・猫欠乏症 無言フォローご めんなさい。',
+        avatar_url: '' // Twitter APIから取得
+    }
+};
+
+// プロフィールページ: /:username/profile/
+app.get('/:username/profile/', async (req, res) => {
+    try {
+        const { username } = req.params;
+        
+        console.log(`📄 プロフィールページリクエスト: ${username}`);
+        
+        // 仮データを取得
+        const profileData = narratorProfiles[username];
+        
+        if (!profileData) {
+            console.log(`❌ 声優が見つかりません: ${username}`);
+            return res.status(404).send('声優が見つかりません');
+        }
+        
+        // Twitter APIからアカウント情報を取得
+        let twitterData = {
+            username: username,
+            name: profileData.name,
+            description: profileData.description || 'プロフィールを読み込んでいます...',
+            profile_image_url: profileData.avatar_url || '/images/icon/default-avatar.png',
+            followers_count: '...'
+        };
+        
+        try {
+            // キャッシュを使用してTwitter APIレート制限を回避
+            const response = await axios.get(`http://localhost:${PORT}/api/user/profile/${username}`);
+            if (response.data && response.data.profile_image_url) {
+                const followerCount = response.data.public_metrics?.followers_count || 0;
+                // _normalを_400x400に置き換えて高解像度画像を取得
+                let avatarUrl = response.data.profile_image_url;
+                if (avatarUrl.includes('_normal')) {
+                    avatarUrl = avatarUrl.replace('_normal', '_400x400');
+                }
+                
+                twitterData = {
+                    username: username,
+                    name: response.data.name || profileData.name,
+                    description: response.data.description || profileData.description || 'プロフィール情報がありません',
+                    profile_image_url: avatarUrl,
+                    followers_count: followerCount.toLocaleString()
+                };
+                console.log(`✅ Twitter情報取得成功: ${username}`);
+                console.log(`   - 名前: ${twitterData.name}`);
+                console.log(`   - フォロワー数: ${followerCount}`);
+                console.log(`   - アバターURL: ${avatarUrl}`);
+            } else {
+                console.log(`⚠️ Twitter API レスポンスが不完全: ${username}`);
+                console.log(`   - レスポンス:`, JSON.stringify(response.data, null, 2));
+            }
+        } catch (error) {
+            console.error(`❌ Twitter情報取得失敗: ${username}`);
+            console.error(`   - エラー: ${error.message}`);
+            if (error.response) {
+                console.error(`   - ステータス: ${error.response.status}`);
+                console.error(`   - レスポンス:`, error.response.data);
+            }
+        }
+        
+        // HTMLテンプレートを読み込み
+        const templatePath = path.join(__dirname, 'profile', 'index.html');
+        let html = fs.readFileSync(templatePath, 'utf8');
+        
+        // プレースホルダーを置き換え
+        html = html.replace(/\{\{name\}\}/g, twitterData.name);
+        html = html.replace(/\{\{username\}\}/g, twitterData.username);
+        html = html.replace(/\{\{description\}\}/g, twitterData.description);
+        html = html.replace(/\{\{profile_image_url\}\}/g, twitterData.profile_image_url);
+        html = html.replace(/\{\{followers_count\}\}/g, twitterData.followers_count);
+        html = html.replace(/\{\{rank\}\}/g, profileData.rank);
+        html = html.replace(/\{\{rankLabel\}\}/g, profileData.rankLabel);
+        html = html.replace(/\{\{price_per_char\}\}/g, profileData.price_per_char);
+        html = html.replace(/\{\{min_price\}\}/g, profileData.min_price.toLocaleString());
+        html = html.replace(/\{\{achievement_count\}\}/g, profileData.achievement_count);
+        html = html.replace(/\{\{engagement_count\}\}/g, profileData.engagement_count.toLocaleString());
+        html = html.replace(/\{\{tags\}\}/g, profileData.tags);
+        
+        res.send(html);
+        console.log(`✅ プロフィールページ送信完了: ${username}`);
+        
+    } catch (error) {
+        console.error('❌ プロフィールページエラー:', error);
+        res.status(500).send('サーバーエラーが発生しました');
+    }
+});
+
+// ===== 静的ファイル =====
 app.use(express.static(path.join(__dirname)));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

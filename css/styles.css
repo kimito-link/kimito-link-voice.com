@@ -706,6 +706,12 @@ body {
     margin: 20px auto;
     border: 3px solid #4FC3F7;
     box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .narrator-name {
@@ -1168,6 +1174,11 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--primary-orange);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .collaborator-info h3 {
