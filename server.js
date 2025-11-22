@@ -246,6 +246,22 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ダッシュボード（ホームと同じ）
+app.get('/dashboard', (req, res) => {
+    res.redirect('/');
+});
+
+// ログアウト
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('❌ セッション破棄エラー:', err);
+        }
+        res.clearCookie('connect.sid');
+        res.redirect('/?logout=success');
+    });
+});
+
 // 認証キャンセルページ
 app.get('/auth-cancelled.html', (req, res) => {
     // キャッシュを無効化
@@ -655,6 +671,17 @@ app.post('/api/cache/clear', (req, res) => {
 
 // 現在のユーザー情報取得
 app.get('/api/user/me', (req, res) => {
+    console.log('🔍 /api/user/me リクエスト受信');
+    console.log('   - セッションID:', req.sessionID);
+    console.log('   - セッション存在:', !!req.session);
+    console.log('   - ユーザー存在:', !!req.session?.user);
+    
+    if (req.session?.user) {
+        console.log('   - ユーザー名:', req.session.user.username);
+    } else {
+        console.log('   - セッションにユーザー情報なし');
+    }
+    
     if (!req.session.user) {
         return res.status(401).json({ error: '認証が必要です' });
     }
@@ -1074,21 +1101,19 @@ app.post('/api/ai/generate-cheer', async (req, res) => {
         console.log('🤖 AI応援ボイス生成:', { narrator_name, requester_name });
         
         const prompt = `あなたは声優への依頼サポートAIです。
-依頼者「${requester_name}」が、声優「${narrator_name}」に応援ボイスを依頼したいと考えています。
 
-以下の条件で、3パターンの応援ボイススクリプトを提案してください：
+依頼者：${requester_name}
+声優：${narrator_name}
 
-1. 短め（50文字程度）
-2. 中くらい（100文字程度）
-3. 長め（150文字程度）
+${requester_name}を元気づける応援ボイススクリプトを3パターン作成してください。
 
 条件：
 - 温かく、元気が出る内容
-- 声優の名前を自然に入れる
-- 依頼者を応援する内容
+- ${requester_name}に直接呼びかける
+- 励まし、応援する内容
 - 読みやすく、声に出しやすい
 
-フォーマット：
+出力フォーマット：
 【パターン1（短め）】
 （スクリプト）
 
@@ -1130,31 +1155,37 @@ app.post('/api/ai/expand-script', async (req, res) => {
     try {
         const { rough_idea, narrator_name, requester_name } = req.body;
         
-        console.log('🤖 AI台本膨らませ:', { rough_idea });
+        console.log('🤖 AI台本膨らませ:');
+        console.log('   - 依頼者:', requester_name);
+        console.log('   - 声優:', narrator_name);
+        console.log('   - アイデア:', rough_idea);
         
         const prompt = `あなたは声優への依頼サポートAIです。
-依頼者「${requester_name}」が、声優「${narrator_name}」に以下のような依頼をしたいと考えています。
 
-依頼者のふわっとしたイメージ：
+【重要】以下のユーザーの要望を**必ず反映**してください：
 「${rough_idea}」
 
-このイメージを元に、具体的で魅力的な声優用スクリプトを3パターン作成してください。
+依頼者：${requester_name}
+声優：${narrator_name}
+
+上記のユーザーの要望に基づいて、声優用スクリプトを3パターン作成してください。
+ユーザーが指定した状況・内容を必ず含めてください。
 
 条件：
+- ユーザーの要望内容を必ず反映する（最重要）
 - 読みやすく、声に出しやすい
 - 感情が伝わる内容
-- 100〜200文字程度
+- 50〜150文字程度
 - 自然で温かみのある表現
-- 声優の名前を自然に入れる
 
-フォーマット：
-【提案1】
+出力フォーマット：
+【パターン1（短め）】
 （スクリプト）
 
-【提案2】
+【パターン2（中くらい）】
 （スクリプト）
 
-【提案3】
+【パターン3（長め）】
 （スクリプト）`;
 
         const openrouterResponse = await axios.post(

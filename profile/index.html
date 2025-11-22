@@ -115,11 +115,11 @@
                         <div class="pricing-card">
                             <div class="pricing-item">
                                 <span class="pricing-label">基本料金</span>
-                                <span class="pricing-value">¥{{price_per_char}}/文字</span>
+                                <span class="pricing-value">¥<span id="pricePerChar">{{price_per_char}}</span>/文字</span>
                             </div>
                             <div class="pricing-item">
                                 <span class="pricing-label">最低料金</span>
-                                <span class="pricing-value">¥{{min_price}}</span>
+                                <span class="pricing-value">¥<span id="minimumPrice">{{min_price}}</span></span>
                             </div>
                             <div class="pricing-note">
                                 <i class="fas fa-info-circle"></i>
@@ -253,10 +253,10 @@
                 <div class="request-section">
                     <h3><i class="fas fa-user"></i> 依頼者情報</h3>
                     
-                    <!-- Twitterアカウント情報（自動表示） -->
-                    <div class="twitter-account-info" id="twitterAccountInfo" style="display: none;">
+                    <!-- ログインアカウント情報 -->
+                    <div class="twitter-account-info" id="twitterAccountInfo">
                         <div class="account-card">
-                            <img src="" alt="アバター" class="account-avatar" id="requesterAvatar">
+                            <img src="/images/icon/kewXCUOt_400x400.jpg" alt="アバター" class="account-avatar" id="requesterAvatar">
                             <div class="account-details">
                                 <div class="account-name" id="requesterDisplayName">読み込み中...</div>
                                 <div class="account-handle" id="requesterTwitterHandle">@...</div>
@@ -264,25 +264,8 @@
                         </div>
                         <p class="account-note">
                             <i class="fas fa-info-circle"></i>
-                            Twitterアカウントで依頼します。このアカウントで声優さんとやりとりします。
+                            このアカウントで声優さんとやりとりします
                         </p>
-                    </div>
-                    
-                    <!-- ログインしていない場合 -->
-                    <div class="login-required" id="loginRequired">
-                        <div class="login-prompt">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <p>依頼するにはTwitterアカウントでログインが必要です</p>
-                            <button class="btn-login-prompt" onclick="location.href='/auth/twitter'">
-                                <i class="fab fa-twitter"></i> Twitterでログイン
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>連絡用メールアドレス（任意）</label>
-                        <input type="email" id="requesterEmail" placeholder="example@example.com">
-                        <small>通知を受け取りたい場合はメールアドレスを入力してください</small>
                     </div>
                 </div>
 
@@ -291,12 +274,40 @@
                     <h3><i class="fas fa-file-alt"></i> 依頼内容</h3>
                     <div class="form-group">
                         <label>スクリプト <span class="required">*</span></label>
+                        
+                        <!-- AI補助機能の説明 -->
+                        <div class="ai-help-banner">
+                            <i class="fas fa-robot"></i>
+                            <div class="help-content">
+                                <strong>AIがスクリプト作成をサポート！</strong>
+                                <div class="help-step">
+                                    <div class="step-item">
+                                        <span class="step-number">1</span>
+                                        <div class="step-content">
+                                            <strong>応援ボイスのパターンを提案</strong>
+                                            <p>→ ボタンを押すだけ！短・中・長の3パターンを自動生成</p>
+                                        </div>
+                                    </div>
+                                    <div class="step-item">
+                                        <span class="step-number">2</span>
+                                        <div class="step-content">
+                                            <strong>台本のイメージを膨らませる</strong>
+                                            <p>→ 下のテキストエリアに「配信者を応援したい」などのふわっとしたアイデアを入力してボタンを押すと、具体的なスクリプト3パターンに変換！</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="ai-assist-buttons">
                             <button type="button" class="btn-ai-assist" onclick="generateCheerPattern()">
                                 <i class="fas fa-magic"></i> 応援ボイスのパターンを提案
                             </button>
                             <button type="button" class="btn-ai-assist" onclick="expandScriptIdea()">
                                 <i class="fas fa-lightbulb"></i> 台本のイメージを膨らませる
+                            </button>
+                            <button type="button" class="btn-clear-cache" onclick="clearAICache()" title="AIキャッシュをクリアして新鮮な提案を取得">
+                                <i class="fas fa-trash-alt"></i> キャッシュクリア
                             </button>
                         </div>
                         <textarea 
@@ -311,12 +322,22 @@
                         </div>
                         <div id="aiSuggestion" class="ai-suggestion" style="display: none;">
                             <div class="suggestion-header">
-                                <i class="fas fa-robot"></i> AI提案
-                                <button type="button" class="btn-use-suggestion" onclick="useSuggestion()">
-                                    <i class="fas fa-check"></i> この提案を使う
-                                </button>
+                                <div class="suggestion-title">
+                                    <i class="fas fa-robot"></i> AI提案
+                                </div>
+                                <div class="suggestion-actions">
+                                    <button type="button" class="btn-regenerate" onclick="regenerateSuggestion()">
+                                        <i class="fas fa-redo"></i> やり直す
+                                    </button>
+                                    <button type="button" class="btn-edit-suggestion" onclick="editSuggestion()">
+                                        <i class="fas fa-edit"></i> 編集する
+                                    </button>
+                                    <button type="button" class="btn-use-suggestion" onclick="useSuggestion()">
+                                        <i class="fas fa-check"></i> この提案を使う
+                                    </button>
+                                </div>
                             </div>
-                            <div class="suggestion-content" id="suggestionContent"></div>
+                            <textarea class="suggestion-content-editable" id="suggestionContentEditable" rows="10"></textarea>
                         </div>
                     </div>
                     
@@ -351,6 +372,10 @@
                 <!-- 料金計算 -->
                 <div class="request-section price-section">
                     <h3><i class="fas fa-yen-sign"></i> 料金</h3>
+                    <p class="price-note">
+                        <i class="fas fa-info-circle"></i>
+                        クリエイターが受け取れる最低金額は <strong>¥<span id="displayMinPrice">{{min_price}}</span></strong> です
+                    </p>
                     <div class="price-detail">
                         <div class="price-row">
                             <span>文字数</span>

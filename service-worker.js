@@ -1,9 +1,9 @@
 // Service Worker for KimiLink Voice
 // PWA (Progressive Web App) support
 
-const CACHE_NAME = 'kimitolink-voice-v3-fixed';
-const STATIC_CACHE = 'static-v3';
-const DYNAMIC_CACHE = 'dynamic-v3';
+const CACHE_NAME = 'kimitolink-voice-v5-layout-fix';
+const STATIC_CACHE = 'static-v5';
+const DYNAMIC_CACHE = 'dynamic-v5';
 
 // 重要な静的リソース（前キャッシュ）
 const STATIC_ASSETS = [
@@ -67,6 +67,11 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
+
+    // chrome-extension、chrome:、devtools: などのスキームは無視
+    if (!url.protocol.startsWith('http')) {
+        return;
+    }
 
     // APIリクエストはNetwork First
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/auth/')) {

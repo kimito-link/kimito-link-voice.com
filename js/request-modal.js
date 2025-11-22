@@ -19,11 +19,110 @@ let currentUserData = {
 };
 
 let aiSuggestionText = '';
+let lastAIRequestType = ''; // 'cheer' or 'expand'
+let lastAIRequestData = {};
+
+// AIキャッシュ設定
+const AI_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24時間
+const AI_CACHE_PREFIX = 'ai_suggestion_';
 
 /**
- * モーダルを開く
+ * キャッシュキーを生成（入力内容を含む）
+ */
+function generateCacheKey(type, data) {
+    // データを正規化してソート
+    const normalizedData = JSON.stringify(data, Object.keys(data).sort());
+    
+    // 簡易的なハッシュ生成
+    let hash = 0;
+    for (let i = 0; i < normalizedData.length; i++) {
+        const char = normalizedData.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    
+    const hashValue = Math.abs(hash);
+    console.log(`🔑 キャッシュキー生成: ${type}_${hashValue}`, data);
+    
+    return `${AI_CACHE_PREFIX}${type}_${hashValue}`;
+}
+
+/**
+ * キャッシュから取得
+ */
+function getFromCache(cacheKey) {
+    try {
+        const cached = localStorage.getItem(cacheKey);
+        if (!cached) return null;
+        
+        const { timestamp, data } = JSON.parse(cached);
+        
+        // 有効期限チェック
+        if (Date.now() - timestamp > AI_CACHE_DURATION) {
+            localStorage.removeItem(cacheKey);
+            return null;
+        }
+        
+        console.log('💾 キャッシュから取得:', cacheKey);
+        return data;
+    } catch (error) {
+        console.error('キャッシュ取得エラー:', error);
+        return null;
+    }
+}
+
+/**
+ * キャッシュに保存
+ */
+function saveToCache(cacheKey, data) {
+    try {
+        const cacheData = {
+            timestamp: Date.now(),
+            data: data
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
+        console.log('💾 キャッシュに保存:', cacheKey);
+    } catch (error) {
+        console.error('キャッシュ保存エラー:', error);
+    }
+}
+
+/**
+ * モーダルを開く（ログイン必須）
  */
 async function openRequestModal() {
+    // まずログイン状態を確認
+    const loginCheckResponse = await fetch('/api/user/me');
+    
+    if (!loginCheckResponse.ok) {
+        // ログインしていない場合
+        // 現在のページURLを保存してログイン後に戻る
+        sessionStorage.setItem('redirect_after_login', window.location.pathname);
+        alert('依頼するにはTwitterでログインが必要です。\nログイン後、このページに戻ります。');
+        window.location.href = '/auth/twitter';
+        return;
+    }
+    
+    // フォローチェック
+    try {
+        const followResponse = await fetch('/api/user/check-follow');
+        if (followResponse.ok) {
+            const followData = await followResponse.json();
+            
+            if (!followData.isFollowingCreator || !followData.isFollowingIdol) {
+                alert('依頼するには以下のアカウントをフォローする必要があります：\n\n@streamerfunch (クリエイター応援)\n@idolfunch (アイドル応援)\n\nフォロー後、再度お試しください。');
+                
+                // フォローページに誘導
+                window.open('https://twitter.com/streamerfunch', '_blank');
+                window.open('https://twitter.com/idolfunch', '_blank');
+                return;
+            }
+        }
+    } catch (followError) {
+        console.error('フォローチェックエラー:', followError);
+        // エラーの場合は続行（API制限などを考慮）
+    }
+    
     const modal = document.getElementById('requestModal');
     if (!modal) return;
     
@@ -36,12 +135,21 @@ async function openRequestModal() {
     currentNarratorData.pricePerChar = parseInt(document.getElementById('pricePerChar')?.textContent) || 0;
     currentNarratorData.minPrice = parseInt(document.getElementById('minimumPrice')?.textContent) || 0;
     
-    // モーダルを表示
+    // 最低金額を表示エリアにも設定
+    const displayMinPriceEl = document.getElementById('displayMinPrice');
+    if (displayMinPriceEl) {
+        displayMinPriceEl.textContent = currentNarratorData.minPrice.toLocaleString();
+    }
+    
+    // モーダルを表示（先に表示してから要素を更新）
     modal.classList.add('active');
     document.body.style.overflow = 'hidden'; // 背景スクロール防止
     
-    // Twitterアカウント情報を取得
-    await loadRequesterInfo();
+    // モーダルが表示された後にTwitterアカウント情報を取得
+    // setTimeoutで次のイベントループまで待つ
+    setTimeout(async () => {
+        await loadRequesterInfo();
+    }, 100);
     
     // 料金情報を設定
     calculatePrice();
@@ -53,11 +161,16 @@ async function openRequestModal() {
  * 依頼者のTwitterアカウント情報を読み込む
  */
 async function loadRequesterInfo() {
+    console.log('🔄 ユーザー情報取得開始...');
+    
     try {
         const response = await fetch('/api/user/me');
+        console.log('📡 API応答:', response.status);
         
         if (response.ok) {
             const userData = await response.json();
+            console.log('✅ ユーザーデータ:', userData);
+            
             currentUserData = {
                 twitter_id: userData.id,
                 username: userData.username,
@@ -66,25 +179,26 @@ async function loadRequesterInfo() {
             };
             
             // Twitterアカウント情報を表示
-            document.getElementById('requesterAvatar').src = userData.profile_image_url;
-            document.getElementById('requesterDisplayName').textContent = userData.name;
-            document.getElementById('requesterTwitterHandle').textContent = '@' + userData.username;
+            const avatarEl = document.getElementById('requesterAvatar');
+            const nameEl = document.getElementById('requesterDisplayName');
+            const handleEl = document.getElementById('requesterTwitterHandle');
             
-            document.getElementById('twitterAccountInfo').style.display = 'block';
-            document.getElementById('loginRequired').style.display = 'none';
+            if (avatarEl) avatarEl.src = userData.profile_image_url;
+            if (nameEl) nameEl.textContent = userData.name;
+            if (handleEl) handleEl.textContent = '@' + userData.username;
             
-            console.log('✅ ログインユーザー情報取得:', userData.username);
+            console.log('✅ UI更新完了');
         } else {
-            // ログインしていない
-            document.getElementById('twitterAccountInfo').style.display = 'none';
-            document.getElementById('loginRequired').style.display = 'block';
-            
-            console.log('⚠️ ログインしていません');
+            // ログインしていない場合はここには来ない（openRequestModalで弾かれる）
+            console.error('❌ ログインエラー');
+            closeRequestModal();
+            alert('セッションが切れました。再度ログインしてください。');
+            window.location.href = '/auth/twitter';
         }
     } catch (error) {
         console.error('❌ ユーザー情報取得エラー:', error);
-        document.getElementById('twitterAccountInfo').style.display = 'none';
-        document.getElementById('loginRequired').style.display = 'block';
+        closeRequestModal();
+        alert('ユーザー情報の取得に失敗しました。');
     }
 }
 
@@ -115,12 +229,19 @@ function closeRequestModal() {
  * 料金を計算
  */
 function calculatePrice() {
-    const script = document.getElementById('requestScript').value;
+    const script = document.getElementById('requestScript')?.value || '';
     const charCount = script.length;
     
-    // 文字数を表示
-    document.getElementById('charCount').textContent = charCount;
-    document.getElementById('priceCharCount').textContent = charCount;
+    // 文字数を表示（両方の場所）
+    const charCountElement = document.getElementById('charCount');
+    const priceCharCountElement = document.getElementById('priceCharCount');
+    
+    if (charCountElement) {
+        charCountElement.textContent = charCount;
+    }
+    if (priceCharCountElement) {
+        priceCharCountElement.textContent = charCount;
+    }
     
     // 小計を計算
     const subtotal = charCount * currentNarratorData.pricePerChar;
@@ -278,6 +399,39 @@ document.addEventListener('keydown', function(e) {
 async function generateCheerPattern() {
     const btn = event.target.closest('.btn-ai-assist');
     const originalHTML = btn.innerHTML;
+    
+    // 再生成用にリクエストデータを保存
+    lastAIRequestType = 'cheer';
+    lastAIRequestData = {
+        narrator_name: currentNarratorData.name,
+        requester_name: currentUserData.display_name
+    };
+    
+    // キャッシュキーを生成
+    const cacheKey = generateCacheKey('cheer', lastAIRequestData);
+    
+    // キャッシュをチェック
+    const cachedSuggestion = getFromCache(cacheKey);
+    if (cachedSuggestion) {
+        // キャッシュからでも一瞬「読み込み中」を表示
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> キャッシュから読み込み中...';
+        
+        // 0.5秒後に表示（ユーザーに処理を認識させる）
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        aiSuggestionText = cachedSuggestion;
+        document.getElementById('suggestionContentEditable').value = aiSuggestionText;
+        document.getElementById('aiSuggestion').style.display = 'block';
+        
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        
+        console.log('✅ キャッシュから応援ボイスを取得（OpenRouter API節約）');
+        return;
+    }
+    
+    // キャッシュにない場合はAPI呼び出し
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI生成中...';
     
@@ -285,10 +439,7 @@ async function generateCheerPattern() {
         const response = await fetch('/api/ai/generate-cheer', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                narrator_name: currentNarratorData.name,
-                requester_name: currentUserData.display_name
-            })
+            body: JSON.stringify(lastAIRequestData)
         });
         
         if (!response.ok) throw new Error('AI生成に失敗しました');
@@ -296,11 +447,14 @@ async function generateCheerPattern() {
         const data = await response.json();
         aiSuggestionText = data.suggestion;
         
+        // キャッシュに保存
+        saveToCache(cacheKey, aiSuggestionText);
+        
         // 提案を表示
-        document.getElementById('suggestionContent').textContent = aiSuggestionText;
+        document.getElementById('suggestionContentEditable').value = aiSuggestionText;
         document.getElementById('aiSuggestion').style.display = 'block';
         
-        console.log('✅ AI提案生成成功');
+        console.log('✅ AI提案生成成功（OpenRouter API使用）');
     } catch (error) {
         console.error('❌ AI生成エラー:', error);
         alert('AI提案の生成に失敗しました。もう一度お試しください。');
@@ -324,6 +478,40 @@ async function expandScriptIdea() {
     
     const btn = event.target.closest('.btn-ai-assist');
     const originalHTML = btn.innerHTML;
+    
+    // 再生成用にリクエストデータを保存
+    lastAIRequestType = 'expand';
+    lastAIRequestData = {
+        rough_idea: script,
+        narrator_name: currentNarratorData.name,
+        requester_name: currentUserData.display_name
+    };
+    
+    // キャッシュキーを生成
+    const cacheKey = generateCacheKey('expand', lastAIRequestData);
+    
+    // キャッシュをチェック
+    const cachedSuggestion = getFromCache(cacheKey);
+    if (cachedSuggestion) {
+        // キャッシュからでも一瞬「読み込み中」を表示
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> キャッシュから読み込み中...';
+        
+        // 0.5秒後に表示（ユーザーに処理を認識させる）
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        aiSuggestionText = cachedSuggestion;
+        document.getElementById('suggestionContentEditable').value = aiSuggestionText;
+        document.getElementById('aiSuggestion').style.display = 'block';
+        
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        
+        console.log('✅ キャッシュから台本を取得（OpenRouter API節約）');
+        return;
+    }
+    
+    // キャッシュにない場合はAPI呼び出し
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI生成中...';
     
@@ -331,11 +519,7 @@ async function expandScriptIdea() {
         const response = await fetch('/api/ai/expand-script', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                rough_idea: script,
-                narrator_name: currentNarratorData.name,
-                requester_name: currentUserData.display_name
-            })
+            body: JSON.stringify(lastAIRequestData)
         });
         
         if (!response.ok) throw new Error('AI生成に失敗しました');
@@ -343,11 +527,14 @@ async function expandScriptIdea() {
         const data = await response.json();
         aiSuggestionText = data.suggestion;
         
+        // キャッシュに保存
+        saveToCache(cacheKey, aiSuggestionText);
+        
         // 提案を表示
-        document.getElementById('suggestionContent').textContent = aiSuggestionText;
+        document.getElementById('suggestionContentEditable').value = aiSuggestionText;
         document.getElementById('aiSuggestion').style.display = 'block';
         
-        console.log('✅ AI提案生成成功');
+        console.log('✅ AI提案生成成功（OpenRouter API使用）');
     } catch (error) {
         console.error('❌ AI生成エラー:', error);
         alert('AI提案の生成に失敗しました。もう一度お試しください。');
@@ -358,10 +545,80 @@ async function expandScriptIdea() {
 }
 
 /**
+ * AI提案をやり直す（キャッシュを無視）
+ */
+async function regenerateSuggestion() {
+    if (!lastAIRequestType) {
+        alert('やり直すAI提案がありません');
+        return;
+    }
+    
+    const btn = event.target.closest('.btn-regenerate');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 再生成中...';
+    
+    try {
+        const endpoint = lastAIRequestType === 'cheer' 
+            ? '/api/ai/generate-cheer' 
+            : '/api/ai/expand-script';
+        
+        // キャッシュを削除（強制再生成）
+        const cacheKey = generateCacheKey(lastAIRequestType, lastAIRequestData);
+        localStorage.removeItem(cacheKey);
+        console.log('🗑️ キャッシュを削除:', cacheKey);
+        
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(lastAIRequestData)
+        });
+        
+        if (!response.ok) throw new Error('AI再生成に失敗しました');
+        
+        const data = await response.json();
+        aiSuggestionText = data.suggestion;
+        
+        // キャッシュに保存
+        saveToCache(cacheKey, aiSuggestionText);
+        
+        // 新しい提案を表示
+        document.getElementById('suggestionContentEditable').value = aiSuggestionText;
+        
+        console.log('✅ AI提案再生成成功（OpenRouter API使用）');
+    } catch (error) {
+        console.error('❌ AI再生成エラー:', error);
+        alert('AI提案の再生成に失敗しました。もう一度お試しください。');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+}
+
+/**
+ * AI提案を編集する（ユーザーが直接編集）
+ */
+function editSuggestion() {
+    const textarea = document.getElementById('suggestionContentEditable');
+    textarea.focus();
+    textarea.setSelectionRange(0, 0);
+    
+    alert('提案を自由に編集できます！\n編集が終わったら「この提案を使う」ボタンを押してください。');
+}
+
+/**
  * AI提案を使用
  */
 function useSuggestion() {
-    document.getElementById('requestScript').value = aiSuggestionText;
+    // 編集された内容を取得
+    const editedText = document.getElementById('suggestionContentEditable').value.trim();
+    
+    if (!editedText) {
+        alert('提案が空です');
+        return;
+    }
+    
+    document.getElementById('requestScript').value = editedText;
     calculatePrice();
     document.getElementById('aiSuggestion').style.display = 'none';
     
@@ -369,6 +626,50 @@ function useSuggestion() {
     document.getElementById('requestScript').focus();
     
     console.log('✅ AI提案を採用');
+}
+
+/**
+ * AIキャッシュをクリア
+ */
+function clearAICache() {
+    const confirmed = confirm('AIキャッシュをクリアしますか？\n次回のAI生成時に新しい提案を取得します。');
+    
+    if (!confirmed) return;
+    
+    // すべてのAIキャッシュを削除
+    const keys = Object.keys(localStorage);
+    let clearedCount = 0;
+    
+    keys.forEach(key => {
+        if (key.startsWith(AI_CACHE_PREFIX)) {
+            localStorage.removeItem(key);
+            clearedCount++;
+        }
+    });
+    
+    alert(`${clearedCount}件のAIキャッシュをクリアしました！\n次回のAI生成時は新しい提案が生成されます。`);
+    console.log(`🗑️ ${clearedCount}件のAIキャッシュをクリア`);
+}
+
+/**
+ * ダッシュボードに移動（ログインチェック付き）
+ */
+async function checkLoginAndGoToDashboard() {
+    try {
+        const response = await fetch('/api/user/me');
+        if (response.ok) {
+            // ログインしている場合、ダッシュボードに移動
+            window.location.href = '/?dashboard=true';
+        } else {
+            // ログインしていない場合
+            sessionStorage.setItem('redirect_after_login', '/');
+            alert('ダッシュボードを表示するにはログインが必要です。\nログイン後、ダッシュボードを表示します。');
+            window.location.href = '/auth/twitter';
+        }
+    } catch (error) {
+        console.error('ログインチェックエラー:', error);
+        alert('エラーが発生しました。もう一度お試しください。');
+    }
 }
 
 console.log('✅ 依頼モーダル機能が読み込まれました');

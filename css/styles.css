@@ -5,6 +5,11 @@
     box-sizing: border-box;
 }
 
+/* スムーズスクロール */
+html {
+    scroll-behavior: smooth;
+}
+
 :root {
     /* Kimito-Link カラー */
     --primary-blue: #00427B;
@@ -549,6 +554,27 @@ body {
     text-shadow: 0 3px 12px rgba(255, 200, 87, 0.6);
 }
 
+.narrator-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+}
+
+/* スマホでボタンを大きく */
+@media (max-width: 768px) {
+    .narrator-actions {
+        gap: 12px;
+    }
+    
+    .narrator-actions button,
+    .narrator-actions a {
+        padding: 14px 20px !important;
+        font-size: 0.95rem !important;
+        min-height: 48px; /* タップしやすい最小サイズ */
+    }
+}
+
 .hero-icons {
     margin-top: 60px;
     display: flex;
@@ -649,8 +675,49 @@ body {
 
 .narrator-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 420px));
     gap: 25px;
+    justify-content: center;
+}
+
+/* スマホで1列表示 */
+@media (max-width: 768px) {
+    .narrator-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 10px;
+    }
+    
+    .narrator-card {
+        padding: 20px;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        min-height: auto;
+    }
+    
+    .narrator-avatar {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    .narrator-info {
+        width: 100%;
+        align-items: center;
+    }
+    
+    .narrator-handle {
+        margin: 0 auto 8px;
+    }
+    
+    .narrator-tags {
+        justify-content: center;
+    }
+    
+    .narrator-followers {
+        justify-content: center;
+    }
 }
 
 .narrator-card {
@@ -658,17 +725,37 @@ body {
     backdrop-filter: blur(20px);
     border: 2px solid #4FC3F7;
     border-radius: 20px;
-    padding: 25px;
-    text-align: center;
+    padding: 20px;
     transition: all 0.3s ease;
     position: relative;
     box-shadow: 0 4px 15px rgba(79, 195, 247, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    min-height: 380px;
 }
 
 .narrator-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(79, 195, 247, 0.4);
     border-color: #26C6DA;
+}
+
+/* スマホ用のタップフィードバック */
+.narrator-card:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 10px rgba(79, 195, 247, 0.3);
+}
+
+/* タッチデバイス用のホバー解除 */
+@media (hover: none) {
+    .narrator-card:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(79, 195, 247, 0.15);
+        border-color: #4FC3F7;
+    }
 }
 
 .narrator-badge {
@@ -703,7 +790,7 @@ body {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    margin: 20px auto;
+    margin: 10px auto;
     border: 3px solid #4FC3F7;
     box-shadow: 0 4px 12px rgba(79, 195, 247, 0.3);
     object-fit: cover;
@@ -714,11 +801,22 @@ body {
     backface-visibility: hidden;
 }
 
+.narrator-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
 .narrator-name {
-    font-size: 1.3rem;
-    color: #1a1a1a;
-    margin-bottom: 6px;
-    font-weight: 700;
+    font-size: 1.2rem;
+    color: #000 !important;
+    margin: 0;
+    font-weight: 700 !important;
+    text-shadow: none !important;
+    background: transparent !important;
+    -webkit-text-fill-color: #000 !important;
 }
 
 .narrator-handle {
@@ -728,9 +826,9 @@ body {
     color: #01579B;
     font-size: 0.9rem;
     font-weight: 600;
-    border-radius: 20px;
+    border-radius: 15px;
     border: 1.5px solid #4FC3F7;
-    margin-bottom: 8px;
+    margin: 0;
     box-shadow: 0 2px 8px rgba(79, 195, 247, 0.2);
     transition: all 0.3s ease;
 }
@@ -742,47 +840,35 @@ body {
     box-shadow: 0 3px 12px rgba(79, 195, 247, 0.35);
 }
 
+.narrator-bio {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 0;
+    padding: 0 10px;
+    line-height: 1.5;
+    text-align: center;
+}
+
 .narrator-followers {
     color: var(--primary-blue);
     font-size: 1rem;
-    margin: 12px 0;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-    border-radius: 12px;
+    margin: 0;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
 }
 
 .narrator-followers i {
     color: var(--primary-blue);
-    font-size: 1.4rem;
-}
-
-.narrator-followers .follower-label {
-    font-weight: 500;
-    color: #555;
+    font-size: 1.2rem;
 }
 
 .narrator-followers .follower-count {
-    font-size: 1.6rem;
-    font-weight: 900;
+    font-size: 1.1rem;
+    font-weight: 700;
     color: var(--primary-blue);
-    margin-left: 5px;
-}
-
-/* 声優カード - フォローセクション */
-.narrator-follow-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 12px 0;
-}
-
-.narrator-follow-section .narrator-followers {
-    flex: 1;
-    margin: 0;
 }
 
 /* 声優カード専用フォローボタン（ブルー/グリーン系） */
@@ -849,7 +935,7 @@ body {
     display: flex;
     gap: 8px;
     justify-content: center;
-    margin-bottom: 15px;
+    margin: 0;
     flex-wrap: wrap;
 }
 
@@ -867,30 +953,30 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     color: #4FC3F7;
-    margin: 15px 0 5px;
+    margin: 10px 0 5px;
 }
 
 .narrator-meta {
     font-size: 0.9rem;
     color: #666666;
-    margin-bottom: 15px;
+    margin: 0 0 10px;
 }
 
 .narrator-achievements {
-    margin-bottom: 15px;
+    margin: 10px 0;
 }
 
 .achievement-count {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: 5px 12px;
+    border-radius: 15px;
     border: 2px solid #4CAF50;
     color: #4CAF50;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
 }
 
 .achievement-count i {
@@ -907,7 +993,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 15px;
     width: 100%;
 }
 
@@ -933,6 +1019,64 @@ body {
 .btn-play-intro {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 24px;
+}
+
+.btn-play-intro .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-play-intro .audio-progress {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-play-intro .audio-icon {
+    font-size: 1.2rem;
+    color: #fff;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-play-intro:hover .audio-icon {
+    transform: scale(1.1);
+}
+
+.btn-play-intro .progress-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.btn-play-intro .progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.btn-play-intro .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.8));
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.btn-play-intro .audio-time {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
 }
 
 .btn-play-intro:hover {
@@ -943,6 +1087,38 @@ body {
 
 .btn-play-intro:active {
     transform: translateY(0);
+}
+
+/* サイト内フォローボタン */
+.btn-follow-site {
+    background: linear-gradient(135deg, #ff6b9d, #ff4081);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(255, 64, 129, 0.3);
+}
+
+.btn-follow-site:hover {
+    background: linear-gradient(135deg, #ff4081, #f50057);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 64, 129, 0.5);
+}
+
+.btn-follow-site.following {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.btn-follow-site.following:hover {
+    background: linear-gradient(135deg, #45a049, #388e3c);
 }
 
 /* Twitterフォローボタン */
@@ -981,6 +1157,7 @@ body {
     
     .btn-play-intro,
     .btn-follow-twitter,
+    .btn-follow-site,
     .btn-request-detail {
         padding: 10px 20px;
         font-size: 0.9rem;
@@ -5947,8 +6124,13 @@ body {
     background: white;
     border-radius: 15px;
     padding: 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid transparent;
 }
 
 .thanks-archive-card:hover {

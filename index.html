@@ -15,7 +15,7 @@
     
     <!-- Preload Critical Resources -->
     <link rel="preload" href="images/webp/yukkuri-link-nikoniko-kuchiake.webp" as="image" type="image/webp">
-    <link rel="preload" href="css/styles.css?v=106.0" as="style">
+    <link rel="preload" href="css/styles.css?v=116.0" as="style">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></noscript>
     
     <!-- Styles -->
-    <link rel="stylesheet" href="css/styles.css?v=106.0">
+    <link rel="stylesheet" href="css/styles.css?v=116.0">
     <link rel="stylesheet" href="css/modal-responsive-fix.css?v=3.0" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/loading-animation.css?v=1.0" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/faq.css?v=1.0" media="print" onload="this.media='all'">
@@ -211,125 +211,134 @@
 
                 <div class="narrator-grid">
                     <!-- エントリー: 君斗りんく@クリエイター応援 -->
-                    <div class="narrator-card" data-level="entry">
+                    <div class="narrator-card" data-level="entry" data-username="streamerfunch" onclick="location.href='/streamerfunch/profile/'" style="cursor: pointer;">
                         <div class="narrator-badge badge-entry">エントリー</div>
                         <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator1Avatar" width="120" height="120" loading="lazy">
-                        <h3 class="narrator-name" id="narrator1Name">君斗りんく</h3>
-                        <p class="narrator-handle" id="narrator1Handle">@streamerfunch</p>
-                        <p class="narrator-bio" id="narrator1Bio">プロフィール読み込み中...</p>
-                        
-                        <!-- フォロワー数とフォローボタン -->
-                        <div class="narrator-follow-section">
+                        <div class="narrator-info">
+                            <h3 class="narrator-name" id="narrator1Name">君斗りんく</h3>
+                            <p class="narrator-handle" id="narrator1Handle">@streamerfunch</p>
+                            <p class="narrator-bio" id="narrator1Bio">プロフィール読み込み中...</p>
+                            
+                            <!-- フォロワー数 -->
                             <div class="narrator-followers" id="narrator1Followers">
                                 <i class="fas fa-users"></i> 
-                                <span class="follower-label">フォロワー</span>
                                 <span class="follower-count">読み込み中...</span>
                             </div>
-                            <a href="https://twitter.com/streamerfunch" target="_blank" class="btn-follow-narrator">
-                                <i class="fab fa-twitter"></i> フォロー
-                            </a>
-                        </div>
-                        
-                        <div class="narrator-tags">
-                            <span class="tag">少女ボイス</span>
-                            <span class="tag">萌え系</span>
-                        </div>
-                        <div class="narrator-price">¥1/文字〜</div>
-                        <div class="narrator-meta">最低 ¥500</div>
-                        <div class="narrator-achievements">
-                            <span class="achievement-count">
-                                <i class="fas fa-check-circle"></i> 23件の実績
-                            </span>
-                        </div>
-                        
-                        <!-- アクションボタン -->
-                        <div class="narrator-actions">
-                            <button class="btn-play-intro" onclick="playIntroVoice('streamerfunch', event)">
-                                <i class="fas fa-play"></i> 自己紹介を聞く
-                            </button>
-                            <a href="https://twitter.com/streamerfunch" class="btn-follow-twitter" onclick="playThanksVoice('streamerfunch', event)">
-                                <i class="fab fa-twitter"></i> フォロー
-                            </a>
-                            <button class="btn-request-detail" onclick="playThanksVoice('streamerfunch', event); setTimeout(() => location.href='/streamerfunch/profile/', 500)">
-                                <i class="fas fa-paper-plane"></i> 依頼する
-                            </button>
+                            
+                            <div class="narrator-achievements">
+                                <span class="achievement-count">
+                                    <i class="fas fa-check-circle"></i> 23件の実績
+                                </span>
+                            </div>
+                            
+                            <!-- アクションボタン -->
+                            <div class="narrator-actions">
+                                <button class="btn-play-intro" onclick="event.stopPropagation(); playIntroVoice('streamerfunch', event)" data-audio-id="narrator1">
+                                    <div class="audio-progress">
+                                        <i class="fas fa-play audio-icon"></i>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar"></div>
+                                        </div>
+                                        <span class="audio-time">0:00 / --:--</span>
+                                    </div>
+                                </button>
+                                <button class="btn-follow-site" onclick="event.stopPropagation(); toggleFollow('streamerfunch', event)">
+                                    <i class="fas fa-heart"></i> フォロー
+                                </button>
+                                <button class="btn-request-detail" onclick="event.stopPropagation(); location.href='/streamerfunch/profile/'">
+                                    <i class="fas fa-paper-plane"></i> 依頼する
+                                </button>
+                            </div>
                         </div>
                     </div>
 
                     <!-- スタンダード: 君斗りんく@アイドル応援 -->
-                    <div class="narrator-card" data-level="standard">
+                    <div class="narrator-card" data-level="standard" data-username="idolfunch" onclick="location.href='/idolfunch/profile/'" style="cursor: pointer;">
                         <div class="narrator-badge badge-standard">スタンダード</div>
                         <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator2Avatar" width="120" height="120" loading="lazy">
-                        <h3 class="narrator-name" id="narrator2Name">君斗りんく</h3>
-                        <p class="narrator-handle" id="narrator2Handle">@idolfunch</p>
-                        <p class="narrator-bio" id="narrator2Bio">プロフィール読み込み中...</p>
-                        
-                        <!-- フォロワー数とフォローボタン -->
-                        <div class="narrator-follow-section">
+                        <div class="narrator-info">
+                            <h3 class="narrator-name" id="narrator2Name">君斗りんく</h3>
+                            <p class="narrator-handle" id="narrator2Handle">@idolfunch</p>
+                            <p class="narrator-bio" id="narrator2Bio">プロフィール読み込み中...</p>
+                            
+                            <!-- フォロワー数 -->
                             <div class="narrator-followers" id="narrator2Followers">
                                 <i class="fas fa-users"></i> 
-                                <span class="follower-label">フォロワー</span>
                                 <span class="follower-count">読み込み中...</span>
                             </div>
-                            <a href="https://twitter.com/idolfunch" target="_blank" class="btn-follow-narrator">
-                                <i class="fab fa-twitter"></i> フォロー
-                            </a>
-                        </div>
-                        
-                        <div class="narrator-tags">
-                            <span class="tag">青年ボイス</span>
-                            <span class="tag">ナレーション</span>
-                        </div>
-                        <div class="narrator-price">¥3/文字〜</div>
-                        <div class="narrator-meta">最低 ¥1,000</div>
-                        <div class="narrator-achievements">
-                            <span class="achievement-count">
-                                <i class="fas fa-check-circle"></i> 45件の実績
-                            </span>
-                        </div>
-                        
-                        <!-- アクションボタン -->
-                        <div class="narrator-actions">
-                            <button class="btn-play-intro" onclick="playIntroVoice('idolfunch', event)">
-                                <i class="fas fa-play"></i> 自己紹介を聞く
-                            </button>
-                            <a href="https://twitter.com/idolfunch" class="btn-follow-twitter" onclick="playThanksVoice('idolfunch', event)">
-                                <i class="fab fa-twitter"></i> フォロー
-                            </a>
-                            <button class="btn-request-detail" onclick="playThanksVoice('idolfunch', event); setTimeout(() => location.href='/idolfunch/profile/', 500)">
-                                <i class="fas fa-paper-plane"></i> 依頼する
-                            </button>
+                            
+                            <div class="narrator-achievements">
+                                <span class="achievement-count">
+                                    <i class="fas fa-check-circle"></i> 45件の実績
+                                </span>
+                            </div>
+                            
+                            <!-- アクションボタン -->
+                            <div class="narrator-actions">
+                                <button class="btn-play-intro" onclick="event.stopPropagation(); playIntroVoice('idolfunch', event)" data-audio-id="narrator2">
+                                    <div class="audio-progress">
+                                        <i class="fas fa-play audio-icon"></i>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar"></div>
+                                        </div>
+                                        <span class="audio-time">0:00 / --:--</span>
+                                    </div>
+                                </button>
+                                <button class="btn-follow-site" onclick="event.stopPropagation(); toggleFollow('idolfunch', event)">
+                                    <i class="fas fa-heart"></i> フォロー
+                                </button>
+                                <button class="btn-request-detail" onclick="event.stopPropagation(); location.href='/idolfunch/profile/'">
+                                    <i class="fas fa-paper-plane"></i> 依頼する
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- プロフェッショナル -->
-                    <div class="narrator-card" data-level="professional">
+                    <!-- プロフェッショナル: 鈴木 あかね -->
+                    <div class="narrator-card" data-level="professional" data-username="suzuki_akane" onclick="location.href='/suzuki_akane/profile/'" style="cursor: pointer;">
                         <div class="narrator-badge badge-professional">プロ</div>
-                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" width="120" height="120" loading="lazy">
-                        <h3 class="narrator-name">鈴木 あかね</h3>
-                        <div class="narrator-tags">
-                            <span class="tag">CM</span>
-                            <span class="tag">企業VP</span>
-                        </div>
-                        <div class="narrator-price">¥6/文字〜</div>
-                        <div class="narrator-meta">最低 ¥3,000</div>
-                        <div class="narrator-achievements">
-                            <span class="achievement-count">
-                                <i class="fas fa-check-circle"></i> 89件の実績
-                            </span>
-                        </div>
-                        
-                        <!-- アクションボタン -->
-                        <div class="narrator-actions">
-                            <button class="btn-play-intro" onclick="playIntroVoice('c0tanpoTesh1ta', event)">
-                                <i class="fas fa-play"></i> 自己紹介を聞く
-                            </button>
-                            <a href="https://twitter.com/c0tanpoTesh1ta" class="btn-follow-twitter" onclick="playThanksVoice('c0tanpoTesh1ta', event)">
-                                <i class="fab fa-twitter"></i> フォロー
-                            </a>
-                            <button class="btn-request-detail" onclick="playThanksVoice('c0tanpoTesh1ta', event); setTimeout(() => location.href='/c0tanpoTesh1ta/profile/', 500)">
-                                <i class="fas fa-paper-plane"></i> 依頼する
-                            </button>
+                        <img src="images/icon/kewXCUOt_400x400.jpg" alt="声優" class="narrator-avatar" id="narrator3Avatar" width="120" height="120" loading="lazy">
+                        <div class="narrator-info">
+                            <h3 class="narrator-name" id="narrator3Name">鈴木 あかね</h3>
+                            <p class="narrator-handle" id="narrator3Handle">@suzuki_akane</p>
+                            <p class="narrator-bio" id="narrator3Bio">CMやVP、ナレーションなど幅広く対応。プロフェッショナルな品質をお届けします。</p>
+                            
+                            <!-- フォロワー数 -->
+                            <div class="narrator-followers" id="narrator3Followers">
+                                <i class="fas fa-users"></i> 
+                                <span class="follower-count">3,456</span>
+                            </div>
+                            
+                            <div class="narrator-tags">
+                                <span class="tag">CM</span>
+                                <span class="tag">企業VP</span>
+                            </div>
+                            <div class="narrator-price">¥6/文字〜</div>
+                            <div class="narrator-meta">最低 ¥3,000</div>
+                            <div class="narrator-achievements">
+                                <span class="achievement-count">
+                                    <i class="fas fa-check-circle"></i> 89件の実績
+                                </span>
+                            </div>
+                            
+                            <!-- アクションボタン -->
+                            <div class="narrator-actions">
+                                <button class="btn-play-intro" onclick="event.stopPropagation(); playIntroVoice('suzuki_akane', event)" data-audio-id="narrator3">
+                                    <div class="audio-progress">
+                                        <i class="fas fa-play audio-icon"></i>
+                                        <div class="progress-bar-container">
+                                            <div class="progress-bar"></div>
+                                        </div>
+                                        <span class="audio-time">0:00 / --:--</span>
+                                    </div>
+                                </button>
+                                <button class="btn-follow-site" onclick="event.stopPropagation(); toggleFollow('suzuki_akane', event)">
+                                    <i class="fas fa-heart"></i> フォロー
+                                </button>
+                                <button class="btn-request-detail" onclick="event.stopPropagation(); location.href='/suzuki_akane/profile/'">
+                                    <i class="fas fa-paper-plane"></i> 依頼する
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1595,7 +1604,7 @@
                                     <span class="btn-icon">📝</span>
                                     <span class="btn-text">依頼を作成する</span>
                                 </button>
-                                <button class="btn-yukkuri btn-search" onclick="showDashboardSection('collabs')">
+                                <button class="btn-yukkuri btn-search" onclick="scrollToNarrators()">
                                     <span class="btn-icon">🔍</span>
                                     <span class="btn-text">声優を探す</span>
                                 </button>
@@ -2607,7 +2616,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script defer src="js/loading.js?v=1.0"></script>
     <script src="js/error-logger.js?v=1.0"></script>
-    <script defer src="js/script.js?v=93.0"></script>
+    <script defer src="js/script.js?v=98.0"></script>
     <!-- Decorative effects - Low priority -->
     <script>
         window.addEventListener('load', function() {

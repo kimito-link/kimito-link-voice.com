@@ -8,6 +8,105 @@ const SKIP_FOLLOW_CHECK = true; // 開発中はAPIレート制限回避のため
 // 認証をスキップ（開発中のみ）
 const SKIP_AUTHENTICATION = false; // 本番環境では必ずfalse - 認証を必須にする
 
+/**
+ * 声優セクションにスムーズスクロール
+ */
+function scrollToNarrators() {
+    // ダッシュボード表示中は「おすすめの声優」セクションにスクロール
+    const dashboard = document.getElementById('dashboard');
+    if (dashboard && dashboard.style.display !== 'none') {
+        const recommendedSection = document.querySelector('.recommended-narrators-card');
+        if (recommendedSection) {
+            recommendedSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            console.log('🎤 おすすめの声優セクションにスクロール');
+            return;
+        }
+    }
+    
+    // ログイン前のページでは通常の声優セクションにスクロール
+    const narratorsSection = document.getElementById('narrators');
+    if (narratorsSection) {
+        narratorsSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+        console.log('🎤 声優セクションにスクロール');
+    } else {
+        console.error('❌ 声優セクションが見つかりません');
+    }
+}
+
+/**
+ * サイト内フォロー機能（localStorageで管理）
+ */
+function toggleFollow(username, event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    
+    // localStorageからフォロー状態を取得
+    const followedNarrators = JSON.parse(localStorage.getItem('followedNarrators') || '[]');
+    const index = followedNarrators.indexOf(username);
+    
+    if (index === -1) {
+        // フォローする
+        followedNarrators.push(username);
+        localStorage.setItem('followedNarrators', JSON.stringify(followedNarrators));
+        
+        // ボタンの状態を更新
+        const button = event.target.closest('.btn-follow-site');
+        if (button) {
+            button.classList.add('following');
+            button.innerHTML = '<i class="fas fa-heart"></i> フォロー中';
+        }
+        
+        console.log(`✅ ${username}をフォローしました`);
+    } else {
+        // フォロー解除
+        followedNarrators.splice(index, 1);
+        localStorage.setItem('followedNarrators', JSON.stringify(followedNarrators));
+        
+        // ボタンの状態を更新
+        const button = event.target.closest('.btn-follow-site');
+        if (button) {
+            button.classList.remove('following');
+            button.innerHTML = '<i class="fas fa-heart"></i> フォロー';
+        }
+        
+        console.log(`❌ ${username}のフォローを解除しました`);
+    }
+}
+
+/**
+ * おすすめの声優を読み込む
+ */
+function loadRecommendedNarrators() {
+    const grid = document.getElementById('recommendedNarratorsGrid');
+    if (!grid) return;
+    
+    // 声優カードを追加
+    const narrators = [
+        { username: 'streamerfunch', name: '君斗りんく@クリエイター応援' },
+        { username: 'idolfunch', name: '君斗りんく@アイドル応援' }
+    ];
+    
+    grid.innerHTML = narrators.map(narrator => `
+        <div class="narrator-mini-card" onclick="location.href='/${narrator.username}/profile/'" style="cursor: pointer;">
+            <img src="/images/icon/kewXCUOt_400x400.jpg" alt="${narrator.name}" class="narrator-mini-avatar">
+            <h4 class="narrator-mini-name">${narrator.name}</h4>
+            <p class="narrator-mini-handle">@${narrator.username}</p>
+            <button class="btn-mini-view" onclick="event.stopPropagation(); location.href='/${narrator.username}/profile/'">
+                プロフィールを見る
+            </button>
+        </div>
+    `).join('');
+    
+    console.log('✅ おすすめの声優を読み込みました');
+}
+
 // ===== Supabase初期化 =====
 const SUPABASE_URL = 'https://ljidnprwxniixrigktss.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqaWRucHJ3eG5paXhyaWdrdHNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0OTU3MTUsImV4cCI6MjA3ODA3MTcxNX0.PyqHGu4zKEI2eKivLM3syIjntgtPU0ohX_6aMgUWFcI';
@@ -159,7 +258,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     if (loginStatus === 'success') {
         // ログイン成功後の処理
-        console.log('✅ ログイン成功 - ダッシュボードを表示');
+        console.log('✅ ログイン成功');
+        
+        // ログイン前のページに戻る処理
+        const redirectUrl = sessionStorage.getItem('redirect_after_login');
+        if (redirectUrl) {
+            console.log('🔄 元のページにリダイレクト:', redirectUrl);
+            sessionStorage.removeItem('redirect_after_login');
+            window.location.href = redirectUrl;
+            return;
+        }
+        
+        console.log('📊 ダッシュボードを表示');
         
         // 実際のユーザー情報を取得
         try {
@@ -228,6 +338,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             console.log('⚠️ アカウント情報取得エラー:', error.message);
         });
         
+        // おすすめの声優を表示
+        loadRecommendedNarrators();
+        
         return;
     } else if (loginStatus === 'error') {
         // エラーの理由を確認
@@ -294,7 +407,19 @@ async function checkAuthStatus() {
     try {
         const response = await fetch('/api/user/me');
         if (response.ok) {
-            currentUser = await response.json();
+            const userData = await response.json();
+            console.log('✅ ログイン中:', userData.username);
+            
+            currentUser = {
+                id: userData.id,
+                username: userData.username,
+                name: userData.name || userData.displayName,
+                displayName: userData.name || userData.displayName,
+                avatar: userData.profile_image_url || userData.avatar,
+                description: userData.description || '',
+                followers: userData.public_metrics?.followers_count || userData.followers || 0,
+                following: userData.public_metrics?.following_count || userData.following || 0
+            };
             
             // アカウント履歴に保存
             saveAccountToHistory(currentUser);
@@ -305,22 +430,31 @@ async function checkAuthStatus() {
                 followedAccounts.creator = true;
                 followedAccounts.idol = true;
                 
-                // 開発モードでもアカウント情報は取得する
+                // 先にダッシュボードを表示（DOM要素を作成）
+                showPlatform();
+                
+                // DOM要素が作成された後にアカウント情報を取得
                 try {
                     await updateAccountDisplays();
                 } catch (error) {
                     console.log('⚠️ 開発モードでのアカウント情報取得をスキップ:', error.message);
                 }
                 
-                showPlatform();
+                // おすすめの声優を表示
+                loadRecommendedNarrators();
+                
                 return;
             }
             
             // フォロー状態を確認
             await checkFollowStatusOnLoad();
+        } else {
+            console.log('⚠️ ログインしていません（Status:', response.status, ')');
+            // ログインしていない場合は、ログイン画面を表示（何もしない）
         }
     } catch (error) {
-        console.log('未ログイン:', error);
+        console.log('⚠️ 認証状態確認エラー:', error.message);
+        // エラーの場合もログイン画面を表示（何もしない）
     }
 }
 
@@ -2390,6 +2524,12 @@ window.addEventListener('unhandledrejection', function(e) {
     console.error('未処理のPromiseエラー:', e.reason);
 });
 
+// ===== ページ読み込み時の初期化 =====
+window.addEventListener('load', () => {
+    // 音声ファイルの長さを事前に取得
+    preloadAudioDurations();
+});
+
 // ===== サービスワーカー登録（PWA対応） =====
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -3562,13 +3702,11 @@ async function loadNarratorCard1() {
                 const count = userData.public_metrics.followers_count.toLocaleString();
                 followersEl.innerHTML = `
                     <i class="fas fa-users"></i> 
-                    <span class="follower-label">フォロワー</span>
                     <span class="follower-count">${count}</span>
                 `;
             } else {
                 followersEl.innerHTML = `
                     <i class="fas fa-users"></i> 
-                    <span class="follower-label">フォロワー</span>
                     <span class="follower-count">取得中...</span>
                 `;
             }
@@ -3635,13 +3773,11 @@ async function loadNarratorCard2() {
                 const count = userData.public_metrics.followers_count.toLocaleString();
                 followersEl.innerHTML = `
                     <i class="fas fa-users"></i> 
-                    <span class="follower-label">フォロワー</span>
                     <span class="follower-count">${count}</span>
                 `;
             } else {
                 followersEl.innerHTML = `
                     <i class="fas fa-users"></i> 
-                    <span class="follower-label">フォロワー</span>
                     <span class="follower-count">取得中...</span>
                 `;
             }
@@ -4856,6 +4992,42 @@ console.log('✅ ダッシュボード機能が読み込まれました');
 // ===== 音声再生機能 =====
 
 /**
+ * ページ読み込み時に音声ファイルの長さを取得して表示
+ */
+async function preloadAudioDurations() {
+    const audioFiles = {
+        'narrator1': { username: 'streamerfunch', file: 'KimitoLink-creator.mp3' },
+        'narrator2': { username: 'idolfunch', file: 'kimitoLinkidol.mp3' },
+        'narrator3': { username: 'suzuki_akane', file: 'intro.mp3' }
+    };
+    
+    for (const [id, info] of Object.entries(audioFiles)) {
+        const audioPath = `/uploads/samples/${info.username}/${info.file}`;
+        const audio = new Audio(audioPath);
+        
+        audio.addEventListener('loadedmetadata', () => {
+            const mins = Math.floor(audio.duration / 60);
+            const secs = Math.floor(audio.duration % 60);
+            const duration = `${mins}:${secs.toString().padStart(2, '0')}`;
+            
+            // 該当するボタンの時間表示を更新
+            const button = document.querySelector(`[data-audio-id="${id}"]`);
+            if (button) {
+                const audioTime = button.querySelector('.audio-time');
+                if (audioTime) {
+                    audioTime.textContent = `0:00 / ${duration}`;
+                    console.log(`✅ ${id}の再生時間を表示: ${duration}`);
+                }
+            }
+        });
+        
+        audio.addEventListener('error', () => {
+            console.warn(`⚠️ ${id}の音声ファイルが見つかりません`);
+        });
+    }
+}
+
+/**
  * 自己紹介音声を再生
  * @param {string} username - 声優のユーザー名
  * @param {Event} event - クリックイベント
@@ -4863,23 +5035,99 @@ console.log('✅ ダッシュボード機能が読み込まれました');
 function playIntroVoice(username, event) {
     if (event) event.stopPropagation();
     
-    // 音声ファイルのパス
-    const audioPath = `/uploads/samples/${username}/intro.mp3`;
+    // ボタン要素を取得
+    const button = event.currentTarget;
+    const audioProgress = button.querySelector('.audio-progress');
+    const progressBar = button.querySelector('.progress-bar');
+    const audioTime = button.querySelector('.audio-time');
+    const audioIcon = button.querySelector('.audio-icon');
     
-    // 既存の音声プレイヤーがあれば停止
+    // 既に再生中の同じボタンの場合は一時停止/再開
+    if (window.currentAudio && window.currentAudioButton === button) {
+        if (window.currentAudio.paused) {
+            // 再開
+            window.currentAudio.play();
+            audioIcon.classList.remove('fa-play');
+            audioIcon.classList.add('fa-pause');
+            console.log('▶️ 音声を再開');
+        } else {
+            // 一時停止
+            window.currentAudio.pause();
+            audioIcon.classList.remove('fa-pause');
+            audioIcon.classList.add('fa-play');
+            console.log('⏸️ 音声を一時停止');
+        }
+        return;
+    }
+    
+    // 音声ファイルのパス（ユーザー名に応じて異なるファイル名）
+    const audioFiles = {
+        'streamerfunch': 'KimitoLink-creator.mp3',
+        'idolfunch': 'kimitoLinkidol.mp3'
+    };
+    const fileName = audioFiles[username] || 'intro.mp3';
+    const audioPath = `/uploads/samples/${username}/${fileName}`;
+    
+    // 別の音声プレイヤーがあれば停止してリセット
     if (window.currentAudio) {
         window.currentAudio.pause();
         window.currentAudio.currentTime = 0;
+        // 前のボタンのプログレスバーをリセット
+        if (window.currentAudioButton) {
+            const prevProgressBar = window.currentAudioButton.querySelector('.progress-bar');
+            const prevAudioTime = window.currentAudioButton.querySelector('.audio-time');
+            const prevAudioIcon = window.currentAudioButton.querySelector('.audio-icon');
+            if (prevProgressBar) prevProgressBar.style.width = '0%';
+            if (prevAudioTime) {
+                // 元の時間表示を維持
+                const match = prevAudioTime.textContent.match(/\/ (.+)$/);
+                if (match) {
+                    prevAudioTime.textContent = `0:00 / ${match[1]}`;
+                } else {
+                    prevAudioTime.textContent = '0:00 / --:--';
+                }
+            }
+            if (prevAudioIcon) {
+                prevAudioIcon.classList.remove('fa-pause');
+                prevAudioIcon.classList.add('fa-play');
+            }
+        }
     }
     
     // 新しい音声プレイヤーを作成
     const audio = new Audio(audioPath);
     window.currentAudio = audio;
+    window.currentAudioButton = button;
+    
+    // 時間をフォーマット
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // メタデータ読み込み時（音声の長さがわかる）
+    audio.addEventListener('loadedmetadata', () => {
+        audioTime.textContent = `0:00 / ${formatTime(audio.duration)}`;
+    });
+    
+    // 再生中の更新
+    audio.addEventListener('timeupdate', () => {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${progress}%`;
+        audioTime.textContent = `${formatTime(audio.currentTime)} / ${formatTime(audio.duration)}`;
+    });
     
     // 再生開始
     audio.play().then(() => {
         console.log(`🎵 自己紹介音声再生: ${username}`);
         showToast('自己紹介音声を再生しています', 'info');
+        
+        // アイコンを一時停止に変更
+        if (audioIcon) {
+            audioIcon.classList.remove('fa-play');
+            audioIcon.classList.add('fa-pause');
+        }
     }).catch(error => {
         console.error('❌ 音声再生エラー:', error);
         showToast('音声ファイルが見つかりません', 'error');
@@ -4888,6 +5136,14 @@ function playIntroVoice(username, event) {
     // 再生終了時の処理
     audio.addEventListener('ended', () => {
         console.log('✅ 音声再生完了');
+        progressBar.style.width = '0%';
+        audioTime.textContent = `0:00 / ${formatTime(audio.duration)}`;
+        
+        // アイコンを再生に戻す
+        if (audioIcon) {
+            audioIcon.classList.remove('fa-pause');
+            audioIcon.classList.add('fa-play');
+        }
     });
 }
 
