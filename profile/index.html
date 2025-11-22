@@ -18,6 +18,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/profile.css">
+    <link rel="stylesheet" href="/css/request-modal.css">
 </head>
 <body>
     <!-- 宇宙背景エフェクト -->
@@ -234,7 +235,161 @@
         </div>
     </footer>
 
+    <!-- 依頼モーダル -->
+    <div id="requestModal" class="request-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <i class="fas fa-paper-plane"></i> 
+                    <span id="modalNarratorName">{{name}}</span>に依頼する
+                </h2>
+                <button class="modal-close" onclick="closeRequestModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- 依頼者情報 -->
+                <div class="request-section">
+                    <h3><i class="fas fa-user"></i> 依頼者情報</h3>
+                    
+                    <!-- Twitterアカウント情報（自動表示） -->
+                    <div class="twitter-account-info" id="twitterAccountInfo" style="display: none;">
+                        <div class="account-card">
+                            <img src="" alt="アバター" class="account-avatar" id="requesterAvatar">
+                            <div class="account-details">
+                                <div class="account-name" id="requesterDisplayName">読み込み中...</div>
+                                <div class="account-handle" id="requesterTwitterHandle">@...</div>
+                            </div>
+                        </div>
+                        <p class="account-note">
+                            <i class="fas fa-info-circle"></i>
+                            Twitterアカウントで依頼します。このアカウントで声優さんとやりとりします。
+                        </p>
+                    </div>
+                    
+                    <!-- ログインしていない場合 -->
+                    <div class="login-required" id="loginRequired">
+                        <div class="login-prompt">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>依頼するにはTwitterアカウントでログインが必要です</p>
+                            <button class="btn-login-prompt" onclick="location.href='/auth/twitter'">
+                                <i class="fab fa-twitter"></i> Twitterでログイン
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>連絡用メールアドレス（任意）</label>
+                        <input type="email" id="requesterEmail" placeholder="example@example.com">
+                        <small>通知を受け取りたい場合はメールアドレスを入力してください</small>
+                    </div>
+                </div>
+
+                <!-- スクリプト入力 -->
+                <div class="request-section">
+                    <h3><i class="fas fa-file-alt"></i> 依頼内容</h3>
+                    <div class="form-group">
+                        <label>スクリプト <span class="required">*</span></label>
+                        <div class="ai-assist-buttons">
+                            <button type="button" class="btn-ai-assist" onclick="generateCheerPattern()">
+                                <i class="fas fa-magic"></i> 応援ボイスのパターンを提案
+                            </button>
+                            <button type="button" class="btn-ai-assist" onclick="expandScriptIdea()">
+                                <i class="fas fa-lightbulb"></i> 台本のイメージを膨らませる
+                            </button>
+                        </div>
+                        <textarea 
+                            id="requestScript" 
+                            placeholder="読み上げてほしいスクリプトを入力してください&#10;&#10;💡 ふわっとしたイメージでもOK！&#10;例：「頑張ってる配信者を応援したい」&#10;→ AIが具体的なスクリプトを提案します&#10;&#10;または具体的なスクリプト：&#10;「こんにちは！今日も配信お疲れ様！&#10;いつも楽しい配信をありがとう！」"
+                            rows="10"
+                            oninput="calculatePrice()"
+                            required
+                        ></textarea>
+                        <div class="char-count">
+                            <span id="charCount">0</span> 文字
+                        </div>
+                        <div id="aiSuggestion" class="ai-suggestion" style="display: none;">
+                            <div class="suggestion-header">
+                                <i class="fas fa-robot"></i> AI提案
+                                <button type="button" class="btn-use-suggestion" onclick="useSuggestion()">
+                                    <i class="fas fa-check"></i> この提案を使う
+                                </button>
+                            </div>
+                            <div class="suggestion-content" id="suggestionContent"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>用途・目的</label>
+                        <select id="requestPurpose">
+                            <option value="">選択してください</option>
+                            <option value="youtube">YouTube動画</option>
+                            <option value="commercial">CM・広告</option>
+                            <option value="game">ゲーム</option>
+                            <option value="anime">アニメ</option>
+                            <option value="stream">配信</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>希望納期</label>
+                        <input type="date" id="requestDeadline">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>備考・特記事項</label>
+                        <textarea 
+                            id="requestNotes" 
+                            placeholder="イメージ、トーン、その他ご要望があればご記入ください"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- 料金計算 -->
+                <div class="request-section price-section">
+                    <h3><i class="fas fa-yen-sign"></i> 料金</h3>
+                    <div class="price-detail">
+                        <div class="price-row">
+                            <span>文字数</span>
+                            <span><strong id="priceCharCount">0</strong> 文字</span>
+                        </div>
+                        <div class="price-row">
+                            <span>単価</span>
+                            <span>¥<span id="pricePerChar">{{price_per_char}}</span> / 文字</span>
+                        </div>
+                        <div class="price-row">
+                            <span>小計</span>
+                            <span>¥<span id="priceSubtotal">0</span></span>
+                        </div>
+                        <div class="price-row minimum-price" id="minimumPriceRow" style="display: none;">
+                            <span>最低料金適用</span>
+                            <span>¥<span id="minimumPrice">{{min_price}}</span></span>
+                        </div>
+                        <div class="price-divider"></div>
+                        <div class="price-row price-total">
+                            <span>合計金額</span>
+                            <span>¥<span id="priceTotal">0</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeRequestModal()">
+                    キャンセル
+                </button>
+                <button class="btn-submit" onclick="submitRequest()">
+                    <i class="fas fa-paper-plane"></i> 依頼を送信
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- スクリプト -->
     <script src="/js/script.js"></script>
+    <script src="/js/request-modal.js"></script>
 </body>
 </html>

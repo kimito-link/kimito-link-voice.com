@@ -1064,6 +1064,182 @@ app.get('/api/logs/view', (req, res) => {
     }
 });
 
+// ===== AI API（OpenRouter統合） =====
+
+// 応援ボイスのパターン提案
+app.post('/api/ai/generate-cheer', async (req, res) => {
+    try {
+        const { narrator_name, requester_name } = req.body;
+        
+        console.log('🤖 AI応援ボイス生成:', { narrator_name, requester_name });
+        
+        const prompt = `あなたは声優への依頼サポートAIです。
+依頼者「${requester_name}」が、声優「${narrator_name}」に応援ボイスを依頼したいと考えています。
+
+以下の条件で、3パターンの応援ボイススクリプトを提案してください：
+
+1. 短め（50文字程度）
+2. 中くらい（100文字程度）
+3. 長め（150文字程度）
+
+条件：
+- 温かく、元気が出る内容
+- 声優の名前を自然に入れる
+- 依頼者を応援する内容
+- 読みやすく、声に出しやすい
+
+フォーマット：
+【パターン1（短め）】
+（スクリプト）
+
+【パターン2（中くらい）】
+（スクリプト）
+
+【パターン3（長め）】
+（スクリプト）`;
+
+        const openrouterResponse = await axios.post(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+                model: 'anthropic/claude-3.5-sonnet',
+                messages: [
+                    { role: 'user', content: prompt }
+                ]
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        
+        const suggestion = openrouterResponse.data.choices[0].message.content;
+        
+        res.json({ suggestion });
+        console.log('✅ AI応援ボイス生成完了');
+        
+    } catch (error) {
+        console.error('❌ AI生成エラー:', error.message);
+        res.status(500).json({ error: 'AI生成に失敗しました' });
+    }
+});
+
+// 台本のイメージを膨らませる
+app.post('/api/ai/expand-script', async (req, res) => {
+    try {
+        const { rough_idea, narrator_name, requester_name } = req.body;
+        
+        console.log('🤖 AI台本膨らませ:', { rough_idea });
+        
+        const prompt = `あなたは声優への依頼サポートAIです。
+依頼者「${requester_name}」が、声優「${narrator_name}」に以下のような依頼をしたいと考えています。
+
+依頼者のふわっとしたイメージ：
+「${rough_idea}」
+
+このイメージを元に、具体的で魅力的な声優用スクリプトを3パターン作成してください。
+
+条件：
+- 読みやすく、声に出しやすい
+- 感情が伝わる内容
+- 100〜200文字程度
+- 自然で温かみのある表現
+- 声優の名前を自然に入れる
+
+フォーマット：
+【提案1】
+（スクリプト）
+
+【提案2】
+（スクリプト）
+
+【提案3】
+（スクリプト）`;
+
+        const openrouterResponse = await axios.post(
+            'https://openrouter.ai/api/v1/chat/completions',
+            {
+                model: 'anthropic/claude-3.5-sonnet',
+                messages: [
+                    { role: 'user', content: prompt }
+                ]
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+        
+        const suggestion = openrouterResponse.data.choices[0].message.content;
+        
+        res.json({ suggestion });
+        console.log('✅ AI台本膨らませ完了');
+        
+    } catch (error) {
+        console.error('❌ AI生成エラー:', error.message);
+        res.status(500).json({ error: 'AI生成に失敗しました' });
+    }
+});
+
+// ===== 依頼API =====
+
+// 依頼作成
+app.post('/api/requests/create', async (req, res) => {
+    try {
+        const {
+            narrator_username,
+            narrator_name,
+            requester_name,
+            requester_email,
+            script,
+            char_count,
+            purpose,
+            deadline,
+            notes,
+            price_per_char,
+            subtotal,
+            min_price_applied,
+            total_price
+        } = req.body;
+        
+        console.log('📝 新規依頼受付:', {
+            narrator: narrator_username,
+            requester: requester_name,
+            chars: char_count,
+            price: total_price
+        });
+        
+        // TODO: Supabaseに保存
+        // const { data, error } = await supabase
+        //     .from('requests')
+        //     .insert({...})
+        
+        // 仮のレスポンス
+        const requestId = `REQ-${Date.now()}`;
+        
+        // メール通知を送信（TODO: 実装）
+        console.log('📧 確認メール送信:', requester_email);
+        
+        res.json({
+            success: true,
+            request_id: requestId,
+            message: '依頼を受け付けました'
+        });
+        
+        console.log(`✅ 依頼受付完了: ${requestId}`);
+        
+    } catch (error) {
+        console.error('❌ 依頼作成エラー:', error);
+        res.status(500).json({
+            success: false,
+            error: '依頼の作成に失敗しました'
+        });
+    }
+});
+
 // サーバー起動
 app.listen(PORT, () => {
     console.log(`🎤 KimiLink Voice Server is running on http://localhost:${PORT}`);
