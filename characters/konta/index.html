@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>こん太 - キャラクター紹介 | KimiLink Voice</title>
+    <meta name="description" content="こん太 - どんべえきつねそばが大好きな元気いっぱいの弟キャラ。たぬ姉の弟として活躍中！">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../css/styles.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 154, 86, 0.3), transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.2), transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(255, 193, 7, 0.2), transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .character-header {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #FF9A56, #FFD93D);
+        }
+
+        .character-avatar {
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .character-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+        }
+
+        .character-name {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+
+        .character-role {
+            color: #7F8C8D;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .character-favorite {
+            background: linear-gradient(135deg, #FFF4E5 0%, #FFE5CC 100%);
+            border-left: 6px solid #FF9A56;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 30px 0;
+        }
+
+        .favorite-title {
+            font-weight: 700;
+            color: #E67E22;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .favorite-item {
+            font-size: 1.5rem;
+            color: #2C3E50;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .character-content {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #2C3E50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .character-description {
+            color: #555;
+            line-height: 2;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .trait-card {
+            background: linear-gradient(135deg, #FF9A56 0%, #FF6B6B 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .trait-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .nissin-section {
+            background: linear-gradient(135deg, #FF9A56 0%, #FFD93D 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .nissin-section h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nissin-section p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-home {
+            background: white;
+            color: #FF9A56;
+        }
+
+        .btn-other {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .character-name {
+                font-size: 2rem;
+            }
+
+            .character-avatar {
+                width: 150px;
+                height: 150px;
+                font-size: 6rem;
+            }
+
+            .section-title {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* キラキラエフェクト */
+        .star {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: twinkle 3s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* キャラクターの揺れるアニメーション */
+        .character-avatar {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- キャラクターヘッダー -->
+        <div class="character-header">
+            <div class="character-avatar">
+                <img src="../../images/yukkuri-charactore-english/konta/kitsune-yukkuri-smile-mouth-open.png" alt="こん太">
+            </div>
+            <h1 class="character-name">こん太</h1>
+            <p class="character-role">たぬ姉の弟・元気な弟キャラ</p>
+            
+            <div class="character-favorite">
+                <div class="favorite-title">
+                    <i class="fas fa-heart"></i> 大好きな食べ物
+                </div>
+                <div class="favorite-item">🍜 どんべえ きつねそば</div>
+            </div>
+        </div>
+
+        <!-- プロフィール -->
+        <div class="character-content">
+            <h2 class="section-title">
+                <i class="fas fa-user"></i> プロフィール
+            </h2>
+            <div class="character-description">
+                やっほー！こん太だよ！🦊<br><br>
+                
+                姉ちゃんのたぬ姉と一緒にボイスのお仕事をしてるんだ。姉ちゃんはしっかり者だけど、ボクは元気いっぱいがモットーだよ！<br><br>
+                
+                どんべえのきつねそばが大好きで、あのお揚げが最高なんだよね。甘くてジューシーで、そばとの相性が抜群！お腹が空いたらいつもどんべえだよ。<br><br>
+                
+                姉ちゃんと一緒に、みんなを笑顔にできる声のお仕事を頑張ってるよ。応援よろしくね！
+            </div>
+
+            <h3 class="section-title">
+                <i class="fas fa-star"></i> 特徴
+            </h3>
+            <div class="traits-grid">
+                <div class="trait-card">⚡ 元気</div>
+                <div class="trait-card">🍜 食いしん坊</div>
+                <div class="trait-card">👦 弟</div>
+                <div class="trait-card">🎤 青年ボイス</div>
+                <div class="trait-card">😆 明るい</div>
+                <div class="trait-card">🦊 きつね好き</div>
+            </div>
+        </div>
+
+        <!-- ボタン -->
+        <div class="buttons">
+            <a href="../../index.html" class="btn btn-home">
+                <i class="fas fa-home"></i> ホームに戻る
+            </a>
+            <a href="../link/" class="btn btn-other">
+                <i class="fas fa-arrow-right"></i> りんくのページ
+            </a>
+            <a href="../tanunee/" class="btn btn-other">
+                <i class="fas fa-arrow-right"></i> たぬ姉のページ
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // キラキラエフェクト
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'star';
+            
+            star.style.left = Math.random() * window.innerWidth + 'px';
+            star.style.top = Math.random() * window.innerHeight + 'px';
+            
+            const size = Math.random() * 3 + 2;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            
+            // オレンジ・黄色系
+            const colors = [
+                'rgba(255, 154, 86, 0.8)',
+                'rgba(255, 107, 107, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(255, 152, 0, 0.8)'
+            ];
+            star.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            star.style.animationDelay = Math.random() * 3 + 's';
+            star.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            
+            document.body.appendChild(star);
+            
+            setTimeout(() => {
+                star.remove();
+            }, 3000);
+        }
+
+        setInterval(createStar, 300);
+
+        for (let i = 0; i < 20; i++) {
+            createStar();
+        }
+    </script>
+</body>
+</html>

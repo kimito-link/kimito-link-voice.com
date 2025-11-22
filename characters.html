@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キャラクター紹介 - KimiLink Voice</title>
+    <meta name="description" content="君斗りんく、こん太、たぬ姉の3人のキャラクター紹介。日清食品の商品が大好きな仲間たち！">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .character-card {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCF7F);
+        }
+
+        .character-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .character-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .character-name {
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2C3E50;
+        }
+
+        .character-role {
+            text-align: center;
+            color: #7F8C8D;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .character-favorite {
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFF4E5 100%);
+            border-left: 4px solid #FF6B6B;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .character-favorite-title {
+            font-weight: 700;
+            color: #E74C3C;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .character-favorite-item {
+            font-size: 1.1rem;
+            color: #2C3E50;
+            font-weight: 600;
+        }
+
+        .character-description {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .character-traits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .trait-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .nissin-collab {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .nissin-collab h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .nissin-collab p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .character-name {
+                font-size: 1.5rem;
+            }
+
+            .nissin-collab h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>🎤 キャラクター紹介</h1>
+            <p>日清食品の商品が大好きな3人の仲間たち</p>
+        </div>
+
+        <div class="characters-grid">
+            <!-- りんく -->
+            <div class="character-card">
+                <div class="character-avatar">🎤</div>
+                <h2 class="character-name">君斗りんく</h2>
+                <p class="character-role">声優・ナレーター</p>
+                
+                <div class="character-favorite">
+                    <div class="character-favorite-title">
+                        <i class="fas fa-heart"></i> 大好きな食べ物
+                    </div>
+                    <div class="character-favorite-item">🍜 日清カップヌードル</div>
+                </div>
+
+                <div class="character-description">
+                    はろー！君斗りんくだよ！配信者さんやクリエイターさんの応援をしているよ。カップヌードルが大好きで、いろんな味を試すのが楽しみ！みんなと一緒に楽しいコンテンツを作っていきたいな。
+                </div>
+
+                <div class="character-traits">
+                    <span class="trait-tag">明るい</span>
+                    <span class="trait-tag">元気</span>
+                    <span class="trait-tag">クリエイター応援</span>
+                    <span class="trait-tag">少女ボイス</span>
+                </div>
+            </div>
+
+            <!-- こん太 -->
+            <div class="character-card">
+                <div class="character-avatar">🦊</div>
+                <h2 class="character-name">こん太</h2>
+                <p class="character-role">たぬ姉の弟・元気な弟キャラ</p>
+                
+                <div class="character-favorite">
+                    <div class="character-favorite-title">
+                        <i class="fas fa-heart"></i> 大好きな食べ物
+                    </div>
+                    <div class="character-favorite-item">🍜 どんべえ きつねそば</div>
+                </div>
+
+                <div class="character-description">
+                    やっほー！こん太だよ！姉ちゃんのたぬ姉と一緒にボイスのお仕事をしてるんだ。どんべえのきつねそばが大好きで、あのお揚げが最高なんだよね！元気いっぱいがモットーだよ！
+                </div>
+
+                <div class="character-traits">
+                    <span class="trait-tag">元気</span>
+                    <span class="trait-tag">食いしん坊</span>
+                    <span class="trait-tag">弟</span>
+                    <span class="trait-tag">青年ボイス</span>
+                </div>
+            </div>
+
+            <!-- たぬ姉 -->
+            <div class="character-card">
+                <div class="character-avatar">🦝</div>
+                <h2 class="character-name">たぬ姉</h2>
+                <p class="character-role">こん太の姉・しっかり者の姉キャラ</p>
+                
+                <div class="character-favorite">
+                    <div class="character-favorite-title">
+                        <i class="fas fa-heart"></i> 大好きな食べ物
+                    </div>
+                    <div class="character-favorite-item">🍜 どんべえ たぬき</div>
+                </div>
+
+                <div class="character-description">
+                    こんにちは、たぬ姉よ。弟のこん太の面倒を見ながら、ボイスのお仕事を頑張ってるわ。どんべえのたぬきが大好きで、あの天かすの食感がたまらないのよね。しっかりしてるって言われるけど、実は甘えん坊なの。
+                </div>
+
+                <div class="character-traits">
+                    <span class="trait-tag">しっかり者</span>
+                    <span class="trait-tag">優しい</span>
+                    <span class="trait-tag">姉</span>
+                    <span class="trait-tag">萌え系ボイス</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日清コラボセクション -->
+        <div class="nissin-collab">
+            <h2>🍜 日清食品コラボ企画進行中！</h2>
+            <p>
+                君斗りんく、こん太、たぬ姉の3人は日清食品の商品が大好き！<br>
+                カップヌードル、どんべえきつねそば、どんべえたぬきそれぞれの魅力を<br>
+                声で伝えるコラボ企画を準備中です。お楽しみに！
+            </p>
+            <a href="index.html" class="back-button">
+                <i class="fas fa-home"></i> ホームに戻る
+            </a>
+        </div>
+    </div>
+</body>
+</html>
