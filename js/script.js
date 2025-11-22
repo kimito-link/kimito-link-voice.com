@@ -4852,3 +4852,66 @@ function toggleFAQ(button) {
 }
 
 console.log('✅ ダッシュボード機能が読み込まれました');
+
+// ===== 音声再生機能 =====
+
+/**
+ * 自己紹介音声を再生
+ * @param {string} username - 声優のユーザー名
+ * @param {Event} event - クリックイベント
+ */
+function playIntroVoice(username, event) {
+    if (event) event.stopPropagation();
+    
+    // 音声ファイルのパス
+    const audioPath = `/uploads/samples/${username}/intro.mp3`;
+    
+    // 既存の音声プレイヤーがあれば停止
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio.currentTime = 0;
+    }
+    
+    // 新しい音声プレイヤーを作成
+    const audio = new Audio(audioPath);
+    window.currentAudio = audio;
+    
+    // 再生開始
+    audio.play().then(() => {
+        console.log(`🎵 自己紹介音声再生: ${username}`);
+        showToast('自己紹介音声を再生しています', 'info');
+    }).catch(error => {
+        console.error('❌ 音声再生エラー:', error);
+        showToast('音声ファイルが見つかりません', 'error');
+    });
+    
+    // 再生終了時の処理
+    audio.addEventListener('ended', () => {
+        console.log('✅ 音声再生完了');
+    });
+}
+
+/**
+ * 「ありがとう！」などの短い音声を再生
+ * @param {string} username - 声優のユーザー名
+ * @param {Event} event - クリックイベント
+ */
+function playThanksVoice(username, event) {
+    if (event) event.stopPropagation();
+    
+    // 音声ファイルのパス
+    const audioPath = `/uploads/samples/${username}/thanks.mp3`;
+    
+    // 新しい音声プレイヤーを作成
+    const audio = new Audio(audioPath);
+    
+    // 再生開始
+    audio.play().then(() => {
+        console.log(`🎵 ありがとう音声再生: ${username}`);
+    }).catch(error => {
+        console.log('⚠️ ありがとう音声なし（デフォルト動作）');
+        // エラーは表示しない（音声がない場合は無音で動作）
+    });
+}
+
+console.log('✅ 音声再生機能が読み込まれました');
