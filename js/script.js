@@ -1596,9 +1596,9 @@ function showPlatform() {
             dashboard: !!dashboard
         });
         
+        // プロフィールページなど、ダッシュボード要素がないページでは処理をスキップ
         if (!publicPage || !dashboard) {
-            console.error('❌ publicPageまたはdashboard要素が見つかりません');
-            alert('エラー: ダッシュボード要素が見つかりません。ページをリロードしてください。');
+            console.log('ℹ️ ダッシュボード要素が見つかりません（プロフィールページなど）。処理をスキップします。');
             return;
         }
         

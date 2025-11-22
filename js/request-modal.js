@@ -1,6 +1,6 @@
 /**
  * 依頼モーダル機能
- * v1.0
+ * v2.1 - AI生成時のユーザー情報読み込みチェック追加
  */
 
 // グローバル変数
@@ -95,11 +95,11 @@ async function openRequestModal() {
     const loginCheckResponse = await fetch('/api/user/me');
     
     if (!loginCheckResponse.ok) {
-        // ログインしていない場合
-        // 現在のページURLを保存してログイン後に戻る
+        // ログインしていない場合、ログインモーダルを表示
+        // 現在のページURLを保存してログイン後に依頼モーダルを開く
         sessionStorage.setItem('redirect_after_login', window.location.pathname);
-        alert('依頼するにはTwitterでログインが必要です。\nログイン後、このページに戻ります。');
-        window.location.href = '/auth/twitter';
+        sessionStorage.setItem('open_request_modal_after_login', 'true');
+        showLoginModal();
         return;
     }
     
@@ -212,13 +212,16 @@ function closeRequestModal() {
     modal.classList.remove('active');
     document.body.style.overflow = ''; // 背景スクロール復元
     
-    // フォームをリセット
-    document.getElementById('requesterName').value = '';
-    document.getElementById('requesterEmail').value = '';
-    document.getElementById('requestScript').value = '';
-    document.getElementById('requestPurpose').value = '';
-    document.getElementById('requestDeadline').value = '';
-    document.getElementById('requestNotes').value = '';
+    // フォームをリセット（存在するフィールドのみ）
+    const scriptField = document.getElementById('requestScript');
+    const purposeField = document.getElementById('requestPurpose');
+    const deadlineField = document.getElementById('requestDeadline');
+    const notesField = document.getElementById('requestNotes');
+    
+    if (scriptField) scriptField.value = '';
+    if (purposeField) purposeField.value = '';
+    if (deadlineField) deadlineField.value = '';
+    if (notesField) notesField.value = '';
     
     calculatePrice();
     
@@ -267,37 +270,21 @@ function calculatePrice() {
  */
 async function submitRequest() {
     // フォームデータを取得
-    const requesterName = document.getElementById('requesterName').value.trim();
-    const requesterEmail = document.getElementById('requesterEmail').value.trim();
     const script = document.getElementById('requestScript').value.trim();
     const purpose = document.getElementById('requestPurpose').value;
     const deadline = document.getElementById('requestDeadline').value;
     const notes = document.getElementById('requestNotes').value.trim();
     
     // バリデーション
-    if (!requesterName) {
-        alert('お名前を入力してください');
-        document.getElementById('requesterName').focus();
-        return;
-    }
-    
-    if (!requesterEmail) {
-        alert('メールアドレスを入力してください');
-        document.getElementById('requesterEmail').focus();
-        return;
-    }
-    
     if (!script) {
         alert('スクリプトを入力してください');
         document.getElementById('requestScript').focus();
         return;
     }
     
-    // メールアドレスの形式チェック
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(requesterEmail)) {
-        alert('正しいメールアドレスを入力してください');
-        document.getElementById('requesterEmail').focus();
+    // Twitterアカウント情報をチェック
+    if (!currentUserData.twitter_id || !currentUserData.username) {
+        alert('ユーザー情報の取得に失敗しました。ページを再読み込みしてください。');
         return;
     }
     
@@ -310,12 +297,14 @@ async function submitRequest() {
         totalPrice = currentNarratorData.minPrice;
     }
     
-    // 依頼データを作成
+    // 依頼データを作成（Twitterアカウント情報を使用）
     const requestData = {
         narrator_username: currentNarratorData.username,
         narrator_name: currentNarratorData.name,
-        requester_name: requesterName,
-        requester_email: requesterEmail,
+        requester_twitter_id: currentUserData.twitter_id,
+        requester_twitter_username: currentUserData.username,
+        requester_name: currentUserData.display_name,
+        requester_avatar: currentUserData.avatar_url,
         script: script,
         char_count: charCount,
         purpose: purpose,
@@ -355,7 +344,7 @@ async function submitRequest() {
         console.log('✅ 依頼送信成功:', result);
         
         // 成功メッセージを表示
-        alert(`依頼を受け付けました！\n\n依頼ID: ${result.request_id || 'N/A'}\n合計金額: ¥${totalPrice.toLocaleString()}\n\nご登録いただいたメールアドレスに確認メールを送信しました。`);
+        alert(`依頼を受け付けました！\n\n依頼ID: ${result.request_id || 'N/A'}\n合計金額: ¥${totalPrice.toLocaleString()}\n\n声優さんからの連絡をお待ちください。`);
         
         // モーダルを閉じる
         closeRequestModal();
@@ -400,11 +389,17 @@ async function generateCheerPattern() {
     const btn = event.target.closest('.btn-ai-assist');
     const originalHTML = btn.innerHTML;
     
+    // ユーザー情報が読み込まれていない場合は待つ
+    if (!currentUserData.display_name) {
+        alert('ユーザー情報を読み込み中です。少しお待ちください。');
+        return;
+    }
+    
     // 再生成用にリクエストデータを保存
     lastAIRequestType = 'cheer';
     lastAIRequestData = {
-        narrator_name: currentNarratorData.name,
-        requester_name: currentUserData.display_name
+        narrator_name: currentNarratorData.name || '声優',
+        requester_name: currentUserData.display_name || 'あなた'
     };
     
     // キャッシュキーを生成
@@ -476,6 +471,12 @@ async function expandScriptIdea() {
         return;
     }
     
+    // ユーザー情報が読み込まれていない場合は待つ
+    if (!currentUserData.display_name) {
+        alert('ユーザー情報を読み込み中です。少しお待ちください。');
+        return;
+    }
+    
     const btn = event.target.closest('.btn-ai-assist');
     const originalHTML = btn.innerHTML;
     
@@ -483,8 +484,8 @@ async function expandScriptIdea() {
     lastAIRequestType = 'expand';
     lastAIRequestData = {
         rough_idea: script,
-        narrator_name: currentNarratorData.name,
-        requester_name: currentUserData.display_name
+        narrator_name: currentNarratorData.name || '声優',
+        requester_name: currentUserData.display_name || 'あなた'
     };
     
     // キャッシュキーを生成
@@ -671,5 +672,60 @@ async function checkLoginAndGoToDashboard() {
         alert('エラーが発生しました。もう一度お試しください。');
     }
 }
+
+/**
+ * ログインモーダルを表示
+ */
+function showLoginModal() {
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        console.log('✅ ログインモーダルを表示');
+    }
+}
+
+/**
+ * ログインモーダルを閉じる
+ */
+function hideLoginModal() {
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+        console.log('✅ ログインモーダルを閉じる');
+    }
+}
+
+/**
+ * プロフィールページからTwitterログイン
+ */
+function loginWithTwitterFromProfile() {
+    // 現在のページURLを保存
+    sessionStorage.setItem('redirect_after_login', window.location.pathname);
+    sessionStorage.setItem('open_request_modal_after_login', 'true');
+    
+    console.log('🔐 Twitterログインへリダイレクト');
+    window.location.href = '/auth/twitter';
+}
+
+/**
+ * ページ読み込み時にログイン後の処理をチェック
+ */
+window.addEventListener('DOMContentLoaded', () => {
+    // ログイン後に依頼モーダルを開く必要があるかチェック
+    const shouldOpenRequestModal = sessionStorage.getItem('open_request_modal_after_login');
+    
+    if (shouldOpenRequestModal === 'true') {
+        sessionStorage.removeItem('open_request_modal_after_login');
+        
+        // 少し待ってから依頼モーダルを開く
+        setTimeout(() => {
+            openRequestModal();
+        }, 500);
+        
+        console.log('✅ ログイン後、依頼モーダルを自動的に開きます');
+    }
+});
 
 console.log('✅ 依頼モーダル機能が読み込まれました');
